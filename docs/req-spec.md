@@ -57,6 +57,7 @@ Idea based on the ______- sutra, specifically this passage (translation to Engli
 > 2. Live in an environment that is conducive to spiritual practice and builds good character
 > 
 > 3. Foster opportunities to learn more about the Dharma, the precepts, and your own trade in greater depth
+> (Non-buddhists: Wisdom, precepts???, trade)
 > 
 > 4. Take the time to care well for your parents, spouse, and children
 > 
@@ -67,8 +68,10 @@ Idea based on the ______- sutra, specifically this passage (translation to Engli
 > 7. Cultivate humility, gratitude, and simple living
 > 
 > 8. Seek opportunities to be close to bhikkhus in order to study the Way
+> ()
 > 
 > 9. Live a life based on the Four Noble Truths
+> ()
 > 
 > 10. Learn how to meditate in order to release sorrows and anxieties
 

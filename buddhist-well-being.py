@@ -28,14 +28,17 @@ DIARY_PIXEL_WIDTH = 300
 ### DIARY_TEXT_FONT_SIZE = 10
 
 
-class WellBeingWindow(QWidget):
+class WellBeingWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
 
+        self.central_widget = QWidget()
+        self.setCentralWidget(self.central_widget)
+
         t_observances_lt = bwb_model.ObservanceM.get_all()
 
-        self.setGeometry(30, 30, 500, 400)
+        self.setGeometry(30, 30, 700, 500)
         self.setWindowTitle("Buddhist Well-Being")
         self.setWindowIcon(QIcon("icon.png"))
 
@@ -51,7 +54,7 @@ class WellBeingWindow(QWidget):
         self.right_vbox_widget.setLayout(self.right_vbox)
         #self.right_vbox_widget.setFixedWidth(510)
         t_hbox.addWidget(self.right_vbox_widget)
-        self.setLayout(t_hbox)
+        self.central_widget.setLayout(t_hbox)
         self.show()
 
         # Creating widgets..
@@ -85,16 +88,30 @@ class WellBeingWindow(QWidget):
         self.right_vbox.addWidget(self.diary_lb)
 
         # ..for adding new diary entry
-        ###self.adding_to_diary_date_ey = QCalendarWidget()
-        ###self.adding_to_diary_date_ey.setNavigationBarVisible(True)
-        ###self.right_vbox.addWidget(self.adding_to_diary_date_ey)
+        t_edit_diary_entry_hbox = QHBoxLayout()
+        self.right_vbox.addLayout(t_edit_diary_entry_hbox)
+
+        self.adding_to_diary_date_ey = QDateTimeEdit()
+        t_edit_diary_entry_hbox.addWidget(self.adding_to_diary_date_ey)
+        self.adding_to_diary_date_ey.setCalendarPopup(True)
         ###self.adding_to_diary_date_ey.insert(tkinter.END, "2015-01-09 13:42")
         self.adding_text_to_diary_tt = QTextEdit()
-        self.right_vbox.addWidget(self.adding_text_to_diary_tt)
+        t_edit_diary_entry_hbox.addWidget(self.adding_text_to_diary_tt)
         self.adding_text_to_diary_tt.setFixedHeight(50)
         self.adding_new_button = QPushButton("Add new")
         self.right_vbox.addWidget(self.adding_new_button)
         self.adding_new_button.clicked.connect(self.add_text_to_diary_button_pressed_fn)
+
+
+
+        # Menu bar
+        exit_command = QAction("Exit", self)
+        exit_command.triggered.connect(self.close)
+
+        self.menu_bar = self.menuBar()
+        file_menu = self.menu_bar.addMenu("&File")
+        file_menu.addAction(exit_command)
+
 
 
         """
@@ -237,16 +254,3 @@ if __name__ == "__main__":
     t_win = WellBeingWindow()
     sys.exit(t_app.exec_())
 
-
-    # Menu
-    '''
-    menubar = tkinter.Menu(root)
-    file_menu = tkinter.Menu(menubar, tearoff=0)
-    file_menu.add_command(label="Export", command=bwb_model.export_all)
-    file_menu.add_separator()
-    file_menu.add_command(label="Exit", command=root.quit)
-    menubar.add_cascade(label="File", menu=file_menu)
-    root.config(menu=menubar)
-
-    root.mainloop()
-    '''
