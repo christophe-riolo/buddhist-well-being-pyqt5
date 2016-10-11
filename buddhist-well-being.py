@@ -35,15 +35,22 @@ class WellBeingWindow(QWidget):
 
         t_observances_lt = bwb_model.ObservanceM.get_all()
 
-        self.setGeometry(300, 200, 200, 300)
+        self.setGeometry(30, 30, 500, 400)
         self.setWindowTitle("Buddhist Well-Being")
         self.setWindowIcon(QIcon("icon.png"))
 
         t_hbox = QHBoxLayout()
         t_left_vbox = QVBoxLayout()
-        t_hbox.addLayout(t_left_vbox)
+        t_left_vbox_widget = QWidget()
+        t_left_vbox_widget.setLayout(t_left_vbox)
+        t_left_vbox_widget.setFixedWidth(190)
+
+        t_hbox.addWidget(t_left_vbox_widget)
         self.right_vbox = QVBoxLayout()
-        t_hbox.addLayout(self.right_vbox)
+        self.right_vbox_widget = QWidget()
+        self.right_vbox_widget.setLayout(self.right_vbox)
+        #self.right_vbox_widget.setFixedWidth(510)
+        t_hbox.addWidget(self.right_vbox_widget)
         self.setLayout(t_hbox)
         self.show()
 
@@ -59,17 +66,35 @@ class WellBeingWindow(QWidget):
 
         ## ..for details
         self.ten_practices_details_ll = QLabel("-----")
+        self.ten_practices_details_ll.setWordWrap(True)
         t_left_vbox.addWidget(self.ten_practices_details_ll)
 
-        #..for karma
+        #..for karma list
         self.karma_lb = QListWidget()
         t_left_vbox.addWidget(self.karma_lb)
+
+        #..for adding new karma
+        self.adding_new_karma_ey = QLineEdit()
+        t_left_vbox.addWidget(self.adding_new_karma_ey)
+        self.adding_new_karma_bn = QPushButton("Add new")
+        t_left_vbox.addWidget(self.adding_new_karma_bn)
+        self.adding_new_karma_bn.clicked.connect(self.add_new_karma_button_pressed_fn)
 
         #.. for diary
         self.diary_lb = QListWidget()
         self.right_vbox.addWidget(self.diary_lb)
 
-        self.update_gui()
+        # ..for adding new diary entry
+        ###self.adding_to_diary_date_ey = QCalendarWidget()
+        ###self.adding_to_diary_date_ey.setNavigationBarVisible(True)
+        ###self.right_vbox.addWidget(self.adding_to_diary_date_ey)
+        ###self.adding_to_diary_date_ey.insert(tkinter.END, "2015-01-09 13:42")
+        self.adding_text_to_diary_tt = QTextEdit()
+        self.right_vbox.addWidget(self.adding_text_to_diary_tt)
+        self.adding_text_to_diary_tt.setFixedHeight(50)
+        self.adding_new_button = QPushButton("Add new")
+        self.right_vbox.addWidget(self.adding_new_button)
+        self.adding_new_button.clicked.connect(self.add_text_to_diary_button_pressed_fn)
 
 
         """
@@ -77,39 +102,6 @@ class WellBeingWindow(QWidget):
         self.diary_labels_lt = []  # Used in the gui update function
 
 
-        #..adding new karma
-        self.adding_new_karma_ey = tkinter.Entry(
-            self.karma_lf,
-            width=KARMA_TEXT_WIDTH)
-        self.adding_new_karma_ey.pack(side=tkinter.TOP)
-        #TODO: Limiting the text input area: http://stackoverflow.com/questions/11491161/limiting-entry-on-a-tk-widget
-        self.adding_new_karma_bn = tkinter.Button(
-            self.karma_lf,
-            text="Add new karma",
-            command=self.add_new_karma_button_pressed_fn
-        )
-        self.adding_new_karma_bn.pack(side=tkinter.TOP)
-
-        # ..text area for adding to diary
-        self.adding_text_to_diary_lf = tkinter.ttk.LabelFrame(self, text="Adding new")
-        self.adding_text_to_diary_lf.pack(side = tkinter.TOP, anchor=tkinter.NW)
-        self.adding_to_diary_date_ey = tkinter.Entry(
-            self.adding_text_to_diary_lf,
-            width=DIARY_DATE_TEXT_WIDTH)
-        self.adding_to_diary_date_ey.insert(tkinter.END, "2015-01-09 13:42")
-        self.adding_to_diary_date_ey.pack()
-        ###self.adding_to_diary_font = tkinter.font.Font(size=TEN_OBS_TEXT_FONT_SIZE)
-        self.adding_text_to_diary_tt = tkinter.Text(
-            self.adding_text_to_diary_lf,
-            width=ADDING_TO_DIARY_TEXT_WIDTH,
-            height=4)
-        self.adding_new_text_scrollbar = tkinter.Scrollbar(
-            self.adding_text_to_diary_lf, orient=tkinter.VERTICAL, command=self.adding_text_to_diary_tt.yview)
-        self.adding_new_text_scrollbar.pack(side = tkinter.RIGHT, fill=tkinter.Y)
-        self.adding_text_to_diary_tt['yscrollcommand'] = self.adding_new_text_scrollbar.set
-        self.adding_text_to_diary_tt.pack(side = tkinter.LEFT)
-        self.adding_new_button = tkinter.ttk.Button(self, text="Add to Diary", command=self.add_text_to_diary_button_pressed_fn)
-        self.adding_new_button.pack(side = tkinter.TOP)
 
         """
 
@@ -132,45 +124,33 @@ class WellBeingWindow(QWidget):
         self.update_gui()  # Showing habits for practice etc
 
     def add_new_karma_button_pressed_fn(self):
-        t_cur_observance_sel_te = self.ten_observances_lb.curselection()
-        t_observance_pos_it = -1
-        if len(t_cur_observance_sel_te) > 0:
-            t_observance_pos_it = t_cur_observance_sel_te[0]
-        else:
-            return
-        t_text_sg = self.adding_new_karma_ey.get().strip() # strip is needed to remove a newline at the end (why?)
+        t_observance_pos_it = self.ten_observances_lb.currentRow()
+        t_text_sg = self.adding_new_karma_ey.text().strip() # strip is needed to remove a newline at the end (why?)
         if not (t_text_sg and t_text_sg.strip()):
-            #TODO: Clear (there might be white space left)
             return
         t_last_pos_it = len(bwb_model.KarmaM.get_all_for_observance(t_observance_pos_it))
         bwb_model.KarmaM.add(t_observance_pos_it, t_last_pos_it, t_text_sg)
 
-        self.adding_new_karma_ey.delete(0, tkinter.END)
+        self.adding_new_karma_ey.clear()
         self.update_gui()
 
     def add_text_to_diary_button_pressed_fn(self):
-        t_cur_observance_sel_te = self.ten_observances_lb.curselection()
-        t_observance_pos_it = -1
-        if len(t_cur_observance_sel_te) > 0:
-            t_observance_pos_it = t_cur_observance_sel_te[0]
-        if t_observance_pos_it == -1:
-            return
+        t_observance_pos_it = self.ten_observances_lb.currentRow()
 
-        t_cur_karma_sel_te = self.karma_lb.curselection()
-        t_karma_pos_it = -1
-        if len(t_cur_karma_sel_te) > 0:
-            t_karma_pos_it = t_cur_karma_sel_te[0]
+        t_karma_pos_it = self.karma_lb.currentRow()
 
-        notes_pre_sg = self.adding_text_to_diary_tt.get(1.0, tkinter.END).strip()
+        notes_pre_sg = self.adding_text_to_diary_tt.toPlainText().strip()
+        """
         if notes_pre_sg == "":
             notes_sg = notes_pre_sg
         else:
             notes_sg = notes_pre_sg + "\n"
-        bwb_model.DiaryM.add(int(time.time()), t_observance_pos_it, t_karma_pos_it, notes_sg)
+        """
+        bwb_model.DiaryM.add(int(time.time()), t_observance_pos_it, t_karma_pos_it, notes_pre_sg)
 
-        self.adding_text_to_diary_tt.delete(1.0, tkinter.END)
-        self.ten_observances_lb.selection_clear(0)  # Clearing the selection
-        self.karma_lb.selection_clear(0)
+        self.adding_text_to_diary_tt.clear()
+        ####self.ten_observances_lb.selection_clear(0)  # Clearing the selection
+        ####self.karma_lb.selection_clear(0)
         self.update_gui()
 
     def open_karma_context_menu(self, i_event):
@@ -194,6 +174,7 @@ class WellBeingWindow(QWidget):
                 self.karma_lb.addItem(row)
         self.karma_lb.show()
 
+        self.diary_lb.clear()
         t_prev_diary_item = None
         for diary_item in bwb_model.DiaryM.get_all():
             t_diary_entry_obs_sg = bwb_model.ObservanceM.get(diary_item.observance_ref).short_name_sg
@@ -204,7 +185,7 @@ class WellBeingWindow(QWidget):
                 t_date_sg = datetime.datetime.fromtimestamp(diary_item.date_added_it).strftime("%A")
 
                 t_new_day_ll = QLabel(t_date_sg)
-                self.right_vbox.addWidget(t_new_day_ll)
+                #########self.right_vbox.addWidget(t_new_day_ll)
 
             if t_karma == None:
                 t_diary_entry_karma_sg = ""
@@ -215,16 +196,17 @@ class WellBeingWindow(QWidget):
             #####t_diary_entry_ll = QLabel(t_label_text_sg)
             print("t_label_text_sg = " + t_label_text_sg)
 
-            # width=300,
-            # relief="solid"raised
-            # anchor=tkinter.E,
-            # state=tkinter.ACTIVE
             ###t_diary_entry_ll.bind("<Button-1>", self.diary_entry_clicked)
             #######self.right_vbox.pack_start(t_diary_entry_ll, True, True, 0)
             ###t_diary_entry_ll.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
 
-            row = QListWidgetItem(t_label_text_sg)
+            row = QListWidgetItem()
+            label = QLabel(t_label_text_sg)
+            ####label.setFixedWidth(320)
+            label.setWordWrap(True)
+            row.setSizeHint(label.sizeHint())
             self.diary_lb.addItem(row)
+            self.diary_lb.setItemWidget(row, label)
 
             t_prev_diary_item = diary_item
 
