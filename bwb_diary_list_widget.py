@@ -23,7 +23,6 @@ class DiaryListWidget(QWidget):
         self.scroll_area.setWidget(self.frame)
         self.v_box_layout.addWidget(self.scroll_area)
 
-
         self.scroll_area.setWidgetResizable(True)
         #self.scroll_area.setFixedHeight(400)
 
@@ -32,6 +31,12 @@ class DiaryListWidget(QWidget):
         pass
 
     def update_gui(self):
+        while(True):
+            layout_item = self.form_layout.takeAt(0)
+            if layout_item == None:
+                break
+            self.form_layout.removeItem(layout_item)
+
 
         t_prev_diary_item = None
         for diary_item in bwb_model.DiaryM.get_all():
