@@ -12,9 +12,9 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
 import bwb_model
+import bwb_diary_list_widget
 import time
 from functools import partial
-import datetime
 
 TEN_OBS_TEXT_WIDTH = 17 # in number of characters (so pixels can very)
 TEN_OBS_TEXT_FONT_SIZE = 14
@@ -24,9 +24,6 @@ KARMA_TEXT_FONT_SIZE = 10
 DIARY_DATE_TEXT_WIDTH = 40
 ADDING_TO_DIARY_TEXT_WIDTH = 80
 DIARY_PIXEL_WIDTH = 300
-
-### DIARY_TEXT_FONT_SIZE = 10
-
 
 class WellBeingWindow(QMainWindow):
 
@@ -84,7 +81,8 @@ class WellBeingWindow(QMainWindow):
         self.adding_new_karma_bn.clicked.connect(self.add_new_karma_button_pressed_fn)
 
         #.. for diary
-        self.diary_lb = QListWidget()
+        ###self.diary_lb = QListWidget()
+        self.diary_lb = bwb_diary_list_widget.DiaryListWidget()
         self.right_vbox.addWidget(self.diary_lb)
 
         # ..for adding new diary entry
@@ -191,43 +189,11 @@ class WellBeingWindow(QMainWindow):
                 self.karma_lb.addItem(row)
         self.karma_lb.show()
 
-        self.diary_lb.clear()
-        t_prev_diary_item = None
-        for diary_item in bwb_model.DiaryM.get_all():
-            t_diary_entry_obs_sg = bwb_model.ObservanceM.get(diary_item.observance_ref).short_name_sg
-            t_karma = bwb_model.KarmaM.get_for_observance_and_pos(
-                diary_item.observance_ref, diary_item.karma_ref)
 
-            if t_prev_diary_item == None or not is_same_day(t_prev_diary_item.date_added_it, diary_item.date_added_it):
-                t_date_sg = datetime.datetime.fromtimestamp(diary_item.date_added_it).strftime("%A")
-
-                t_new_day_ll = QLabel(t_date_sg)
-                #########self.right_vbox.addWidget(t_new_day_ll)
-
-            if t_karma == None:
-                t_diary_entry_karma_sg = ""
-            else:
-                t_diary_entry_karma_sg = t_karma.description_sg.strip() + " "
-
-            t_label_text_sg = t_diary_entry_karma_sg + "[" + t_diary_entry_obs_sg.strip() + "] " + diary_item.notes_sg.strip()
-            #####t_diary_entry_ll = QLabel(t_label_text_sg)
-            print("t_label_text_sg = " + t_label_text_sg)
-
-            ###t_diary_entry_ll.bind("<Button-1>", self.diary_entry_clicked)
-            #######self.right_vbox.pack_start(t_diary_entry_ll, True, True, 0)
-            ###t_diary_entry_ll.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
-
-            row = QListWidgetItem()
-            label = QLabel(t_label_text_sg)
-            ####label.setFixedWidth(320)
-            label.setWordWrap(True)
-            row.setSizeHint(label.sizeHint())
-            self.diary_lb.addItem(row)
-            self.diary_lb.setItemWidget(row, label)
-
-            t_prev_diary_item = diary_item
-
+        self.diary_lb.update_gui()
         self.diary_lb.show()
+
+
 
     def diary_entry_clicked(self, i_event):
         print("Diary entry clicked")
@@ -243,11 +209,6 @@ def pixels_from_monospace_characters(i_nr_of_chars_it):
     '''
     return i_nr_of_chars_it * 8
 
-def is_same_day(i_first_date_it, i_second_date_it):
-    t_first = datetime.datetime.fromtimestamp(i_first_date_it)
-    t_second = datetime.datetime.fromtimestamp(i_second_date_it)
-
-    return t_first.date() == t_second.date()
 
 if __name__ == "__main__":
     t_app = QApplication(sys.argv)
