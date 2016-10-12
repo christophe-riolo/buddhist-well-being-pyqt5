@@ -1,0 +1,14 @@
+Source: buddhist-well-being
+Section: python
+Priority: optional
+Maintainer: Tord Dellsén, <tord.dellsen@gmail.com>
+Build-Depends: debhelper (>= 9), python3
+Standards-Version: 3.9.2
+X-Python-Version: >= 3.2
+
+Package: buddhist-well-being
+Architecture: all
+Section: python
+Depends: python3, python3-pyqt5, ${misc:Depends}, ${python:Depends}
+Description: Ethics application for helping people be happy in their lives
+ Based on a Buddhist Sutra

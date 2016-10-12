@@ -1,0 +1,1 @@
+echo buddhist-well-being.py usr/bin > debian/install

@@ -1,0 +1,10 @@
+Package: buddhist-well-being
+Version: 0.0.1
+Architecture: all
+Maintainer: Tord Dellsén, <tord.dellsen@gmail.com>
+Installed-Size: 19
+Depends: python3, python3-pyqt5
+Section: python
+Priority: optional
+Description: Ethics application for helping people be happy in their lives
+ Based on a Buddhist Sutra
