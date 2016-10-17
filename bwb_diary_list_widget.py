@@ -31,11 +31,26 @@ class DiaryListWidget(QWidget):
         pass
 
     def update_gui(self):
+
+        for i in reversed(range(self.form_layout.count())):
+            t_widget_item = self.form_layout.takeAt(i)
+            if t_widget_item is not None and isinstance(t_widget_item, QWidgetItem):
+                #t_widget_item.widget().deleteLater()--------------------------------------
+                self.form_layout.removeItem(t_widget_item)
+            else:
+                j = 0
+                pass
+        #self.v_box_layout
+        #self.form_layout.deleteLater()
+        #self.form_layout = QFormLayout()
+        #self.frame.setLayout(self.form_layout)
+        """
         while(True):
             layout_item = self.form_layout.takeAt(0)
             if layout_item == None:
                 break
-            self.form_layout.removeItem(layout_item)
+            self.form_layout.deleteLater(layout_item)
+        """
 
 
         t_prev_diary_item = None

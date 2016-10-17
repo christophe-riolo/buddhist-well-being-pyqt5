@@ -105,10 +105,13 @@ class WellBeingWindow(QMainWindow):
         # Menu bar
         exit_command = QAction("Exit", self)
         exit_command.triggered.connect(self.close)
+        redraw_command = QAction("Redraw", self)
+        redraw_command.triggered.connect(self.update_gui)
 
         self.menu_bar = self.menuBar()
         file_menu = self.menu_bar.addMenu("&File")
         file_menu.addAction(exit_command)
+        file_menu.addAction(redraw_command)
 
 
 
@@ -167,6 +170,7 @@ class WellBeingWindow(QMainWindow):
         ####self.ten_observances_lb.selection_clear(0)  # Clearing the selection
         ####self.karma_lb.selection_clear(0)
         self.update_gui()
+        self.update_gui()
 
     def open_karma_context_menu(self, i_event):
         print("opening menu")
@@ -191,7 +195,7 @@ class WellBeingWindow(QMainWindow):
 
 
         self.diary_lb.update_gui()
-        self.diary_lb.show()
+        ###self.diary_lb.show()
 
 
 
