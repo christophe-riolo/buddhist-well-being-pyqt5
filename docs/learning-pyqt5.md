@@ -8,4 +8,5 @@ http://doc.qt.io/qt-5/gallery-fusion.html
 
 http://doc.qt.io/qt-5/modelview.html
 
-
+Layout management:
+http://doc.qt.io/qt-5/layout.html

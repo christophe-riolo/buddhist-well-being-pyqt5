@@ -17,9 +17,9 @@ class DiaryListWidget(QWidget):
         self.v_box_layout = QVBoxLayout(self)
         self.scroll_area = QScrollArea()
         self.frame  = QFrame()
-        self.form_layout = QFormLayout()
+        self.vbox_layout = QVBoxLayout() # QFormLayout()
 
-        self.frame.setLayout(self.form_layout)
+        self.frame.setLayout(self.vbox_layout)
         self.scroll_area.setWidget(self.frame)
         self.v_box_layout.addWidget(self.scroll_area)
 
@@ -32,11 +32,11 @@ class DiaryListWidget(QWidget):
 
     def update_gui(self):
 
-        for i in reversed(range(self.form_layout.count())):
-            t_widget_item = self.form_layout.takeAt(i)
+        for i in reversed(range(self.vbox_layout.count())):
+            t_widget_item = self.vbox_layout.takeAt(i)
             if t_widget_item is not None and isinstance(t_widget_item, QWidgetItem):
-                #t_widget_item.widget().deleteLater()--------------------------------------
-                self.form_layout.removeItem(t_widget_item)
+                t_widget_item.widget().deleteLater() #--------------------------------------
+                self.vbox_layout.removeItem(t_widget_item)
             else:
                 j = 0
                 pass
@@ -86,7 +86,7 @@ class DiaryListWidget(QWidget):
             self.diary_lb.addItem(row)
             self.diary_lb.setItemWidget(row, label)
             """
-            self.form_layout.addRow(label)
+            self.vbox_layout.addWidget(label)
 
             t_prev_diary_item = diary_item
 
