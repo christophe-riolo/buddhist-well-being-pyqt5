@@ -30,7 +30,7 @@ Software requirement specification (SRS) for Buddhist Well-Being version 1.0
 <Describe any standards or typographical conventions that were followed when writing this SRS, such as fonts or highlighting that have special significance. For example, state whether priorities  for higher-level requirements are assumed to be inherited by detailed requirements, or whether every requirement statement is to have its own priority.>
 
 * *The name* ***"Buddhist Well-Being"*** *is a working project name, it will likely change in the future*
-* If a future version is discussed this will be explicitly mentioned in this document. Otherwise version 1.0 is implicitly assumed
+* If a future version of the software is discussed this will be explicitly mentioned in this document. Otherwise version 1.0 is implicitly assumed
 
 
 ### 1.3 Intended Audience and Reading Suggestions
@@ -87,7 +87,6 @@ From wikipedia:
 * http://www.accesstoinsight.org/tipitaka/an/an08/an08.054.than.html
 * http://www.accesstoinsight.org/tipitaka/an/an08/an08.054.nara.html
 
-From wikipedia:
 
 A suggestion for a shortened version:
 * Friends of Virtue
@@ -119,7 +118,7 @@ We want the user to be able to:
     * Has the user done one of them recently?
     * How frequently?
   * Active feedback
-    * Software-internal noifications
+    * Software-internal notifications
 * Have a list of suggestions for actions for each of the ten observances
 * Read diary entries
 * Connection to general diary in txt form
@@ -166,9 +165,8 @@ GNU/Linux, Windows, MacOS
 Programming language: Python version 3
 
 Python modules:
-* tkinter
-* TBD: module for reading text files (diary files)
-* 
+* PyQt5
+* sqlite3
 
 
 
@@ -208,14 +206,8 @@ Diary shows history for the last seven days
 <Describe the connections between this product and other specific software components (name and version), including databases, operating systems, tools, libraries, and integrated commercial components. Identify the data items or messages coming into the system and going out and describe the purpose of each. Describe the services needed and the nature of communications. Refer to documents that describe detailed application programming interface protocols. Identify data that will be shared across software components. If the data sharing mechanism must be implemented in a specific way (for example, use of a global data area in a multitasking operating system), specify this as an implementation constraint.>
 
 Database:
-A simple database is used to store the frequencies of the ten observances. (This is separate from the diary text so that if the user changes the ) ***UPDATE: Better to only use text files and with a pre-determined way to write the ten observances***
+TBD
 
-Text files:
-* TBD
-* There is one text file for each day
-
-(The software will read the diary day files for the last seven days)
-(The diary files have names automatically set to something like: diary_2016-08-15.txt)
 
 
 ### 3.4 Communications Interfaces
