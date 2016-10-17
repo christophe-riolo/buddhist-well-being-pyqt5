@@ -1,6 +1,7 @@
 import bwb_model
 import datetime
 from PyQt5.QtWidgets import *
+from PyQt5 import QtCore
 
 """
 Inspiration for this class:
@@ -39,7 +40,8 @@ class DiaryListWidget(QWidget):
                 t_date_sg = datetime.datetime.fromtimestamp(diary_item.date_added_it).strftime("%A")
 
                 t_new_day_ll = QLabel(t_date_sg)
-                #########self.right_vbox.addWidget(t_new_day_ll)
+                t_new_day_ll.setAlignment(QtCore.Qt.AlignCenter)
+                self.vbox_layout.addWidget(t_new_day_ll)
 
             if t_karma is None:
                 t_diary_entry_karma_sg = ""
