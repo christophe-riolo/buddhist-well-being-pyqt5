@@ -1,5 +1,9 @@
 # Buddhist Well-Being
 
+*Buddhist Well-Being* is a happiness and well-being application inspired by Buddhist ethics
+
+It's a cross platform desktop application and is in an early development/prototype stage
+
 ## Description
 
 This software project is inspired by a buddhist sutra about "achiveing true happiness", but anyone can benefit from these principles:
