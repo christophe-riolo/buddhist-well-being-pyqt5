@@ -1,14 +1,11 @@
-"""
-
-Inspiration:
-http://stackoverflow.com/questions/20041385/python-pyqt-setting-scroll-area
-
-
-"""
-
 import bwb_model
 import datetime
 from PyQt5.QtWidgets import *
+
+"""
+Inspiration for this class:
+http://stackoverflow.com/questions/20041385/python-pyqt-setting-scroll-area
+"""
 
 
 class DiaryListWidget(QWidget):
@@ -17,41 +14,20 @@ class DiaryListWidget(QWidget):
         self.v_box_layout = QVBoxLayout(self)
         self.scroll_area = QScrollArea()
         self.frame  = QFrame()
-        self.vbox_layout = QVBoxLayout() # QFormLayout()
+        self.vbox_layout = QVBoxLayout()
 
         self.frame.setLayout(self.vbox_layout)
         self.scroll_area.setWidget(self.frame)
         self.v_box_layout.addWidget(self.scroll_area)
 
         self.scroll_area.setWidgetResizable(True)
-        #self.scroll_area.setFixedHeight(400)
-
-
-    def add_item(self):
-        pass
 
     def update_gui(self):
-
         for i in reversed(range(self.vbox_layout.count())):
-            t_widget_item = self.vbox_layout.takeAt(i)
+            t_widget_item = self.vbox_layout.takeAt(0)
             if t_widget_item is not None and isinstance(t_widget_item, QWidgetItem):
-                t_widget_item.widget().deleteLater() #--------------------------------------
+                t_widget_item.widget().deleteLater()
                 self.vbox_layout.removeItem(t_widget_item)
-            else:
-                j = 0
-                pass
-        #self.v_box_layout
-        #self.form_layout.deleteLater()
-        #self.form_layout = QFormLayout()
-        #self.frame.setLayout(self.form_layout)
-        """
-        while(True):
-            layout_item = self.form_layout.takeAt(0)
-            if layout_item == None:
-                break
-            self.form_layout.deleteLater(layout_item)
-        """
-
 
         t_prev_diary_item = None
         for diary_item in bwb_model.DiaryM.get_all():
@@ -65,7 +41,7 @@ class DiaryListWidget(QWidget):
                 t_new_day_ll = QLabel(t_date_sg)
                 #########self.right_vbox.addWidget(t_new_day_ll)
 
-            if t_karma == None:
+            if t_karma is None:
                 t_diary_entry_karma_sg = ""
             else:
                 t_diary_entry_karma_sg = t_karma.description_sg.strip() + " "
@@ -81,13 +57,7 @@ class DiaryListWidget(QWidget):
             label = QLabel(t_label_text_sg)
             ####label.setFixedWidth(320)
             label.setWordWrap(True)
-            """
-            row.setSizeHint(label.sizeHint())
-            self.diary_lb.addItem(row)
-            self.diary_lb.setItemWidget(row, label)
-            """
             self.vbox_layout.addWidget(label)
-
             t_prev_diary_item = diary_item
 
         self.show()
@@ -97,4 +67,3 @@ def is_same_day(i_first_date_it, i_second_date_it):
     t_second = datetime.datetime.fromtimestamp(i_second_date_it)
 
     return t_first.date() == t_second.date()
-
