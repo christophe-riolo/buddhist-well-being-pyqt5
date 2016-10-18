@@ -21,7 +21,7 @@ This software project is inspired by a buddhist sutra about "achiveing true happ
 
 ## Background
 
-Having studied wellness factors (as part of an online course in positive psychology) i was not satisfied with the factors that i found so i started looking into the Buddhist tradition where i have a background, and found a text in the book "Old Path, White Clouds" by Thich Nhat Hanh
+Having studied wellness factors (as part of an online course in positive psychology) i was not satisfied with the factors that i found so i started looking into the Buddhist tradition where i have a background, and found a text in the book "Old Path, White Clouds" (by Thich Nhat Hanh) which dealt with laypeople and was very practical. This stuck with me for some time and eventually i decided to start working on this project
 
 ## Dependencies
 
@@ -39,9 +39,9 @@ PyQt5 installation instructions: http://pyqt.sourceforge.net/Docs/PyQt5/installa
 
 ## Installation
 
-Make sure you have the dependencies installed
+Make sure you have the dependencies installed and then:
 
-1. Download ("Clone or download" button, "Download ZIP")
+1. Download the project files from GitHub ("Clone or download" button, "Download ZIP")
 2. Unzip
 
 ## To run
@@ -55,4 +55,4 @@ GPLv3
 
 ## Reporting bugs
 
-Please use the github issue tracker: https://github.com/SunyataZero/buddhist-well-being-pyqt5/issues
+Please use the GitHub issue tracker: https://github.com/SunyataZero/buddhist-well-being-pyqt5/issues
