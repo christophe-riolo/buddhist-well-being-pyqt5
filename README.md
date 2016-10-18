@@ -49,6 +49,10 @@ Make sure you have the dependencies installed
 1. Change directory to where the software files have been extracted
 2. Type and run `python3 buddhist-well-being-pyqt5.py`
 
+## License
+
+GPLv3
+
 ## Reporting bugs
 
 Please use the github issue tracker: https://github.com/SunyataZero/buddhist-well-being-pyqt5/issues
