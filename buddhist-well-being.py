@@ -151,7 +151,6 @@ class WellBeingWindow(QMainWindow):
             t_karma_lt = bwb_model.KarmaM.get_all_for_observance(t_cur_sel_it)
             for karma_item in t_karma_lt:
                 row = QListWidgetItem(karma_item.description_sg)
-                print("karma_item.description_sg = " + karma_item.description_sg)
                 self.karma_lb.addItem(row)
         self.karma_lb.show()
 
@@ -159,11 +158,10 @@ class WellBeingWindow(QMainWindow):
 
     def diary_entry_clicked(self, i_event):
         print("Diary entry clicked")
-        print(i_event.widget)
-        i_event.widget.config(relief="sunken")
+        #TBD
 
 
 if __name__ == "__main__":
-    t_app = QApplication(sys.argv)
-    t_win = WellBeingWindow()
-    sys.exit(t_app.exec_())
+    app = QApplication(sys.argv)
+    win = WellBeingWindow()
+    sys.exit(app.exec_())
