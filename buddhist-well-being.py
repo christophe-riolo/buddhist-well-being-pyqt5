@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
 import bwb_model
 import bwb_diary_list_widget
-import time
 
 
 class WellBeingWindow(QMainWindow):
@@ -91,6 +90,8 @@ class WellBeingWindow(QMainWindow):
         redraw_action.triggered.connect(self.update_gui)
         about_action = QAction("About", self)
         about_action.triggered.connect(self.show_about_box)
+        backup_action = QAction("Backup db", self)
+        backup_action.triggered.connect(bwb_model.backup_db_file)
 
         self.menu_bar = self.menuBar()
 
@@ -104,6 +105,7 @@ class WellBeingWindow(QMainWindow):
         file_menu.addAction(export_action)
         debug_menu.addAction(redraw_action)
         help_menu.addAction(about_action)
+        debug_menu.addAction(backup_action)
 
     def show_about_box(self):
         message_box = QMessageBox.about(self, "About Buddhist Well-Being",

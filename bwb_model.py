@@ -1,5 +1,10 @@
 import sqlite3
 import csv
+from shutil import copyfile
+import os
+import datetime
+
+DATABASE_FILE_NAME = "bwb_database_file.db"
 
 
 def get_schema_version(i_db_conn):
@@ -68,7 +73,6 @@ upgrade_steps = {
 
 
 class DbHelperM(object):
-    DATABASE_NAME = "bwb_database_file.db"
     __db_connection = None  # "Static"
 
     # def __init__(self):
@@ -76,7 +80,7 @@ class DbHelperM(object):
     @staticmethod
     def get_db_connection():
         if DbHelperM.__db_connection is None:
-            DbHelperM.__db_connection = sqlite3.connect(DbHelperM.DATABASE_NAME)
+            DbHelperM.__db_connection = sqlite3.connect(DATABASE_FILE_NAME)
 
             ###db_connection = DbHelperM.get_db_connection(self)
 
@@ -287,3 +291,14 @@ def export_all():
         csv_writer.writerow((t_diary_entry_obs_sg, t_diary_entry_karma_sg, diary_item.notes_sg))
 
 
+def backup_db_file():
+    date_sg = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    new_file_name_sg = DATABASE_FILE_NAME + "_" + date_sg
+    """
+    i = 1
+    while(True):
+        if not os.path.isfile(new_file_name_sg):
+            break
+        i += 1
+    """
+    copyfile(DATABASE_FILE_NAME, new_file_name_sg)
