@@ -83,15 +83,34 @@ class WellBeingWindow(QMainWindow):
 
 
         # Creating the menu bar
-        exit_command = QAction("Exit", self)
-        exit_command.triggered.connect(self.close)
-        redraw_command = QAction("Redraw", self)
-        redraw_command.triggered.connect(self.update_gui)
+        exit_action = QAction("Exit", self)
+        exit_action.triggered.connect(self.close)
+        export_action = QAction("Export", self)
+        export_action.triggered.connect(bwb_model.export_all)
+        redraw_action = QAction("Redraw", self)
+        redraw_action.triggered.connect(self.update_gui)
+        about_action = QAction("About", self)
+        about_action.triggered.connect(self.show_about_box)
 
         self.menu_bar = self.menuBar()
+
         file_menu = self.menu_bar.addMenu("&File")
-        file_menu.addAction(exit_command)
-        file_menu.addAction(redraw_command)
+        debug_menu = self.menu_bar.addMenu("Debu&g")
+        observance_menu = self.menu_bar.addMenu("&Observance")
+        karma_menu = self.menu_bar.addMenu("&Karma")
+        diary_note_menu = self.menu_bar.addMenu("&Diary note")
+        help_menu = self.menu_bar.addMenu("&Help")
+        file_menu.addAction(exit_action)
+        file_menu.addAction(export_action)
+        debug_menu.addAction(redraw_action)
+        help_menu.addAction(about_action)
+
+    def show_about_box(self):
+        message_box = QMessageBox.about(self, "About Buddhist Well-Being",
+            """Concept and programming by Tord Dellsén
+Photography (for icons) by Torgny Dellsén - torgnydellsen.zenfolio.com
+Software License: GPLv3
+Art license: CC BY-SA 4.0""")
 
     def on_diary_frame_configure(self, i_event):
         self.diary_canvas.configure(scrollregion=self.diary_canvas.bbox("all"))
@@ -147,14 +166,14 @@ class WellBeingWindow(QMainWindow):
 
         t_cur_sel_it = self.ten_observances_lb.currentRow()
         if t_cur_sel_it != -1:
-            print("t_cur_sel_it = " + str(t_cur_sel_it))
+            #print("t_cur_sel_it = " + str(t_cur_sel_it))
             t_karma_lt = bwb_model.KarmaM.get_all_for_observance(t_cur_sel_it)
             for karma_item in t_karma_lt:
                 row = QListWidgetItem(karma_item.description_sg)
                 self.karma_lb.addItem(row)
         self.karma_lb.show()
 
-        self.diary_lb.update_gui()
+        self.diary_lb.update_gui(t_cur_sel_it)
 
     def diary_entry_clicked(self, i_event):
         print("Diary entry clicked")

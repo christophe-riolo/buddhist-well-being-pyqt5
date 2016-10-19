@@ -2,6 +2,7 @@ import bwb_model
 import datetime
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore
+from PyQt5.QtGui import *
 
 """
 Inspiration for this class:
@@ -23,7 +24,7 @@ class DiaryListWidget(QWidget):
 
         self.scroll_area.setWidgetResizable(True)
 
-    def update_gui(self):
+    def update_gui(self, i_cur_sel_it):
         for i in reversed(range(self.vbox_layout.count())):
             widget_item = self.vbox_layout.takeAt(0)
             if widget_item is not None and isinstance(widget_item, QWidgetItem):
@@ -58,7 +59,14 @@ class DiaryListWidget(QWidget):
             ####label.setFixedWidth(320)
             label.setWordWrap(True)
             self.vbox_layout.addWidget(label)
-            prev_diary_item = diary_item
+
+            if i_cur_sel_it == diary_item.observance_ref:
+                palette = QPalette()
+                palette.setColor(label.backgroundRole(), QColor("yellow"))
+                label.setAutoFillBackground(True)
+                label.setPalette(palette)
+
+            prev_diary_item = diary_item # -used for the weekday labels
 
         #self.show()
 

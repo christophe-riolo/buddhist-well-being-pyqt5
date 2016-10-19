@@ -259,7 +259,7 @@ class DiaryM:
         return ret_diary_lt
 
 def export_all():
-    csv_writer = csv.writer(open("export.csv", "w"))
+    csv_writer = csv.writer(open("exported.csv", "w"))
 
     t_space_tab_sg = "    "
 
