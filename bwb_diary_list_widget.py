@@ -16,13 +16,30 @@ class DiaryListWidget(QWidget):
 
         self.v_box_layout = QVBoxLayout(self)
         self.scroll_area = QScrollArea()
-        self.frame  = QFrame()
+        self.table  = QTableWidget()
+        #self.tabel = QTableWidget()
         self.vbox_layout = QVBoxLayout()
-        self.frame.setLayout(self.vbox_layout)
-        self.scroll_area.setWidget(self.frame)
+        self.table.setLayout(self.vbox_layout)
+        self.scroll_area.setWidget(self.table)
         self.v_box_layout.addWidget(self.scroll_area)
 
         self.scroll_area.setWidgetResizable(True)
+
+        self.table.cellPressed.connect(self.my_cell_clicked_fn)
+
+    def my_cell_clicked_fn(self, i_row_it, i_column_it):
+        print("cell clicked")
+
+    # http://doc.qt.io/qt-5/qwidget.html#contextMenuEvent
+    def contextMenuEvent(self, i_QContextMenuEvent):
+        self.right_click_menu = QMenu()
+        action = QAction("Action ---")
+        self.right_click_menu.triggered.connect(self.action_function)
+        self.right_click_menu.addAction(action)
+        self.right_click_menu.exec_(QCursor.pos())
+
+    def action_function(self):
+        print("now in action function")
 
     def update_gui(self, i_cur_sel_it):
         for i in reversed(range(self.vbox_layout.count())):
