@@ -56,6 +56,10 @@ class DiaryListWidget(QWidget):
             ###t_diary_entry_ll.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
 
             label = QLabel(label_text_sg)
+            #label.setStyleSheet("border: 1px solid black")
+            label.setFrameStyle(QFrame.StyledPanel)
+            # -http://doc.qt.io/qt-4.8/qframe.html#setFrameStyle
+            # -http://nullege.com/codes/search/PyQt4.QtGui.QFrame.setFrameStyle
             ####label.setFixedWidth(320)
             label.setWordWrap(True)
             self.vbox_layout.addWidget(label)
