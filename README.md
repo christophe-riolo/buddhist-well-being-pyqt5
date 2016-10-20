@@ -31,11 +31,11 @@ Tested on Ubuntu 16.04, should work on any Linux distro, and on Windows and MacO
 
 ### Python3
 
-Python 3 downloads: https://www.python.org/downloads/
+Python 3 installation packages: https://www.python.org/downloads/
 
 ### PyQt5
 
-PyQt5 installation instructions: http://pyqt.sourceforge.net/Docs/PyQt5/installation.html
+On the command line type and run: `pip3 install PyQt5`
 
 ## Installation
 
@@ -47,7 +47,7 @@ Make sure you have the dependencies installed and then:
 ## To run
 
 1. Change directory to where the software files have been extracted
-2. Type and run `python3 buddhist-well-being-pyqt5.py`
+2. Type and run `python3 buddhist-well-being-pyqt5.py` on GNU/Linux systems or `python buddhist-well-being-pyqt5.py` on Windows (TBD: MacOS?)
 
 ## License
 
