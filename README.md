@@ -54,3 +54,5 @@ GPLv3
 ## Reporting bugs
 
 Please use the GitHub issue tracker: https://github.com/SunyataZero/buddhist-well-being-pyqt5/issues
+
+Don't hesitate to file a bug! *You are helping to improve the software*. Also if something is unclear in the *documentation* that counts as a bug as well, so please report it
