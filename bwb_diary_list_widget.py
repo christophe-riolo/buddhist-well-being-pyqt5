@@ -70,21 +70,23 @@ class DiaryListWidget(QWidget):
 
             label = QLabel(label_text_sg)
             #label.setStyleSheet("border: 1px solid black")
-            label.setFrameStyle(QFrame.StyledPanel)
-            # -http://doc.qt.io/qt-4.8/qframe.html#setFrameStyle
-            # -http://nullege.com/codes/search/PyQt4.QtGui.QFrame.setFrameStyle
-            ####label.setFixedWidth(320)
+            ############label.setFrameStyle(QFrame.StyledPanel)
             label.setWordWrap(True)
-            list_item = QListWidgetItem(label_text_sg)
+            list_item = QListWidgetItem()
             self.list_widget.addItem(list_item)
             self.list_widget.setItemWidget(list_item, label) # -http://doc.qt.io/qt-5/qlistwidget.html#setItemWidget
             self.list_widget.setWordWrap(True)
 
             if i_cur_sel_it == diary_item.observance_ref:
+                label.setFrameStyle(QFrame.StyledPanel)
+                # -http://doc.qt.io/qt-4.8/qframe.html#setFrameStyle
+                # -http://nullege.com/codes/search/PyQt4.QtGui.QFrame.setFrameStyle
+                """
                 palette = QPalette()
                 palette.setColor(label.backgroundRole(), QColor("yellow"))
                 label.setAutoFillBackground(True)
                 label.setPalette(palette)
+                """
 
             prev_diary_item = diary_item # -used for the weekday labels
 
