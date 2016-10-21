@@ -247,6 +247,17 @@ class DiaryM:
         db_connection.commit()
 
     @staticmethod
+    def remove(i_date_added_it):
+        db_connection = DbHelperM.get_db_connection()
+        db_cursor = db_connection.cursor()
+        db_cursor.execute(
+            "DELETE FROM " + DbSchemaM.DiaryTable.name + " WHERE "
+            + DbSchemaM.DiaryTable.Cols.date_added + "=?",
+            (str(i_date_added_it),)
+        )
+        db_connection.commit()
+
+    @staticmethod
     def get_all(i_reverse_bl = True):
         ret_diary_lt = []
         db_connection = DbHelperM.get_db_connection()

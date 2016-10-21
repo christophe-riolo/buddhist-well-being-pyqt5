@@ -3,12 +3,12 @@ import datetime
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore
 from PyQt5.QtGui import *
+from PyQt5.Qt import *
 
 """
 Inspiration for this class:
 http://stackoverflow.com/questions/20041385/python-pyqt-setting-scroll-area
 """
-
 
 class DiaryListWidget(QWidget):
     def __init__(self):
@@ -24,20 +24,28 @@ class DiaryListWidget(QWidget):
 
         self.list_widget.itemPressed.connect(self.item_clicked_fn) # Clicked doesn't work
 
+        self.row_last_clicked = None
+
     def item_clicked_fn(self, i_listwidgetitem):
         t_index_it = i_listwidgetitem.listWidget().row(i_listwidgetitem)
         print("cell clicked. row = " + str(t_index_it))
+        self.row_last_clicked = i_listwidgetitem
 
     # http://doc.qt.io/qt-5/qwidget.html#contextMenuEvent
     def contextMenuEvent(self, i_QContextMenuEvent):
         self.right_click_menu = QMenu()
-        action = QAction("Action ---")
-        self.right_click_menu.triggered.connect(self.action_function)
-        self.right_click_menu.addAction(action)
+        rename_action = QAction("Rename")
+        #self.right_click_menu.triggered.connect(self.action_function)
+        self.right_click_menu.addAction(rename_action)
+        delete_action = QAction("Delete")
+        self.right_click_menu.triggered.connect(self.delete_action_fn)
+        self.right_click_menu.addAction(delete_action)
         self.right_click_menu.exec_(QCursor.pos())
 
-    def action_function(self):
-        print("now in action function")
+    def delete_action_fn(self):
+        print("now in delete_action_fn function")
+        bwb_model.DiaryM.remove(int(self.row_last_clicked.data(Qt.UserRole)))
+        self.update_gui(-1)
 
     def update_gui(self, i_cur_sel_it):
         """
@@ -73,6 +81,7 @@ class DiaryListWidget(QWidget):
             ############label.setFrameStyle(QFrame.StyledPanel)
             label.setWordWrap(True)
             list_item = QListWidgetItem()
+            list_item.setData(Qt.UserRole, diary_item.date_added_it)
             self.list_widget.addItem(list_item)
             self.list_widget.setItemWidget(list_item, label) # -http://doc.qt.io/qt-5/qlistwidget.html#setItemWidget
             self.list_widget.setWordWrap(True)
