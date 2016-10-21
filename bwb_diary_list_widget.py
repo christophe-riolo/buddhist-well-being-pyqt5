@@ -16,19 +16,17 @@ class DiaryListWidget(QWidget):
 
         self.v_box_layout = QVBoxLayout(self)
         self.scroll_area = QScrollArea()
-        self.table  = QTableWidget()
-        #self.tabel = QTableWidget()
-        self.vbox_layout = QVBoxLayout()
-        self.table.setLayout(self.vbox_layout)
-        self.scroll_area.setWidget(self.table)
+        self.list_widget = QListWidget()
+        self.scroll_area.setWidget(self.list_widget)
         self.v_box_layout.addWidget(self.scroll_area)
 
         self.scroll_area.setWidgetResizable(True)
 
-        self.table.cellPressed.connect(self.my_cell_clicked_fn)
+        self.list_widget.itemPressed.connect(self.item_clicked_fn) # Clicked doesn't work
 
-    def my_cell_clicked_fn(self, i_row_it, i_column_it):
-        print("cell clicked")
+    def item_clicked_fn(self, i_listwidgetitem):
+        t_index_it = i_listwidgetitem.listWidget().row(i_listwidgetitem)
+        print("cell clicked. row = " + str(t_index_it))
 
     # http://doc.qt.io/qt-5/qwidget.html#contextMenuEvent
     def contextMenuEvent(self, i_QContextMenuEvent):
@@ -42,24 +40,22 @@ class DiaryListWidget(QWidget):
         print("now in action function")
 
     def update_gui(self, i_cur_sel_it):
+        """
         for i in reversed(range(self.vbox_layout.count())):
             widget_item = self.vbox_layout.takeAt(0)
             if widget_item is not None and isinstance(widget_item, QWidgetItem):
                 widget_item.widget().deleteLater()
                 self.vbox_layout.removeItem(widget_item)
+        """
+        self.list_widget.clear()
 
         prev_diary_item = None
+
         for diary_item in bwb_model.DiaryM.get_all():
+
             diary_entry_obs_sg = bwb_model.ObservanceM.get(diary_item.observance_ref).short_name_sg
             karma = bwb_model.KarmaM.get_for_observance_and_pos(
                 diary_item.observance_ref, diary_item.karma_ref)
-
-            if prev_diary_item == None or not is_same_day(prev_diary_item.date_added_it, diary_item.date_added_it):
-                date_sg = datetime.datetime.fromtimestamp(diary_item.date_added_it).strftime("%A")
-
-                new_day_ll = QLabel(date_sg)
-                new_day_ll.setAlignment(QtCore.Qt.AlignCenter)
-                self.vbox_layout.addWidget(new_day_ll)
 
             if karma is None:
                 t_diary_entry_karma_sg = ""
@@ -79,7 +75,10 @@ class DiaryListWidget(QWidget):
             # -http://nullege.com/codes/search/PyQt4.QtGui.QFrame.setFrameStyle
             ####label.setFixedWidth(320)
             label.setWordWrap(True)
-            self.vbox_layout.addWidget(label)
+            list_item = QListWidgetItem(label_text_sg)
+            self.list_widget.addItem(list_item)
+            self.list_widget.setItemWidget(list_item, label) # -http://doc.qt.io/qt-5/qlistwidget.html#setItemWidget
+            self.list_widget.setWordWrap(True)
 
             if i_cur_sel_it == diary_item.observance_ref:
                 palette = QPalette()

@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
 import bwb_model
 import bwb_diary_list_widget
+import time
 
 
 class WellBeingWindow(QMainWindow):
