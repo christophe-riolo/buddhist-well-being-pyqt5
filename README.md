@@ -33,6 +33,8 @@ Having studied wellness factors (as part of an online course in positive psychol
 
 ## Installation
 
+There is no installation packages but it's really simple to install by following these steps:
+
 1. Download the Python 3.x installation package for your platform: https://www.python.org/downloads/
 2. Install Python 3.x
 3. On the command line type and run: `pip3 install PyQt5`
