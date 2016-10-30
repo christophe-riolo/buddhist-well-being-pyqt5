@@ -258,6 +258,20 @@ class DiaryM:
         db_connection.commit()
 
     @staticmethod
+    def get(i_date_dbkey_it):
+        db_connection = DbHelperM.get_db_connection()
+        db_cursor = db_connection.cursor()
+        db_cursor_result = db_cursor.execute(
+            "SELECT * FROM " + DbSchemaM.DiaryTable.name + " WHERE "
+            + DbSchemaM.DiaryTable.Cols.date_added + "=?",
+            (str(i_date_dbkey_it),)
+        )
+        t_diary_tuple_from_db = db_cursor_result.fetchone()
+        db_connection.commit()
+
+        return DiaryM(t_diary_tuple_from_db[0], t_diary_tuple_from_db[1], t_diary_tuple_from_db[2], t_diary_tuple_from_db[3])
+
+    @staticmethod
     def get_all(i_reverse_bl = True):
         ret_diary_lt = []
         db_connection = DbHelperM.get_db_connection()

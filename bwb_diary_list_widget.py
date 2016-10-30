@@ -34,12 +34,14 @@ class DiaryListWidget(QWidget):
     # http://doc.qt.io/qt-5/qwidget.html#contextMenuEvent
     def contextMenuEvent(self, i_QContextMenuEvent):
         self.right_click_menu = QMenu()
+
         rename_action = QAction("Rename")
-        #self.right_click_menu.triggered.connect(self.action_function)
+        rename_action.triggered.connect(self.rename_action_fn)
         self.right_click_menu.addAction(rename_action)
         delete_action = QAction("Delete")
-        self.right_click_menu.triggered.connect(self.delete_action_fn)
+        delete_action.triggered.connect(self.delete_action_fn)
         self.right_click_menu.addAction(delete_action)
+
         self.right_click_menu.exec_(QCursor.pos())
 
     def delete_action_fn(self):
@@ -47,20 +49,22 @@ class DiaryListWidget(QWidget):
         bwb_model.DiaryM.remove(int(self.row_last_clicked.data(Qt.UserRole)))
         self.update_gui(-1)
 
-    def update_gui(self, i_cur_sel_it):
-        """
-        for i in reversed(range(self.vbox_layout.count())):
-            widget_item = self.vbox_layout.takeAt(0)
-            if widget_item is not None and isinstance(widget_item, QWidgetItem):
-                widget_item.widget().deleteLater()
-                self.vbox_layout.removeItem(widget_item)
-        """
-        self.list_widget.clear()
+    # http://doc.qt.io/qt-5/qinputdialog.html#getText
+    def rename_action_fn(self):
+        print("now in rename_action_fn")
+        last_clicked_date_dbkey_it = int(self.row_last_clicked.data(Qt.UserRole))
+        t_diary_item = bwb_model.DiaryM.get(last_clicked_date_dbkey_it)
 
+        #bwb_model.DiaryM.remove(int(self.row_last_clicked.data(Qt.UserRole)))
+        text_input_dialog = QInputDialog()
+        text_input_dialog.getText(self, "Rename dialog", "New name: ", text=t_diary_item.notes_sg)
+        self.update_gui(-1)
+
+    def update_gui(self, i_cur_sel_it):
+        self.list_widget.clear()
         prev_diary_item = None
 
         for diary_item in bwb_model.DiaryM.get_all():
-
             diary_entry_obs_sg = bwb_model.ObservanceM.get(diary_item.observance_ref).short_name_sg
             karma = bwb_model.KarmaM.get_for_observance_and_pos(
                 diary_item.observance_ref, diary_item.karma_ref)
@@ -76,15 +80,31 @@ class DiaryListWidget(QWidget):
             #######self.right_vbox.pack_start(t_diary_entry_ll, True, True, 0)
             ###t_diary_entry_ll.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
 
+
             label = QLabel(label_text_sg)
+
+            """
+            palette = QPalette()
+            color = QColor(100, 100, 100, 100)
+            palette.setColor(QPalette.Foreground, color)
+            #label.setAutoFillBackground(True)
+            label.setPalette(palette)
+            """
+
+            ########label.setStyleSheet("color: rgba(0, 255, 255, 255)")
+
+            #layout = QVBoxLayout()
+            #layout.addWidget(label)
+
             #label.setStyleSheet("border: 1px solid black")
             ############label.setFrameStyle(QFrame.StyledPanel)
             label.setWordWrap(True)
-            list_item = QListWidgetItem()
+            list_item = QListWidgetItem(label_text_sg)
+            #list_item = QListWidgetItem()
             list_item.setData(Qt.UserRole, diary_item.date_added_it)
-            self.list_widget.addItem(list_item)
-            self.list_widget.setItemWidget(list_item, label) # -http://doc.qt.io/qt-5/qlistwidget.html#setItemWidget
             self.list_widget.setWordWrap(True)
+            self.list_widget.addItem(list_item)
+            #self.list_widget.setItemWidget(list_item, label) # -http://doc.qt.io/qt-5/qlistwidget.html#setItemWidget
 
             if i_cur_sel_it == diary_item.observance_ref:
                 label.setFrameStyle(QFrame.StyledPanel)
