@@ -43,8 +43,22 @@ class WellBeingWindow(QMainWindow):
         left_vbox.addWidget(self.ten_observances_lb)
         self.ten_observances_lb.currentItemChanged.connect(self.observance_selected_fn)
         for observance_item in observances_lt:
-            row = QListWidgetItem(observance_item.short_name_sg)
+            #row = QListWidgetItem(observance_item.short_name_sg)
+            row = QListWidgetItem()
+            layout = QVBoxLayout()
+            label1 = QLabel(observance_item.short_name_sg)
+            label2 = QLabel("[0 0 1 0 2 0 1]")
+            layout.addWidget(label1)
+            layout.addWidget(label2)
+            layout.size.setSizeConstraint(QLayout.SetMinAndMaxSize) #<-------- # QLayout.SetFixedSize
+            layout_widget = QWidget()
+            layout_widget.setLayout(layout)
+
+            row.setSizeHint(layout_widget.sizeHint()) #<--------
             self.ten_observances_lb.addItem(row)
+            self.ten_observances_lb.setItemWidget(row, layout_widget)
+
+        #self.ten_observances_lb.setSizeAdjustPolicy(QListWidget.AdjustToContents)
 
         ## ..for details (left column)
         self.ten_practices_details_ll = QLabel("-----")
