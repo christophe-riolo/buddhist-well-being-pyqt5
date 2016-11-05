@@ -53,8 +53,19 @@ There is no installation packages but it's really simple to install by following
 GPLv3
 
 
-## Reporting bugs
+## Feedback
+
+Feedback is very welcome! If you send us feedback it can help improve the software
+
+### Ideas for improving the software
+
+https://github.com/SunyataZero/buddhist-well-being-pyqt5/issues
+
+### Reporting bugs
 
 Please use the GitHub issue tracker: https://github.com/SunyataZero/buddhist-well-being-pyqt5/issues
 
 Don't hesitate to file a bug! *You are helping to improve the software*. Also if something is unclear in the *documentation* that counts as a bug as well, so please report it
+
+### Praise :)
+
