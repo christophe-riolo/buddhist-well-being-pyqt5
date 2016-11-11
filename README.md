@@ -38,7 +38,7 @@ There is no installation packages but it's really simple to install by following
 1. Download the Python 3.x installation package for your platform: https://www.python.org/downloads/
 2. Install Python 3.x
 3. On the command line: `pip3 install --upgrade pip` (On Ubuntu use `sudo`)
-4. On the command line: `sudo pip3 install PyQt5` (On Ubuntu use `sudo`)
+4. On the command line: `pip3 install PyQt5` (On Ubuntu use `sudo`)
 5. Download the project files from GitHub, either [using this link](https://github.com/SunyataZero/buddhist-well-being-pyqt5/archive/master.zip) or by clicking on the "Clone or download" button and then "Download ZIP"
 6. Unzip the downloaded file
 
@@ -67,10 +67,6 @@ https://github.com/SunyataZero/buddhist-well-being-pyqt5/issues
 Please use the GitHub issue tracker: https://github.com/SunyataZero/buddhist-well-being-pyqt5/issues
 
 Don't hesitate to file a bug! *You are helping to improve the software*. Also if something is unclear in the *documentation* that counts as a bug as well, so please report it
-
-### Suggestions for improvements
-
-Th
 
 ### Praise :)
 
