@@ -1,6 +1,7 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QSize
 import bwb_model
 import bwb_diary_list_widget
 import time
@@ -25,7 +26,7 @@ class WellBeingWindow(QMainWindow):
         left_vbox = QVBoxLayout()
         left_vbox_widget = QWidget()
         left_vbox_widget.setLayout(left_vbox)
-        left_vbox_widget.setFixedWidth(190)
+        left_vbox_widget.setFixedWidth(240)
 
         hbox.addWidget(left_vbox_widget)
         self.right_vbox = QVBoxLayout()
@@ -43,18 +44,51 @@ class WellBeingWindow(QMainWindow):
         left_vbox.addWidget(self.ten_observances_lb)
         self.ten_observances_lb.currentItemChanged.connect(self.observance_selected_fn)
         for observance_item in observances_lt:
+
+            ###########
+            # Important: "Alternatively, if you want the widget to have a fixed size based on its contents,
+            # you can call QLayout::setSizeConstraint(QLayout::SetFixedSize);"
+            #
+            # https://doc.qt.io/qt-5/qwidget.html#setSizePolicy-1
+            ###########
+
             #row = QListWidgetItem(observance_item.short_name_sg)
             row = QListWidgetItem()
             layout = QVBoxLayout()
             label1 = QLabel(observance_item.short_name_sg)
-            label2 = QLabel("[0 0 1 0 2 0 1]")
+            label1.adjustSize()
+            label1.setFixedWidth(150)
+            text_sg = "[0 0 1 0 2 0 1] asdf1 asdf2 asdf3 asdf4 asdf5 asdf6 asdf7 asdf8 asdf1 asdf2 asdf3 asdf4 asdf5 asdf6 asdf7 asdf8 asdf1 asdf2 asdf3 asdf4 asdf5 asdf6 asdf7 asdf8"
+            label2 = QLabel()
+            label2.setWordWrap(True)
+            label2.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
+            label2.setText(text_sg)
+            label2.adjustSize()
+            label2.setFixedWidth(150)
+            layout.setSizeConstraint(QLayout.SetMinimumSize) # <=================
             layout.addWidget(label1)
             layout.addWidget(label2)
-            layout.size.setSizeConstraint(QLayout.SetMinAndMaxSize) #<-------- # QLayout.SetFixedSize
+            layout.setContentsMargins(0,0,0,0)
+            layout.setSpacing(0)
+            #layout.update()
+
+
+
+            print("layout.sizeHint().height() = " + str(layout.sizeHint().height()))
+            #layout.setSizeConstraint(QLayout.SetMinAndMaxSize) #<-------- # QLayout.SetFixedSize
             layout_widget = QWidget()
             layout_widget.setLayout(layout)
+            layout_widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
+            #layout_widget.setMinimumHeight(label2.height() + label1.height())
+            layout_widget.adjustSize()
+            #layout_widget.updateGeometry()
 
-            row.setSizeHint(layout_widget.sizeHint()) #<--------
+            print("layout_widget.height() = " + str(layout_widget.height()))
+            print("layout_widget.sizeHint().height() = " + str(layout_widget.sizeHint().height()))
+            my_size = QSize(-1, layout_widget.height())
+
+            row.setSizeHint(layout_widget.sizeHint())
+            # - Please note: If we set the size hint to (-1, height) we will get overflow towards the bottom
             self.ten_observances_lb.addItem(row)
             self.ten_observances_lb.setItemWidget(row, layout_widget)
 
