@@ -232,10 +232,13 @@ if __name__ == "__main__":
 
     t_tray_icon = QSystemTrayIcon(QIcon("icon.png"), app)
     t_tray_menu = QMenu()
-    t_quit_action = t_tray_menu.addAction("Quit")
+    t_quit_action = QAction("Quit")
+    t_quit_action.triggered.connect(lambda x: sys.exit())
+    t_tray_menu.addAction(t_quit_action)
     t_tray_icon.setContextMenu(t_tray_menu)
 
     t_tray_icon.show()
 
     win = WellBeingWindow()
+    ###########win.hide()
     sys.exit(app.exec_())
