@@ -45,6 +45,7 @@ class WellBeingWindow(QMainWindow):
         self.ten_observances_lb = QListWidget()
         left_vbox.addWidget(self.ten_observances_lb)
         self.ten_observances_lb.currentItemChanged.connect(self.observance_selected_fn)
+        t_counter = 0
         for observance_item in observances_lt:
             # Important: "Alternatively, if you want the widget to have a fixed size based on its contents,
             # you can call QLayout::setSizeConstraint(QLayout::SetFixedSize);"
@@ -55,14 +56,14 @@ class WellBeingWindow(QMainWindow):
 
 
 
-
-            total_number_today_it = len(bwb_model.DiaryM.get_all_for_day(
+            total_number_today_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
+                t_counter,
                 int(time.mktime(datetime.date.today().timetuple())))
             )
-            total_number_yesterday_it = len(bwb_model.DiaryM.get_all_for_day(
+            total_number_yesterday_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
+                t_counter,
                 int(time.mktime((datetime.date.today() - datetime.timedelta(days=1)).timetuple())))
             )
-
 
 
 
@@ -87,6 +88,8 @@ class WellBeingWindow(QMainWindow):
             # - Please note: If we set the size hint to (-1, height) we will get overflow towards the bottom
             self.ten_observances_lb.addItem(row)
             self.ten_observances_lb.setItemWidget(row, layout_widget)
+
+            t_counter += 1
 
         #self.ten_observances_lb.setSizeAdjustPolicy(QListWidget.AdjustToContents)
 

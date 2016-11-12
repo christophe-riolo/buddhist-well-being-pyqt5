@@ -233,6 +233,8 @@ class DiaryM:
 
     @staticmethod
     def add(i_date_added_it, i_observance_ref_id_it, i_karma_ref_id_it, i_notes_sg):
+        if i_observance_ref_id_it > 9:
+            None
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
         db_cursor.execute(
@@ -287,14 +289,16 @@ class DiaryM:
 
         return ret_diary_lt
 
+
     @staticmethod
-    def get_all_for_day(day_as_unix_time_it, i_reverse_bl=True):
+    def get_all_for_obs_and_day(i_obs_it, day_as_unix_time_it, i_reverse_bl=True):
         ret_diary_lt = []
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
         db_cursor_result = db_cursor.execute(
             "SELECT * FROM " + DbSchemaM.DiaryTable.name
-            + " WHERE " + DbSchemaM.DiaryTable.Cols.date_added + ">=" + str(day_as_unix_time_it)
+            + " WHERE " + DbSchemaM.DiaryTable.Cols.observance_id + "=" + str(i_obs_it)
+            + " AND " + DbSchemaM.DiaryTable.Cols.date_added + ">=" + str(day_as_unix_time_it)
             + " AND " + DbSchemaM.DiaryTable.Cols.date_added + "<" + str(day_as_unix_time_it + 24 * 3600)
         )
         t_diary_from_db = db_cursor_result.fetchall()
