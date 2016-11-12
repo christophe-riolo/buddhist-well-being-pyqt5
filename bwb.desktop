@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Buddhist Well-Being
+Exec=python3 /home/sunyata/PycharmProjects/buddhist-well-being-pyqt5/buddhist-well-being.py
+Terminal=false
+Type=Application
+Icon=/home/sunyata/PycharmProjects/buddhist-well-being-pyqt5/icon.png
+Name[en_US]=Buddhist Well-Being
+Path=/home/sunyata/PycharmProjects/buddhist-well-being-pyqt5
+StartupNotify=false
