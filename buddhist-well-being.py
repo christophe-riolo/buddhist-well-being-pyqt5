@@ -1,10 +1,12 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
+#import PyQt5.QtWidgets.QSyste
 from PyQt5.QtCore import QSize
 import bwb_model
 import bwb_diary_list_widget
 import time
+import datetime
 
 
 class WellBeingWindow(QMainWindow):
@@ -44,47 +46,41 @@ class WellBeingWindow(QMainWindow):
         left_vbox.addWidget(self.ten_observances_lb)
         self.ten_observances_lb.currentItemChanged.connect(self.observance_selected_fn)
         for observance_item in observances_lt:
-
-            ###########
             # Important: "Alternatively, if you want the widget to have a fixed size based on its contents,
             # you can call QLayout::setSizeConstraint(QLayout::SetFixedSize);"
-            #
             # https://doc.qt.io/qt-5/qwidget.html#setSizePolicy-1
-            ###########
 
-            #row = QListWidgetItem(observance_item.short_name_sg)
             row = QListWidgetItem()
             layout = QVBoxLayout()
-            label1 = QLabel(observance_item.short_name_sg)
-            label1.adjustSize()
-            label1.setFixedWidth(150)
-            text_sg = "[0 0 1 0 2 0 1] asdf1 asdf2 asdf3 asdf4 asdf5 asdf6 asdf7 asdf8 asdf1 asdf2 asdf3 asdf4 asdf5 asdf6 asdf7 asdf8 asdf1 asdf2 asdf3 asdf4 asdf5 asdf6 asdf7 asdf8"
-            label2 = QLabel()
-            label2.setWordWrap(True)
-            label2.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
-            label2.setText(text_sg)
-            label2.adjustSize()
-            label2.setFixedWidth(150)
-            layout.setSizeConstraint(QLayout.SetMinimumSize) # <=================
-            layout.addWidget(label1)
-            layout.addWidget(label2)
-            layout.setContentsMargins(0,0,0,0)
-            layout.setSpacing(0)
-            #layout.update()
 
 
 
-            print("layout.sizeHint().height() = " + str(layout.sizeHint().height()))
-            #layout.setSizeConstraint(QLayout.SetMinAndMaxSize) #<-------- # QLayout.SetFixedSize
+
+            total_number_today_it = len(bwb_model.DiaryM.get_all_for_day(
+                int(time.mktime(datetime.date.today().timetuple())))
+            )
+            total_number_yesterday_it = len(bwb_model.DiaryM.get_all_for_day(
+                int(time.mktime((datetime.date.today() - datetime.timedelta(days=1)).timetuple())))
+            )
+
+
+
+
+            combined_label = QLabel(
+                observance_item.short_name_sg
+                + "\n[0 0 0 0 0 " + str(total_number_yesterday_it)
+                + " " + str(total_number_today_it) + "]"
+            )
+            combined_label.adjustSize()
+            layout.addWidget(combined_label)
+            layout.setContentsMargins(0,3,0,3)
+            layout.setSpacing(2)
+
             layout_widget = QWidget()
             layout_widget.setLayout(layout)
             layout_widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
-            #layout_widget.setMinimumHeight(label2.height() + label1.height())
             layout_widget.adjustSize()
-            #layout_widget.updateGeometry()
 
-            print("layout_widget.height() = " + str(layout_widget.height()))
-            print("layout_widget.sizeHint().height() = " + str(layout_widget.sizeHint().height()))
             my_size = QSize(-1, layout_widget.height())
 
             row.setSizeHint(layout_widget.sizeHint())
@@ -233,5 +229,13 @@ Art license: CC BY-SA 4.0""")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+    t_tray_icon = QSystemTrayIcon(QIcon("icon.png"), app)
+    t_tray_menu = QMenu()
+    t_quit_action = t_tray_menu.addAction("Quit")
+    t_tray_icon.setContextMenu(t_tray_menu)
+
+    t_tray_icon.show()
+
     win = WellBeingWindow()
     sys.exit(app.exec_())
