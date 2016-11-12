@@ -31,6 +31,7 @@ class DiaryListWidget(QWidget):
         print("cell clicked. row = " + str(t_index_it))
         self.row_last_clicked = i_listwidgetitem
 
+
     # http://doc.qt.io/qt-5/qwidget.html#contextMenuEvent
     def contextMenuEvent(self, i_QContextMenuEvent):
         self.right_click_menu = QMenu()
@@ -68,6 +69,14 @@ class DiaryListWidget(QWidget):
             diary_entry_obs_sg = bwb_model.ObservanceM.get(diary_item.observance_ref).short_name_sg
             karma = bwb_model.KarmaM.get_for_observance_and_pos(
                 diary_item.observance_ref, diary_item.karma_ref)
+
+
+
+            if prev_diary_item == None or not is_same_day(prev_diary_item.date_added_it, diary_item.date_added_it):
+                t_date_sg = datetime.datetime.fromtimestamp(diary_item.date_added_it).strftime("%A")
+                self.list_widget.addItem(t_date_sg)
+
+
 
             if karma is None:
                 t_diary_entry_karma_sg = ""

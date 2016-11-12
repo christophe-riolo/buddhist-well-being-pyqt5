@@ -287,6 +287,27 @@ class DiaryM:
 
         return ret_diary_lt
 
+    @staticmethod
+    def get_all_for_day(day_as_unix_time_it, i_reverse_bl=True):
+        ret_diary_lt = []
+        db_connection = DbHelperM.get_db_connection()
+        db_cursor = db_connection.cursor()
+        db_cursor_result = db_cursor.execute(
+            "SELECT * FROM " + DbSchemaM.DiaryTable.name
+            + " WHERE " + DbSchemaM.DiaryTable.Cols.date_added + ">=" + str(day_as_unix_time_it)
+            + " AND " + DbSchemaM.DiaryTable.Cols.date_added + "<" + str(day_as_unix_time_it + 24 * 3600)
+        )
+        t_diary_from_db = db_cursor_result.fetchall()
+        for t_tuple in t_diary_from_db:
+            ret_diary_lt.append(DiaryM(t_tuple[0], t_tuple[1], t_tuple[2], t_tuple[3]))
+        db_connection.commit()
+
+        if i_reverse_bl:
+            ret_diary_lt.reverse()
+
+        return ret_diary_lt
+
+
 def export_all():
     csv_writer = csv.writer(open("exported.csv", "w"))
 
