@@ -4,6 +4,14 @@
 
 It's a cross-platform desktop application and is in an early development/prototype stage
 
+**Table of contents:**
+
+1. [Description](#description)
+2. [Installation](#installation)
+3. [Usage](#usage)
+4. [Contributing](#contributing)
+5. [Feedback](#feedback)
+
 
 ## Description
 
@@ -30,6 +38,10 @@ Also planned:
 
 Having studied wellness factors (as part of an online course in positive psychology) i was not satisfied with the factors that i found so i started looking into the Buddhist tradition where i have a background, and found a text in the book "Old Path, White Clouds" (by Thich Nhat Hanh) which directed at laypeople and was very practical. This stuck with me for some time and eventually i decided to start working on this project thinking that a diary application would be a useful format for encouriging people to focus on these principles
 
+### License
+
+GPLv3
+
 
 ## Installation
 
@@ -43,15 +55,14 @@ There is no installation packages but it's really simple to install by following
 6. Unzip the downloaded file
 
 
-## To run
+## Usage
 
 1. Change directory to where the software files have been extracted
 2. Type and run `python3 buddhist-well-being-pyqt5.py` on GNU/Linux systems or `python buddhist-well-being-pyqt5.py` on Windows (TBD: MacOS)
 
 
-## License
+## Contributing
 
-GPLv3
 
 
 ## Feedback
