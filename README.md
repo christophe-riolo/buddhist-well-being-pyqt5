@@ -54,6 +54,15 @@ There is no installation packages but it's really simple to install by following
 5. Download the project files from GitHub, either [using this link](https://github.com/SunyataZero/buddhist-well-being-pyqt5/archive/master.zip) or by clicking on the "Clone or download" button and then "Download ZIP"
 6. Unzip the downloaded file
 
+### Advanced setup (optional)
+
+Please note: *This is not necessary for running the application*
+
+#### GNU/Linux systems
+
+1. Edit the `bwb.desktop` file and change the paths to match the path that you are using
+2. Copy the `bwb.desktop` file to your desktop or any place where you want to be able to start the application from
+3. Copy the `bwb.desktop` file to `/usr/share/applications/` using `sudo` - this will make the application visible in any start-menu-like menu (in Lubuntu this is called the "main menu" and it's shown when clicking the button in the lower left, "vanilla" (the ordinary) Ubuntu may not have a menu like this
 
 ## Usage
 
