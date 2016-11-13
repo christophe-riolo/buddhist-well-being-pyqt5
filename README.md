@@ -60,9 +60,14 @@ Please note: *This is not necessary for running the application*
 
 #### GNU/Linux systems
 
+For desktop systems that are compatible with the [freedesktop](https://www.freedesktop.org/) standard - for example Gnome and KDE - you can use the bwb.desktop file included in the source
+
+To use this file:
+
 1. Edit the `bwb.desktop` file and change the paths to match the path that you are using
 2. Copy the `bwb.desktop` file to your desktop or any place where you want to be able to start the application from
 3. Copy the `bwb.desktop` file to `/usr/share/applications/` using `sudo` - this will make the application visible in any start-menu-like menu (in Lubuntu this is called the "main menu" and it's shown when clicking the button in the lower left, "vanilla" (the ordinary) Ubuntu may not have a menu like this
+
 
 ## Usage
 
