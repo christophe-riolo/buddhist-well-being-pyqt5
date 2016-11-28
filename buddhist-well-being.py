@@ -1,7 +1,6 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
-#import PyQt5.QtWidgets.QSyste
 from PyQt5.QtCore import QSize
 import bwb_model
 import bwb_diary_list_widget
