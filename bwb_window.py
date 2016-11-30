@@ -207,7 +207,6 @@ class WellBeingWindow(QMainWindow):
         ###self.karma_lb.show()
 
     def update_gui_ten_obs(self):
-
         self.ten_obs_lb_w5.clear()
         counter = 0
         for observance_item in bwb_model.ObservanceM.get_all():
@@ -218,20 +217,19 @@ class WellBeingWindow(QMainWindow):
             row_i6 = QListWidgetItem()
             row_layout_l7 = QVBoxLayout()
 
-            total_number_today_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
-                counter,
-                int(time.mktime(datetime.date.today().timetuple())))
-            )
-            total_number_yesterday_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
-                counter,
-                int(time.mktime((datetime.date.today() - datetime.timedelta(days=1)).timetuple())))
-            )
-
+            # Updating frequency
+            total_number_week_list = []
+            for day_it in range(0, 7):
+                total_number_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
+                    counter,
+                    int(time.mktime((datetime.date.today() - datetime.timedelta(days=day_it)).timetuple())))
+                )
+                total_number_week_list.append(total_number_it)
             row_label_w8 = QLabel(
                 observance_item.short_name_sg
-                + "\n[0 0 0 0 0 " + str(total_number_yesterday_it)
-                + " " + str(total_number_today_it) + "]"
+                + "\n[" + ' '.join(str(x) for x in reversed(total_number_week_list)) + "]"
             )
+
             row_label_w8.adjustSize()
             row_layout_l7.addWidget(row_label_w8)
             row_layout_l7.setContentsMargins(0, 3, 0, 3)
