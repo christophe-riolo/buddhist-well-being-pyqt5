@@ -3,119 +3,114 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize
 import bwb_model
-import bwb_diary_list_widget
+import bwb_diary_widget
 import time
 import datetime
 
-
+#################
+# Suffix explanation:
+# w: widget
+# l: layout
+# Number: The level in the layout stack
+#
+#################
 class WellBeingWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
-
-        observances_lt = bwb_model.ObservanceM.get_all()
-
+        # Initializaing window
         self.setGeometry(30, 30, 700, 500)
         self.setWindowTitle("Buddhist Well-Being")
         self.setWindowIcon(QIcon("icon.png"))
+        self.central_widget_w1 = QWidget()
+        self.setCentralWidget(self.central_widget_w1)
 
         # Creating layouts
-
-        hbox = QHBoxLayout()
-        left_vbox = QVBoxLayout()
-        left_vbox_widget = QWidget()
-        left_vbox_widget.setLayout(left_vbox)
-        left_vbox_widget.setFixedWidth(240)
-
-        hbox.addWidget(left_vbox_widget)
-        self.right_vbox = QVBoxLayout()
-        self.right_vbox_widget = QWidget()
-        self.right_vbox_widget.setLayout(self.right_vbox)
-        #self.right_vbox_widget.setFixedWidth(510)
-        hbox.addWidget(self.right_vbox_widget)
-        self.central_widget.setLayout(hbox)
-        self.show()
+        hbox_l2 = QHBoxLayout()
+        left_vbox_w3 = QWidget()
+        left_vbox_l4 = QVBoxLayout()
+        left_vbox_w3.setLayout(left_vbox_l4)
+        left_vbox_w3.setFixedWidth(240)
+        hbox_l2.addWidget(left_vbox_w3)
+        self.right_vbox_w3 = QWidget()
+        self.right_vbox_l4 = QVBoxLayout()
+        self.right_vbox_w3.setLayout(self.right_vbox_l4)
+        hbox_l2.addWidget(self.right_vbox_w3)
+        self.central_widget_w1.setLayout(hbox_l2)
 
         # Creating widgets..
-
         # ..for ten practices (left column)
-        self.ten_observances_lb = QListWidget()
-        left_vbox.addWidget(self.ten_observances_lb)
-        self.ten_observances_lb.currentItemChanged.connect(self.observance_selected_fn)
-        t_counter = 0
-        for observance_item in observances_lt:
+        self.ten_obs_lb_w5 = QListWidget()
+        left_vbox_l4.addWidget(self.ten_obs_lb_w5)
+        self.ten_obs_lb_w5.currentItemChanged.connect(self.on_observance_selected)
+        counter = 0
+        for observance_item in bwb_model.ObservanceM.get_all():
             # Important: "Alternatively, if you want the widget to have a fixed size based on its contents,
             # you can call QLayout::setSizeConstraint(QLayout::SetFixedSize);"
             # https://doc.qt.io/qt-5/qwidget.html#setSizePolicy-1
 
-            row = QListWidgetItem()
-            layout = QVBoxLayout()
-
-
+            row_i6 = QListWidgetItem()
+            row_layout_l7 = QVBoxLayout()
 
             total_number_today_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
-                t_counter,
+                counter,
                 int(time.mktime(datetime.date.today().timetuple())))
             )
             total_number_yesterday_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
-                t_counter,
+                counter,
                 int(time.mktime((datetime.date.today() - datetime.timedelta(days=1)).timetuple())))
             )
 
-
-
-            combined_label = QLabel(
+            row_label_w8 = QLabel(
                 observance_item.short_name_sg
                 + "\n[0 0 0 0 0 " + str(total_number_yesterday_it)
                 + " " + str(total_number_today_it) + "]"
             )
-            combined_label.adjustSize()
-            layout.addWidget(combined_label)
-            layout.setContentsMargins(0,3,0,3)
-            layout.setSpacing(2)
+            row_label_w8.adjustSize()
+            row_layout_l7.addWidget(row_label_w8)
+            row_layout_l7.setContentsMargins(0,3,0,3)
+            row_layout_l7.setSpacing(2)
 
-            layout_widget = QWidget()
-            layout_widget.setLayout(layout)
-            layout_widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
-            layout_widget.adjustSize()
+            row_w6 = QWidget()
+            row_w6.setLayout(row_layout_l7)
+            row_w6.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
+            row_w6.adjustSize()
 
-            my_size = QSize(-1, layout_widget.height())
+            my_size = QSize(-1, row_w6.height())
 
-            row.setSizeHint(layout_widget.sizeHint())
+            row_i6.setSizeHint(row_w6.sizeHint())
             # - Please note: If we set the size hint to (-1, height) we will get overflow towards the bottom
-            self.ten_observances_lb.addItem(row)
-            self.ten_observances_lb.setItemWidget(row, layout_widget)
+            self.ten_obs_lb_w5.addItem(row_i6)
+            self.ten_obs_lb_w5.setItemWidget(row_i6, row_w6)
 
-            t_counter += 1
+            counter += 1
 
         #self.ten_observances_lb.setSizeAdjustPolicy(QListWidget.AdjustToContents)
 
         ## ..for details (left column)
         self.ten_practices_details_ll = QLabel("-----")
         self.ten_practices_details_ll.setWordWrap(True)
-        left_vbox.addWidget(self.ten_practices_details_ll)
+        left_vbox_l4.addWidget(self.ten_practices_details_ll)
 
         #..for karma list (left column)
         self.karma_lb = QListWidget()
-        left_vbox.addWidget(self.karma_lb)
+        left_vbox_l4.addWidget(self.karma_lb)
 
         #..for adding new karma (left column)
         self.adding_new_karma_ey = QLineEdit()
-        left_vbox.addWidget(self.adding_new_karma_ey)
+        left_vbox_l4.addWidget(self.adding_new_karma_ey)
         self.adding_new_karma_bn = QPushButton("Add new")
-        left_vbox.addWidget(self.adding_new_karma_bn)
+        left_vbox_l4.addWidget(self.adding_new_karma_bn)
         self.adding_new_karma_bn.clicked.connect(self.add_new_karma_button_pressed_fn)
 
         #.. for diary (right column)
         ###self.diary_lb = QListWidget()
-        self.diary_lb = bwb_diary_list_widget.DiaryListWidget()
-        self.right_vbox.addWidget(self.diary_lb)
+        self.diary_lb = bwb_diary_widget.DiaryListWidget()
+        self.right_vbox_l4.addWidget(self.diary_lb)
 
         # ..for adding new a diary entry (right column)
         edit_diary_entry_hbox = QHBoxLayout()
-        self.right_vbox.addLayout(edit_diary_entry_hbox)
+        self.right_vbox_l4.addLayout(edit_diary_entry_hbox)
         self.adding_to_diary_date_ey = QDateTimeEdit()
         edit_diary_entry_hbox.addWidget(self.adding_to_diary_date_ey)
         self.adding_to_diary_date_ey.setCalendarPopup(True)
@@ -124,7 +119,7 @@ class WellBeingWindow(QMainWindow):
         edit_diary_entry_hbox.addWidget(self.adding_text_to_diary_tt)
         self.adding_text_to_diary_tt.setFixedHeight(50)
         self.adding_new_button = QPushButton("Add new")
-        self.right_vbox.addWidget(self.adding_new_button)
+        self.right_vbox_l4.addWidget(self.adding_new_button)
         self.adding_new_button.clicked.connect(self.add_text_to_diary_button_pressed_fn)
 
 
@@ -154,18 +149,22 @@ class WellBeingWindow(QMainWindow):
         help_menu.addAction(about_action)
         debug_menu.addAction(backup_action)
 
+        self.show()
+
     def show_about_box(self):
-        message_box = QMessageBox.about(self, "About Buddhist Well-Being",
-            """Concept and programming by Tord Dellsén
-Photography (for icons) by Torgny Dellsén - torgnydellsen.zenfolio.com
-Software License: GPLv3
-Art license: CC BY-SA 4.0""")
+        message_box = QMessageBox.about(
+            self, "About Buddhist Well-Being",
+            ("Concept and programming by Tord Dellsén\n"
+            "Photography (for icons) by Torgny Dellsén - torgnydellsen.zenfolio.com\n"
+            "Software License: GPLv3\n"
+            "Art license: CC BY-SA 4.0")
+        )
 
     def on_diary_frame_configure(self, i_event):
         self.diary_canvas.configure(scrollregion=self.diary_canvas.bbox("all"))
 
-    def observance_selected_fn(self, i_curr_item, i_prev_item):
-        t_selection_it = self.ten_observances_lb.currentRow() #.selectedItems()[0]
+    def on_observance_selected(self, i_curr_item, i_prev_item):
+        t_selection_it = self.ten_obs_lb_w5.currentRow() #.selectedItems()[0]
         t_observance = bwb_model.ObservanceM.get(t_selection_it)
         self.ten_practices_details_ll.setText(t_observance.sutra_text_sg)
 
@@ -178,7 +177,7 @@ Art license: CC BY-SA 4.0""")
         self.update_gui()  # Showing habits for practice etc
 
     def add_new_karma_button_pressed_fn(self):
-        t_observance_pos_it = self.ten_observances_lb.currentRow()
+        t_observance_pos_it = self.ten_obs_lb_w5.currentRow()
         t_text_sg = self.adding_new_karma_ey.text().strip() # strip is needed to remove a newline at the end (why?)
         if not (t_text_sg and t_text_sg.strip()):
             return
@@ -189,7 +188,7 @@ Art license: CC BY-SA 4.0""")
         self.update_gui()
 
     def add_text_to_diary_button_pressed_fn(self):
-        t_observance_pos_it = self.ten_observances_lb.currentRow()
+        t_observance_pos_it = self.ten_obs_lb_w5.currentRow()
 
         t_karma_pos_it = self.karma_lb.currentRow()
 
@@ -213,7 +212,7 @@ Art license: CC BY-SA 4.0""")
     def update_gui(self):
         self.karma_lb.clear()
 
-        t_cur_sel_it = self.ten_observances_lb.currentRow()
+        t_cur_sel_it = self.ten_obs_lb_w5.currentRow()
         if t_cur_sel_it != -1:
             #print("t_cur_sel_it = " + str(t_cur_sel_it))
             t_karma_lt = bwb_model.KarmaM.get_all_for_observance(t_cur_sel_it)
@@ -232,15 +231,14 @@ Art license: CC BY-SA 4.0""")
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    t_tray_icon = QSystemTrayIcon(QIcon("icon.png"), app)
-    t_tray_menu = QMenu()
-    t_quit_action = QAction("Quit")
-    t_quit_action.triggered.connect(lambda x: sys.exit())
-    t_tray_menu.addAction(t_quit_action)
-    t_tray_icon.setContextMenu(t_tray_menu)
-
-    t_tray_icon.show()
+    # System tray
+    tray_icon = QSystemTrayIcon(QIcon("icon.png"), app)
+    tray_menu = QMenu()
+    tray_quit_action = QAction("Quit")
+    tray_quit_action.triggered.connect(lambda x: sys.exit())
+    tray_menu.addAction(tray_quit_action)
+    tray_icon.setContextMenu(tray_menu)
+    tray_icon.show()
 
     win = WellBeingWindow()
-    ###########win.hide()
     sys.exit(app.exec_())
