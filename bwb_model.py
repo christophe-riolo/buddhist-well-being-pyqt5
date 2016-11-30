@@ -224,13 +224,12 @@ class KarmaM:
         return KarmaM(t_karma_tuple_from_db[0], t_karma_tuple_from_db[1], t_karma_tuple_from_db[2])
         #TODO (low prio): Handle "data error" when one of the three has "nonetype"
 
-
 class DiaryM:
     def __init__(self, i_date_added_it, i_observance_ref, i_karma_ref = -1, i_notes_sg = ""):
         self.date_added_it = i_date_added_it
-        self.notes_sg = i_notes_sg
         self.observance_ref = i_observance_ref
         self.karma_ref = i_karma_ref
+        self.notes_sg = i_notes_sg
 
     @staticmethod
     def add(i_date_added_it, i_observance_ref_id_it, i_karma_ref_id_it, i_notes_sg):
@@ -290,7 +289,6 @@ class DiaryM:
 
         return ret_diary_lt
 
-
     @staticmethod
     def get_all_for_obs_and_day(i_obs_it, day_as_unix_time_it, i_reverse_bl=True):
         ret_diary_lt = []
@@ -311,6 +309,28 @@ class DiaryM:
             ret_diary_lt.reverse()
 
         return ret_diary_lt
+
+    # Returns the _________
+    @staticmethod
+    def get_latest_for_karma(i_obs_it, i_karma_id_it):
+        db_connection = DbHelperM.get_db_connection()
+        db_cursor = db_connection.cursor()
+        db_cursor_result = db_cursor.execute(
+            "SELECT * FROM " + DbSchemaM.DiaryTable.name
+            + " WHERE " + DbSchemaM.DiaryTable.Cols.observance_id + "=" + str(i_obs_it)
+            + " AND " + DbSchemaM.DiaryTable.Cols.karma_id + "=" + str(i_karma_id_it)
+        )
+        diary_entry_list_for_karma_list = db_cursor_result.fetchall()
+        if diary_entry_list_for_karma_list == []:
+            return None
+        last_diary_entry_for_karma_tuple = diary_entry_list_for_karma_list[-1]
+
+        return DiaryM(
+            last_diary_entry_for_karma_tuple[0],
+            last_diary_entry_for_karma_tuple[1],
+            last_diary_entry_for_karma_tuple[2],
+            last_diary_entry_for_karma_tuple[3]
+        )
 
 
 def export_all():

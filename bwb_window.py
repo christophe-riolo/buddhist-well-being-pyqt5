@@ -201,8 +201,16 @@ class WellBeingWindow(QMainWindow):
         if i_cur_sel_it != -1:
             logging.debug("t_cur_sel_it = " + str(i_cur_sel_it))
             t_karma_lt = bwb_model.KarmaM.get_all_for_observance(i_cur_sel_it)
+
             for karma_item in t_karma_lt:
-                row = QListWidgetItem(karma_item.description_sg)
+                duration_sg = "x"
+                latest_diary_entry = bwb_model.DiaryM.get_latest_for_karma(i_cur_sel_it, karma_item.pos_it)
+                if latest_diary_entry != None:
+                    diary_entry_date_added = datetime.datetime.fromtimestamp(latest_diary_entry.date_added_it)
+                    today = datetime.datetime.today()
+                    time_delta = today - diary_entry_date_added
+                    duration_sg = str(time_delta.days)
+                row = QListWidgetItem("{" + duration_sg + "}" + karma_item.description_sg)
                 self.karma_lb.addItem(row)
         ###self.karma_lb.show()
 
@@ -220,9 +228,11 @@ class WellBeingWindow(QMainWindow):
             # Updating frequency
             total_number_week_list = []
             for day_it in range(0, 7):
-                total_number_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
-                    counter,
-                    int(time.mktime((datetime.date.today() - datetime.timedelta(days=day_it)).timetuple())))
+                total_number_it = len(
+                    bwb_model.DiaryM.get_all_for_obs_and_day(
+                        counter,
+                        int(time.mktime(
+                            (datetime.date.today() - datetime.timedelta(days=day_it)).timetuple())))
                 )
                 total_number_week_list.append(total_number_it)
             row_label_w8 = QLabel(
