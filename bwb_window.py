@@ -6,6 +6,14 @@ import bwb_model
 import bwb_diary_widget
 import time
 import datetime
+from enum import Enum
+import warnings
+
+
+class EventSource(Enum):
+    undefined = -1
+    obs_selection_changed = 1
+
 
 #################
 # Suffix explanation:
@@ -43,47 +51,6 @@ class WellBeingWindow(QMainWindow):
         self.ten_obs_lb_w5 = QListWidget()
         left_vbox_l4.addWidget(self.ten_obs_lb_w5)
         self.ten_obs_lb_w5.currentItemChanged.connect(self.on_observance_selected)
-        counter = 0
-        for observance_item in bwb_model.ObservanceM.get_all():
-            # Important: "Alternatively, if you want the widget to have a fixed size based on its contents,
-            # you can call QLayout::setSizeConstraint(QLayout::SetFixedSize);"
-            # https://doc.qt.io/qt-5/qwidget.html#setSizePolicy-1
-
-            row_i6 = QListWidgetItem()
-            row_layout_l7 = QVBoxLayout()
-
-            total_number_today_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
-                counter,
-                int(time.mktime(datetime.date.today().timetuple())))
-            )
-            total_number_yesterday_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
-                counter,
-                int(time.mktime((datetime.date.today() - datetime.timedelta(days=1)).timetuple())))
-            )
-
-            row_label_w8 = QLabel(
-                observance_item.short_name_sg
-                + "\n[0 0 0 0 0 " + str(total_number_yesterday_it)
-                + " " + str(total_number_today_it) + "]"
-            )
-            row_label_w8.adjustSize()
-            row_layout_l7.addWidget(row_label_w8)
-            row_layout_l7.setContentsMargins(0,3,0,3)
-            row_layout_l7.setSpacing(2)
-
-            row_w6 = QWidget()
-            row_w6.setLayout(row_layout_l7)
-            row_w6.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
-            row_w6.adjustSize()
-
-            my_size = QSize(-1, row_w6.height())
-
-            row_i6.setSizeHint(row_w6.sizeHint())
-            # - Please note: If we set the size hint to (-1, height) we will get overflow towards the bottom
-            self.ten_obs_lb_w5.addItem(row_i6)
-            self.ten_obs_lb_w5.setItemWidget(row_i6, row_w6)
-
-            counter += 1
 
         #self.ten_observances_lb.setSizeAdjustPolicy(QListWidget.AdjustToContents)
 
@@ -124,10 +91,10 @@ class WellBeingWindow(QMainWindow):
 
 
         # Creating the menu bar
-        exit_action = QAction("Exit", self)
-        exit_action.triggered.connect(self.close)
         export_action = QAction("Export", self)
         export_action.triggered.connect(bwb_model.export_all)
+        exit_action = QAction("Exit", self)
+        exit_action.triggered.connect(self.close)
         redraw_action = QAction("Redraw", self)
         redraw_action.triggered.connect(self.update_gui)
         about_action = QAction("About", self)
@@ -149,6 +116,8 @@ class WellBeingWindow(QMainWindow):
         help_menu.addAction(about_action)
         debug_menu.addAction(backup_action)
 
+        self.update_gui()
+
         self.show()
 
     def show_about_box(self):
@@ -165,8 +134,14 @@ class WellBeingWindow(QMainWindow):
 
     def on_observance_selected(self, i_curr_item, i_prev_item):
         t_selection_it = self.ten_obs_lb_w5.currentRow() #.selectedItems()[0]
-        t_observance = bwb_model.ObservanceM.get(t_selection_it)
-        self.ten_practices_details_ll.setText(t_observance.sutra_text_sg)
+        if 0 <= t_selection_it <= 9:
+            t_observance = bwb_model.ObservanceM.get(t_selection_it)
+            self.ten_practices_details_ll.setText(t_observance.sutra_text_sg)
+        elif t_selection_it == -1:
+            # We arrive here if there is no observance selected and t_selection_it is -1
+            pass
+        else:
+            warnings.warn("In on_observance_selected: t_selection_it = " + str(t_selection_it))
 
         """
         for diary_item in bwb_model.DiaryM.get_all():
@@ -174,7 +149,7 @@ class WellBeingWindow(QMainWindow):
                 diary_item.marked_bl = True
         """
 
-        self.update_gui()  # Showing habits for practice etc
+        self.update_gui(EventSource.obs_selection_changed)  # Showing habits for practice etc
 
     def add_new_karma_button_pressed_fn(self):
         t_observance_pos_it = self.ten_obs_lb_w5.currentRow()
@@ -209,7 +184,57 @@ class WellBeingWindow(QMainWindow):
         print("deleting karma. i_it = " + str(i_it))
         #TBD
 
-    def update_gui(self):
+    def update_gui(self, i_event_source = EventSource.undefined):
+
+        if(i_event_source != EventSource.obs_selection_changed):
+            self.ten_obs_lb_w5.clear()
+            counter = 0
+            for observance_item in bwb_model.ObservanceM.get_all():
+                # Important: "Alternatively, if you want the widget to have a fixed size based on its contents,
+                # you can call QLayout::setSizeConstraint(QLayout::SetFixedSize);"
+                # https://doc.qt.io/qt-5/qwidget.html#setSizePolicy-1
+
+                row_i6 = QListWidgetItem()
+                row_layout_l7 = QVBoxLayout()
+
+                total_number_today_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
+                    counter,
+                    int(time.mktime(datetime.date.today().timetuple())))
+                )
+                total_number_yesterday_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
+                    counter,
+                    int(time.mktime((datetime.date.today() - datetime.timedelta(days=1)).timetuple())))
+                )
+
+                row_label_w8 = QLabel(
+                    observance_item.short_name_sg
+                    + "\n[0 0 0 0 0 " + str(total_number_yesterday_it)
+                    + " " + str(total_number_today_it) + "]"
+                )
+                row_label_w8.adjustSize()
+                row_layout_l7.addWidget(row_label_w8)
+                row_layout_l7.setContentsMargins(0,3,0,3)
+                row_layout_l7.setSpacing(2)
+
+                row_w6 = QWidget()
+                row_w6.setLayout(row_layout_l7)
+                row_w6.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
+                row_w6.adjustSize()
+
+                my_size = QSize(-1, row_w6.height())
+
+                row_i6.setSizeHint(row_w6.sizeHint())
+                # - Please note: If we set the size hint to (-1, height) we will get overflow towards the bottom
+                self.ten_obs_lb_w5.addItem(row_i6)
+                self.ten_obs_lb_w5.setItemWidget(row_i6, row_w6)
+
+                counter += 1
+
+
+
+
+
+
         self.karma_lb.clear()
 
         t_cur_sel_it = self.ten_obs_lb_w5.currentRow()

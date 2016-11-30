@@ -143,6 +143,7 @@ class ObservanceM:
             + DbSchemaM.ObservancesTable.Cols.short_name + ", "
             + DbSchemaM.ObservancesTable.Cols.sutra_text
             + ") VALUES (?, ?)", (i_short_name_sg, i_sutra_text_sg))
+        ####db_connection.commit()
 
     @staticmethod
     def get(i_observance_id_it):
