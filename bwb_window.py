@@ -8,6 +8,7 @@ import time
 import datetime
 from enum import Enum
 import warnings
+import logging
 
 
 class EventSource(Enum):
@@ -51,13 +52,12 @@ class WellBeingWindow(QMainWindow):
         self.ten_obs_lb_w5 = QListWidget()
         left_vbox_l4.addWidget(self.ten_obs_lb_w5)
         self.ten_obs_lb_w5.currentItemChanged.connect(self.on_observance_selected)
+        ##self.ten_observances_lb.setSizeAdjustPolicy(QListWidget.AdjustToContents)
 
-        #self.ten_observances_lb.setSizeAdjustPolicy(QListWidget.AdjustToContents)
-
-        ## ..for details (left column)
-        self.ten_practices_details_ll = QLabel("-----")
-        self.ten_practices_details_ll.setWordWrap(True)
-        left_vbox_l4.addWidget(self.ten_practices_details_ll)
+        # ..for details (left column)
+        self.ten_obs_details_ll = QLabel("-----")
+        self.ten_obs_details_ll.setWordWrap(True)
+        left_vbox_l4.addWidget(self.ten_obs_details_ll)
 
         #..for karma list (left column)
         self.karma_lb = QListWidget()
@@ -68,7 +68,7 @@ class WellBeingWindow(QMainWindow):
         left_vbox_l4.addWidget(self.adding_new_karma_ey)
         self.adding_new_karma_bn = QPushButton("Add new")
         left_vbox_l4.addWidget(self.adding_new_karma_bn)
-        self.adding_new_karma_bn.clicked.connect(self.add_new_karma_button_pressed_fn)
+        self.adding_new_karma_bn.clicked.connect(self.on_add_new_karma_button_pressed)
 
         #.. for diary (right column)
         ###self.diary_lb = QListWidget()
@@ -76,19 +76,18 @@ class WellBeingWindow(QMainWindow):
         self.right_vbox_l4.addWidget(self.diary_lb)
 
         # ..for adding new a diary entry (right column)
-        edit_diary_entry_hbox = QHBoxLayout()
-        self.right_vbox_l4.addLayout(edit_diary_entry_hbox)
-        self.adding_to_diary_date_ey = QDateTimeEdit()
-        edit_diary_entry_hbox.addWidget(self.adding_to_diary_date_ey)
-        self.adding_to_diary_date_ey.setCalendarPopup(True)
+        edit_diary_entry_hbox_l5 = QHBoxLayout()
+        self.right_vbox_l4.addLayout(edit_diary_entry_hbox_l5)
+        self.adding_to_diary_date_ey_w6 = QDateTimeEdit()
+        edit_diary_entry_hbox_l5.addWidget(self.adding_to_diary_date_ey_w6)
+        self.adding_to_diary_date_ey_w6.setCalendarPopup(True)
         ###self.adding_to_diary_date_ey.insert(tkinter.END, "2015-01-09 13:42")
-        self.adding_text_to_diary_tt = QTextEdit()
-        edit_diary_entry_hbox.addWidget(self.adding_text_to_diary_tt)
-        self.adding_text_to_diary_tt.setFixedHeight(50)
-        self.adding_new_button = QPushButton("Add new")
-        self.right_vbox_l4.addWidget(self.adding_new_button)
-        self.adding_new_button.clicked.connect(self.add_text_to_diary_button_pressed_fn)
-
+        self.adding_text_to_diary_te_w6 = QTextEdit()
+        edit_diary_entry_hbox_l5.addWidget(self.adding_text_to_diary_te_w6)
+        self.adding_text_to_diary_te_w6.setFixedHeight(50)
+        self.adding_diary_entry_bn_w5 = QPushButton("Add new")
+        self.right_vbox_l4.addWidget(self.adding_diary_entry_bn_w5)
+        self.adding_diary_entry_bn_w5.clicked.connect(self.on_add_text_to_diary_button_pressed)
 
         # Creating the menu bar
         export_action = QAction("Export", self)
@@ -120,15 +119,6 @@ class WellBeingWindow(QMainWindow):
 
         self.show()
 
-    def show_about_box(self):
-        message_box = QMessageBox.about(
-            self, "About Buddhist Well-Being",
-            ("Concept and programming by Tord Dellsén\n"
-            "Photography (for icons) by Torgny Dellsén - torgnydellsen.zenfolio.com\n"
-            "Software License: GPLv3\n"
-            "Art license: CC BY-SA 4.0")
-        )
-
     def on_diary_frame_configure(self, i_event):
         self.diary_canvas.configure(scrollregion=self.diary_canvas.bbox("all"))
 
@@ -136,7 +126,7 @@ class WellBeingWindow(QMainWindow):
         t_selection_it = self.ten_obs_lb_w5.currentRow() #.selectedItems()[0]
         if 0 <= t_selection_it <= 9:
             t_observance = bwb_model.ObservanceM.get(t_selection_it)
-            self.ten_practices_details_ll.setText(t_observance.sutra_text_sg)
+            self.ten_obs_details_ll.setText(t_observance.sutra_text_sg)
         elif t_selection_it == -1:
             # We arrive here if there is no observance selected and t_selection_it is -1
             pass
@@ -151,7 +141,7 @@ class WellBeingWindow(QMainWindow):
 
         self.update_gui(EventSource.obs_selection_changed)  # Showing habits for practice etc
 
-    def add_new_karma_button_pressed_fn(self):
+    def on_add_new_karma_button_pressed(self):
         t_observance_pos_it = self.ten_obs_lb_w5.currentRow()
         t_text_sg = self.adding_new_karma_ey.text().strip() # strip is needed to remove a newline at the end (why?)
         if not (t_text_sg and t_text_sg.strip()):
@@ -162,19 +152,31 @@ class WellBeingWindow(QMainWindow):
         self.adding_new_karma_ey.clear()
         self.update_gui()
 
-    def add_text_to_diary_button_pressed_fn(self):
+    def on_add_text_to_diary_button_pressed(self):
         t_observance_pos_it = self.ten_obs_lb_w5.currentRow()
 
         t_karma_pos_it = self.karma_lb.currentRow()
 
-        notes_pre_sg = self.adding_text_to_diary_tt.toPlainText().strip()
+        notes_pre_sg = self.adding_text_to_diary_te_w6.toPlainText().strip()
         bwb_model.DiaryM.add(int(time.time()), t_observance_pos_it, t_karma_pos_it, notes_pre_sg)
 
-        self.adding_text_to_diary_tt.clear()
+        self.adding_text_to_diary_te_w6.clear()
         ##self.ten_observances_lb.selection_clear(0)  # Clearing the selection
         ##self.karma_lb.selection_clear(0)
         self.update_gui()
 
+    def on_diary_entry_clicked(self, i_event):
+        print("Diary entry clicked")
+        #TBD
+
+    def show_about_box(self):
+        message_box = QMessageBox.about(
+            self, "About Buddhist Well-Being",
+            ("Concept and programming by Tord Dellsén\n"
+            "Photography (for icons) by Torgny Dellsén - torgnydellsen.zenfolio.com\n"
+            "Software License: GPLv3\n"
+            "Art license: CC BY-SA 4.0")
+        )
 
     def open_karma_context_menu(self, i_event):
         print("opening menu")
@@ -185,72 +187,69 @@ class WellBeingWindow(QMainWindow):
         #TBD
 
     def update_gui(self, i_event_source = EventSource.undefined):
-
         if(i_event_source != EventSource.obs_selection_changed):
-            self.ten_obs_lb_w5.clear()
-            counter = 0
-            for observance_item in bwb_model.ObservanceM.get_all():
-                # Important: "Alternatively, if you want the widget to have a fixed size based on its contents,
-                # you can call QLayout::setSizeConstraint(QLayout::SetFixedSize);"
-                # https://doc.qt.io/qt-5/qwidget.html#setSizePolicy-1
+            self.update_gui_ten_obs()
 
-                row_i6 = QListWidgetItem()
-                row_layout_l7 = QVBoxLayout()
+        cur_sel_it = self.ten_obs_lb_w5.currentRow()
 
-                total_number_today_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
-                    counter,
-                    int(time.mktime(datetime.date.today().timetuple())))
-                )
-                total_number_yesterday_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
-                    counter,
-                    int(time.mktime((datetime.date.today() - datetime.timedelta(days=1)).timetuple())))
-                )
+        self.update_gui_karma(cur_sel_it)
 
-                row_label_w8 = QLabel(
-                    observance_item.short_name_sg
-                    + "\n[0 0 0 0 0 " + str(total_number_yesterday_it)
-                    + " " + str(total_number_today_it) + "]"
-                )
-                row_label_w8.adjustSize()
-                row_layout_l7.addWidget(row_label_w8)
-                row_layout_l7.setContentsMargins(0,3,0,3)
-                row_layout_l7.setSpacing(2)
+        self.diary_lb.update_gui(cur_sel_it)
 
-                row_w6 = QWidget()
-                row_w6.setLayout(row_layout_l7)
-                row_w6.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
-                row_w6.adjustSize()
-
-                my_size = QSize(-1, row_w6.height())
-
-                row_i6.setSizeHint(row_w6.sizeHint())
-                # - Please note: If we set the size hint to (-1, height) we will get overflow towards the bottom
-                self.ten_obs_lb_w5.addItem(row_i6)
-                self.ten_obs_lb_w5.setItemWidget(row_i6, row_w6)
-
-                counter += 1
-
-
-
-
-
-
+    def update_gui_karma(self, i_cur_sel_it):
         self.karma_lb.clear()
-
-        t_cur_sel_it = self.ten_obs_lb_w5.currentRow()
-        if t_cur_sel_it != -1:
-            #print("t_cur_sel_it = " + str(t_cur_sel_it))
-            t_karma_lt = bwb_model.KarmaM.get_all_for_observance(t_cur_sel_it)
+        if i_cur_sel_it != -1:
+            logging.debug("t_cur_sel_it = " + str(i_cur_sel_it))
+            t_karma_lt = bwb_model.KarmaM.get_all_for_observance(i_cur_sel_it)
             for karma_item in t_karma_lt:
                 row = QListWidgetItem(karma_item.description_sg)
                 self.karma_lb.addItem(row)
-        self.karma_lb.show()
+        ###self.karma_lb.show()
 
-        self.diary_lb.update_gui(t_cur_sel_it)
+    def update_gui_ten_obs(self):
 
-    def diary_entry_clicked(self, i_event):
-        print("Diary entry clicked")
-        #TBD
+        self.ten_obs_lb_w5.clear()
+        counter = 0
+        for observance_item in bwb_model.ObservanceM.get_all():
+            # Important: "Alternatively, if you want the widget to have a fixed size based on its contents,
+            # you can call QLayout::setSizeConstraint(QLayout::SetFixedSize);"
+            # https://doc.qt.io/qt-5/qwidget.html#setSizePolicy-1
+
+            row_i6 = QListWidgetItem()
+            row_layout_l7 = QVBoxLayout()
+
+            total_number_today_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
+                counter,
+                int(time.mktime(datetime.date.today().timetuple())))
+            )
+            total_number_yesterday_it = len(bwb_model.DiaryM.get_all_for_obs_and_day(
+                counter,
+                int(time.mktime((datetime.date.today() - datetime.timedelta(days=1)).timetuple())))
+            )
+
+            row_label_w8 = QLabel(
+                observance_item.short_name_sg
+                + "\n[0 0 0 0 0 " + str(total_number_yesterday_it)
+                + " " + str(total_number_today_it) + "]"
+            )
+            row_label_w8.adjustSize()
+            row_layout_l7.addWidget(row_label_w8)
+            row_layout_l7.setContentsMargins(0, 3, 0, 3)
+            row_layout_l7.setSpacing(2)
+
+            row_w6 = QWidget()
+            row_w6.setLayout(row_layout_l7)
+            row_w6.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
+            row_w6.adjustSize()
+
+            my_size = QSize(-1, row_w6.height())
+
+            row_i6.setSizeHint(row_w6.sizeHint())
+            # - Please note: If we set the size hint to (-1, height) we will get overflow towards the bottom
+            self.ten_obs_lb_w5.addItem(row_i6)
+            self.ten_obs_lb_w5.setItemWidget(row_i6, row_w6)
+
+            counter += 1
 
 
 if __name__ == "__main__":
