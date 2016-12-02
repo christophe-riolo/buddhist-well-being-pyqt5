@@ -1,4 +1,3 @@
-import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize
@@ -17,6 +16,8 @@ class EventSource(Enum):
 
 
 #################
+# View and controller
+#
 # Suffix explanation:
 # w: widget
 # l: layout
@@ -28,24 +29,33 @@ class WellBeingWindow(QMainWindow):
         super().__init__()
 
         # Initializaing window
-        self.setGeometry(30, 30, 700, 500)
+        self.setGeometry(40, 30, 960, 520)
         self.setWindowTitle("Buddhist Well-Being")
         self.setWindowIcon(QIcon("icon.png"))
-        self.central_widget_w1 = QWidget()
-        self.setCentralWidget(self.central_widget_w1)
+        self.global_widget_w1 = QWidget()
+        self.setCentralWidget(self.global_widget_w1)
 
-        # Creating layouts
+        # Creating layouts..
         hbox_l2 = QHBoxLayout()
+        #..left side
         left_vbox_w3 = QWidget()
         left_vbox_l4 = QVBoxLayout()
         left_vbox_w3.setLayout(left_vbox_l4)
         left_vbox_w3.setFixedWidth(240)
         hbox_l2.addWidget(left_vbox_w3)
-        self.right_vbox_w3 = QWidget()
-        self.right_vbox_l4 = QVBoxLayout()
-        self.right_vbox_w3.setLayout(self.right_vbox_l4)
-        hbox_l2.addWidget(self.right_vbox_w3)
-        self.central_widget_w1.setLayout(hbox_l2)
+        #..middle
+        self.middle_vbox_w3 = QWidget()
+        self.middle_vbox_l4 = QVBoxLayout()
+        self.middle_vbox_w3.setLayout(self.middle_vbox_l4)
+        hbox_l2.addWidget(self.middle_vbox_w3)
+        #..right side
+        right_vbox_w3 = QWidget()
+        right_vbox_l4 = QVBoxLayout()
+        right_vbox_w3.setLayout(right_vbox_l4)
+        right_vbox_w3.setFixedWidth(240)
+        hbox_l2.addWidget(right_vbox_w3)
+        #..
+        self.global_widget_w1.setLayout(hbox_l2)
 
         # Creating widgets..
         # ..for ten practices (left column)
@@ -70,14 +80,14 @@ class WellBeingWindow(QMainWindow):
         left_vbox_l4.addWidget(self.adding_new_karma_bn)
         self.adding_new_karma_bn.clicked.connect(self.on_add_new_karma_button_pressed)
 
-        #.. for diary (right column)
+        #.. for diary (middle column)
         ###self.diary_lb = QListWidget()
         self.diary_lb = bwb_diary_widget.DiaryListWidget()
-        self.right_vbox_l4.addWidget(self.diary_lb)
+        self.middle_vbox_l4.addWidget(self.diary_lb)
 
-        # ..for adding new a diary entry (right column)
+        # ..for adding new a diary entry (middle column)
         edit_diary_entry_hbox_l5 = QHBoxLayout()
-        self.right_vbox_l4.addLayout(edit_diary_entry_hbox_l5)
+        self.middle_vbox_l4.addLayout(edit_diary_entry_hbox_l5)
         self.adding_to_diary_date_ey_w6 = QDateTimeEdit()
         edit_diary_entry_hbox_l5.addWidget(self.adding_to_diary_date_ey_w6)
         self.adding_to_diary_date_ey_w6.setCalendarPopup(True)
@@ -86,8 +96,15 @@ class WellBeingWindow(QMainWindow):
         edit_diary_entry_hbox_l5.addWidget(self.adding_text_to_diary_te_w6)
         self.adding_text_to_diary_te_w6.setFixedHeight(50)
         self.adding_diary_entry_bn_w5 = QPushButton("Add new")
-        self.right_vbox_l4.addWidget(self.adding_diary_entry_bn_w5)
+        self.middle_vbox_l4.addWidget(self.adding_diary_entry_bn_w5)
         self.adding_diary_entry_bn_w5.clicked.connect(self.on_add_text_to_diary_button_pressed)
+
+        # ..for custom user text
+        self.custom_user_text_te = QTextEdit()
+        self.custom_user_text_te.textChanged.connect(self.on_custom_user_text_text_changed)
+        right_vbox_l4.addWidget(self.custom_user_text_te)
+
+        ###currentItemChanged.connect(self.on_observance_selected)
 
         # Creating the menu bar
         export_action = QAction("Export", self)
@@ -119,35 +136,41 @@ class WellBeingWindow(QMainWindow):
 
         self.show()
 
+    def on_custom_user_text_text_changed(self):
+        bwb_model.ObservanceM.update_custom_user_text(
+            self.ten_obs_lb_w5.currentRow(),
+            self.custom_user_text_te.toPlainText().strip()
+        )
+
     def on_diary_frame_configure(self, i_event):
         self.diary_canvas.configure(scrollregion=self.diary_canvas.bbox("all"))
 
     def on_observance_selected(self, i_curr_item, i_prev_item):
-        t_selection_it = self.ten_obs_lb_w5.currentRow() #.selectedItems()[0]
-        if 0 <= t_selection_it <= 9:
-            t_observance = bwb_model.ObservanceM.get(t_selection_it)
+        selection_it = self.ten_obs_lb_w5.currentRow() #.selectedItems()[0]
+        if 0 <= selection_it <= 9:
+            t_observance = bwb_model.ObservanceM.get(selection_it)
             self.ten_obs_details_ll.setText(t_observance.sutra_text_sg)
-        elif t_selection_it == -1:
-            # We arrive here if there is no observance selected and t_selection_it is -1
+        elif selection_it == -1:
+            # We arrive here if there is no observance selected and selection_it is -1
             pass
         else:
-            warnings.warn("In on_observance_selected: t_selection_it = " + str(t_selection_it))
+            warnings.warn("In on_observance_selected: selection_it = " + str(selection_it))
 
         """
         for diary_item in bwb_model.DiaryM.get_all():
-            if diary_item.observance_ref == t_selection_it:
+            if diary_item.observance_ref == selection_it:
                 diary_item.marked_bl = True
         """
 
         self.update_gui(EventSource.obs_selection_changed)  # Showing habits for practice etc
 
     def on_add_new_karma_button_pressed(self):
-        t_observance_pos_it = self.ten_obs_lb_w5.currentRow()
+        observance_pos_it = self.ten_obs_lb_w5.currentRow()
         t_text_sg = self.adding_new_karma_ey.text().strip() # strip is needed to remove a newline at the end (why?)
         if not (t_text_sg and t_text_sg.strip()):
             return
-        t_last_pos_it = len(bwb_model.KarmaM.get_all_for_observance(t_observance_pos_it))
-        bwb_model.KarmaM.add(t_observance_pos_it, t_last_pos_it, t_text_sg)
+        t_last_pos_it = len(bwb_model.KarmaM.get_all_for_observance(observance_pos_it))
+        bwb_model.KarmaM.add(observance_pos_it, t_last_pos_it, t_text_sg)
 
         self.adding_new_karma_ey.clear()
         self.update_gui()
@@ -195,6 +218,11 @@ class WellBeingWindow(QMainWindow):
         self.update_gui_karma(cur_sel_it)
 
         self.diary_lb.update_gui(cur_sel_it)
+
+        if cur_sel_it != -1:
+            self.custom_user_text_te.setText(
+                bwb_model.ObservanceM.get(cur_sel_it).user_text
+            )
 
     def update_gui_karma(self, i_cur_sel_it):
         self.karma_lb.clear()
@@ -260,17 +288,3 @@ class WellBeingWindow(QMainWindow):
             counter += 1
 
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-
-    # System tray
-    tray_icon = QSystemTrayIcon(QIcon("icon.png"), app)
-    tray_menu = QMenu()
-    tray_quit_action = QAction("Quit")
-    tray_quit_action.triggered.connect(lambda x: sys.exit())
-    tray_menu.addAction(tray_quit_action)
-    tray_icon.setContextMenu(tray_menu)
-    tray_icon.show()
-
-    win = WellBeingWindow()
-    sys.exit(app.exec_())

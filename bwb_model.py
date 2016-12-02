@@ -1,8 +1,13 @@
 import sqlite3
 import csv
 from shutil import copyfile
-import os
 import datetime
+
+#################
+#
+# Model
+#
+#################
 
 DATABASE_FILE_NAME = "bwb_database_file.db"
 
@@ -11,8 +16,10 @@ def get_schema_version(i_db_conn):
     t_cursor = i_db_conn.execute("PRAGMA user_version")
     return t_cursor.fetchone()[0]
 
+
 def set_schema_version(i_db_conn, i_version_it):
     i_db_conn.execute("PRAGMA user_version={:d}".format(i_version_it))
+
 
 def initial_schema_and_setup(i_db_conn):
     i_db_conn.execute(
@@ -63,12 +70,16 @@ def initial_schema_and_setup(i_db_conn):
     )
     ''' Meditera, Knäövningar, Rörelseövningar, Fråga Pappa vad som varit roligt idag!'''
 
+
 def upgrade_1_2(i_db_conn):
-    pass
+    i_db_conn.execute(
+        "ALTER TABLE " + DbSchemaM.ObservancesTable.name + " ADD COLUMN "
+        + DbSchemaM.ObservancesTable.Cols.user_text + " TEXT DEFAULT ''"
+    )
 
 upgrade_steps = {
-    1: initial_schema_and_setup
-    #  2: upgrade_1_2
+    1: initial_schema_and_setup,
+    2: upgrade_1_2
 }
 
 
@@ -112,6 +123,7 @@ class DbSchemaM:
             list_pos = "list_pos"  # Key
             short_name = "short_name"
             sutra_text = "sutra_text"
+            user_text = "user_text"
 
     class KarmaTable:
         name = "karma"
@@ -132,9 +144,10 @@ class DbSchemaM:
 
 
 class ObservanceM:
-    def __init__(self, i_short_name_sg, i_sutra_text_sg):
+    def __init__(self, i_short_name_sg, i_sutra_text_sg, i_user_text):
         self.short_name_sg = i_short_name_sg
         self.sutra_text_sg = i_sutra_text_sg
+        self.user_text = i_user_text
 
     @staticmethod
     def insert(i_cursor, i_short_name_sg, i_sutra_text_sg):
@@ -155,7 +168,11 @@ class ObservanceM:
         t_observance_tuple_from_db = db_cursor_result.fetchone()
         db_connection.commit()
 
-        return ObservanceM(t_observance_tuple_from_db[1], t_observance_tuple_from_db[2])
+        return ObservanceM(
+            t_observance_tuple_from_db[1],
+            t_observance_tuple_from_db[2],
+            t_observance_tuple_from_db[3]
+        )
 
     @staticmethod
     def get_all():
@@ -165,11 +182,21 @@ class ObservanceM:
         db_cursor_result = db_cursor.execute("SELECT * FROM " + DbSchemaM.ObservancesTable.name)
         t_observances_from_db = db_cursor_result.fetchall()
         for t_tuple in t_observances_from_db:
-            ret_observance_lt.append(ObservanceM(t_tuple[1], t_tuple[2]))
+            ret_observance_lt.append(ObservanceM(t_tuple[1], t_tuple[2], t_tuple[3]))
         db_connection.commit()
 
         return ret_observance_lt
 
+    @staticmethod
+    def update_custom_user_text(i_observance_id_it, i_text):
+        db_connection = DbHelperM.get_db_connection()
+        db_cursor = db_connection.cursor()
+        db_cursor.execute(
+            "UPDATE " + DbSchemaM.ObservancesTable.name
+            + " SET " + DbSchemaM.ObservancesTable.Cols.user_text + " = " + "'" + str(i_text) + "'"
+            + " WHERE " + DbSchemaM.ObservancesTable.Cols.list_pos + " = " + str(i_observance_id_it)
+        )
+        db_connection.commit()
 
 class KarmaM:
     def __init__(self, i_observance_ref_it, i_pos_it, i_description_sg):
