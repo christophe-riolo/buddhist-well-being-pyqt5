@@ -63,28 +63,14 @@ class WellBeingWindow(QMainWindow):
         left_vbox_l4.addWidget(self.ten_obs_lb_w5)
         self.ten_obs_lb_w5.currentItemChanged.connect(self.on_observance_selected)
         ##self.ten_observances_lb.setSizeAdjustPolicy(QListWidget.AdjustToContents)
-
         # ..for details (left column)
         self.ten_obs_details_ll = QLabel("-----")
         self.ten_obs_details_ll.setWordWrap(True)
         left_vbox_l4.addWidget(self.ten_obs_details_ll)
-
-        #..for karma list (left column)
-        self.karma_lb = QListWidget()
-        left_vbox_l4.addWidget(self.karma_lb)
-
-        #..for adding new karma (left column)
-        self.adding_new_karma_ey = QLineEdit()
-        left_vbox_l4.addWidget(self.adding_new_karma_ey)
-        self.adding_new_karma_bn = QPushButton("Add new")
-        left_vbox_l4.addWidget(self.adding_new_karma_bn)
-        self.adding_new_karma_bn.clicked.connect(self.on_add_new_karma_button_pressed)
-
         #.. for diary (middle column)
         ###self.diary_lb = QListWidget()
         self.diary_lb = bwb_diary_widget.DiaryListWidget()
         self.middle_vbox_l4.addWidget(self.diary_lb)
-
         # ..for adding new a diary entry (middle column)
         edit_diary_entry_hbox_l5 = QHBoxLayout()
         self.middle_vbox_l4.addLayout(edit_diary_entry_hbox_l5)
@@ -98,15 +84,22 @@ class WellBeingWindow(QMainWindow):
         self.adding_diary_entry_bn_w5 = QPushButton("Add new")
         self.middle_vbox_l4.addWidget(self.adding_diary_entry_bn_w5)
         self.adding_diary_entry_bn_w5.clicked.connect(self.on_add_text_to_diary_button_pressed)
-
-        # ..for custom user text
+        # ..for custom user text (right column)
         self.custom_user_text_te = QTextEdit()
         self.custom_user_text_te.textChanged.connect(self.on_custom_user_text_text_changed)
         right_vbox_l4.addWidget(self.custom_user_text_te)
+        #..for karma list (left column)
+        self.karma_lb = QListWidget()
+        right_vbox_l4.addWidget(self.karma_lb)
+        #..for adding new karma (left column)
+        self.adding_new_karma_ey = QLineEdit()
+        right_vbox_l4.addWidget(self.adding_new_karma_ey)
+        self.adding_new_karma_bn = QPushButton("Add new")
+        right_vbox_l4.addWidget(self.adding_new_karma_bn)
+        self.adding_new_karma_bn.clicked.connect(self.on_add_new_karma_button_pressed)
 
-        ###currentItemChanged.connect(self.on_observance_selected)
-
-        # Creating the menu bar
+        # Creating the menu bar..
+        # ..setup of actions
         export_action = QAction("Export", self)
         export_action.triggered.connect(bwb_model.export_all)
         exit_action = QAction("Exit", self)
@@ -117,9 +110,8 @@ class WellBeingWindow(QMainWindow):
         about_action.triggered.connect(self.show_about_box)
         backup_action = QAction("Backup db", self)
         backup_action.triggered.connect(bwb_model.backup_db_file)
-
+        # ..adding menu items
         self.menu_bar = self.menuBar()
-
         file_menu = self.menu_bar.addMenu("&File")
         debug_menu = self.menu_bar.addMenu("Debu&g")
         observance_menu = self.menu_bar.addMenu("&Observance")
@@ -133,7 +125,6 @@ class WellBeingWindow(QMainWindow):
         debug_menu.addAction(backup_action)
 
         self.update_gui()
-
         self.show()
 
     def on_custom_user_text_text_changed(self):
@@ -212,16 +203,15 @@ class WellBeingWindow(QMainWindow):
     def update_gui(self, i_event_source = EventSource.undefined):
         if(i_event_source != EventSource.obs_selection_changed):
             self.update_gui_ten_obs()
-
         cur_sel_it = self.ten_obs_lb_w5.currentRow()
-
         self.update_gui_karma(cur_sel_it)
-
         self.diary_lb.update_gui(cur_sel_it)
+        self.update_gui_user_text(cur_sel_it)
 
-        if cur_sel_it != -1:
+    def update_gui_user_text(self, i_cur_sel_it):
+        if i_cur_sel_it != -1:
             self.custom_user_text_te.setText(
-                bwb_model.ObservanceM.get(cur_sel_it).user_text
+                bwb_model.ObservanceM.get(i_cur_sel_it).user_text
             )
 
     def update_gui_karma(self, i_cur_sel_it):
@@ -240,7 +230,6 @@ class WellBeingWindow(QMainWindow):
                     duration_sg = str(time_delta.days)
                 row = QListWidgetItem("{" + duration_sg + "}" + karma_item.description_sg)
                 self.karma_lb.addItem(row)
-        ###self.karma_lb.show()
 
     def update_gui_ten_obs(self):
         self.ten_obs_lb_w5.clear()
