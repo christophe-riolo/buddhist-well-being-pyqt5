@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
+from PyQt5 import QtGui
 from PyQt5.QtCore import QSize
+from PyQt5.QtCore import Qt
 import bwb_model
 import bwb_diary_widget
 import time
@@ -77,7 +79,6 @@ class WellBeingWindow(QMainWindow):
         self.adding_to_diary_date_ey_w6 = QDateTimeEdit()
         edit_diary_entry_hbox_l5.addWidget(self.adding_to_diary_date_ey_w6)
         self.adding_to_diary_date_ey_w6.setCalendarPopup(True)
-        ###self.adding_to_diary_date_ey.insert(tkinter.END, "2015-01-09 13:42")
         self.adding_text_to_diary_te_w6 = QTextEdit()
         edit_diary_entry_hbox_l5.addWidget(self.adding_text_to_diary_te_w6)
         self.adding_text_to_diary_te_w6.setFixedHeight(50)
@@ -97,6 +98,22 @@ class WellBeingWindow(QMainWindow):
         self.adding_new_karma_bn = QPushButton("Add new")
         right_vbox_l4.addWidget(self.adding_new_karma_bn)
         self.adding_new_karma_bn.clicked.connect(self.on_add_new_karma_button_pressed)
+        #..for notifications
+        self.notifications_lb = QListWidget()
+        right_vbox_l4.addWidget(self.notifications_lb)
+        #..for the four immeasurable minds
+        self.loving_kindness_slider = QSlider(Qt.Horizontal, self)
+        """
+        http://doc.qt.io/qt-4.8/stylesheet-examples.html#customizing-qslider
+        palette = QtGui.QPalette()
+        colour = QtGui.QColor(0, 199, 0)
+        palette.setColor(self.loving_kindness_slider.backgroundRole(), colour)
+        self.loving_kindness_slider.setAutoFillBackground(True)
+        self.loving_kindness_slider.setPalette(palette)
+        """
+        right_vbox_l4.addWidget(self.loving_kindness_slider)
+        self.compassion_slider = QSlider(Qt.Horizontal, self)
+        right_vbox_l4.addWidget(self.compassion_slider)
 
         # Creating the menu bar..
         # ..setup of actions
@@ -213,6 +230,29 @@ class WellBeingWindow(QMainWindow):
         self.update_gui_karma(cur_sel_it)
         self.diary_lb.update_gui(cur_sel_it)
         self.update_gui_user_text(cur_sel_it)
+        self.update_gui_notifications(cur_sel_it)
+
+    def update_gui_notifications(self, i_cur_sel_it):
+        self.notifications_lb.clear()
+        if i_cur_sel_it != -1:
+            logging.debug("i_cur_sel_it = " + str(i_cur_sel_it))
+            t_karma_lt = bwb_model.KarmaM.get_all_for_observance(i_cur_sel_it)
+
+            for karma_item in t_karma_lt:
+                duration_sg = "x"
+                latest_diary_entry = bwb_model.DiaryM.get_latest_for_karma(i_cur_sel_it, karma_item.pos_it)
+                days_since_last_done_it = -1
+                if latest_diary_entry != None:
+                    diary_entry_date_added = datetime.datetime.fromtimestamp(latest_diary_entry.date_added_it)
+                    today = datetime.datetime.today()
+                    time_delta = today - diary_entry_date_added
+                    days_since_last_done_it = time_delta.days
+                    duration_sg = str(days_since_last_done_it)
+                row = QListWidgetItem("{" + duration_sg + "}" + karma_item.description_sg)
+                if days_since_last_done_it > 10:
+                    self.notifications_lb.addItem(row)
+
+
 
     def update_gui_user_text(self, i_cur_sel_it):
         if i_cur_sel_it != -1:
@@ -223,7 +263,7 @@ class WellBeingWindow(QMainWindow):
     def update_gui_karma(self, i_cur_sel_it):
         self.karma_lb.clear()
         if i_cur_sel_it != -1:
-            logging.debug("t_cur_sel_it = " + str(i_cur_sel_it))
+            logging.debug("i_cur_sel_it = " + str(i_cur_sel_it))
             t_karma_lt = bwb_model.KarmaM.get_all_for_observance(i_cur_sel_it)
 
             for karma_item in t_karma_lt:
