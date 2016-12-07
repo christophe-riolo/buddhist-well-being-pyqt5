@@ -127,6 +127,12 @@ class WellBeingWindow(QMainWindow):
         self.update_gui()
         self.show()
 
+    # Overridden to intercept the close event for the window
+    def closeEvent(self, i_QCloseEvent):
+        self.hide()
+        ###########trayicon.show()
+        i_QCloseEvent.ignore()
+
     def on_custom_user_text_text_changed(self):
         bwb_model.ObservanceM.update_custom_user_text(
             self.ten_obs_lb_w5.currentRow(),
