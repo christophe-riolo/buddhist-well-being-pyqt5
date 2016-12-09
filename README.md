@@ -68,6 +68,12 @@ To use this file:
 2. Copy the `bwb.desktop` file to your desktop or any place where you want to be able to start the application from
 3. Copy the `bwb.desktop` file to `/usr/share/applications/` using `sudo` - this will make the application visible in any start-menu-like menu (in Lubuntu this is called the "main menu" and it's shown when clicking the button in the lower left, "vanilla" (the ordinary) Ubuntu may not have a menu like this
 
+### Hardware recommendations
+
+* Works best on screens with a resolution of at least 1366x768
+* No network connection is needed
+* Does not take much processor and memory resources, should work on most system 
+
 
 ## Usage
 
