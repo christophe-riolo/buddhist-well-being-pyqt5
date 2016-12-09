@@ -28,7 +28,7 @@ This software project is inspired by a buddhist sutra about "achiveing true happ
 * Living with an awareness of the Four Noble Truths (Non-buddhists: Self-compassion and compassion)
 * Meditation
 
-What this application does is to help the user keep these ten principles ("observances") in mind by allowing the user to select them when writing diary entries/notes. Also it can be used in a more casual fashion by adding actions connected to the ten observances and then using these actions by adding them to the diary (optionally with notes)
+The application helps the user to keep these ten principles ("observances") in mind by allowing the user to select them when writing diary entries/notes. Also it can be used in a more casual fashion by adding actions connected to the ten observances and then using these actions by adding them to the diary (optionally with notes)
 
 Also planned:
 * Adding a reminder system for the actions (karma)
