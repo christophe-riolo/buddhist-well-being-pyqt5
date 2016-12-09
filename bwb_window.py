@@ -230,28 +230,24 @@ class WellBeingWindow(QMainWindow):
         self.update_gui_karma(cur_sel_it)
         self.diary_lb.update_gui(cur_sel_it)
         self.update_gui_user_text(cur_sel_it)
-        self.update_gui_notifications(cur_sel_it)
+        self.update_gui_notifications()
 
-    def update_gui_notifications(self, i_cur_sel_it):
+    def update_gui_notifications(self):
         self.notifications_lb.clear()
-        if i_cur_sel_it != -1:
-            logging.debug("i_cur_sel_it = " + str(i_cur_sel_it))
-            t_karma_lt = bwb_model.KarmaM.get_all()
-
-            for karma_item in t_karma_lt:
-                duration_sg = "x"
-                latest_diary_entry = bwb_model.DiaryM.get_latest_for_karma(i_cur_sel_it, karma_item.pos_it)
-                days_since_last_done_it = -1
-                if latest_diary_entry != None:
-                    diary_entry_date_added = datetime.datetime.fromtimestamp(latest_diary_entry.date_added_it)
-                    today = datetime.datetime.today()
-                    time_delta = today - diary_entry_date_added
-                    days_since_last_done_it = time_delta.days
-                    duration_sg = str(days_since_last_done_it)
-                row = QListWidgetItem("{" + duration_sg + "}" + karma_item.description_sg)
-                if days_since_last_done_it > karma_item.days_before_notification_it:
-                    self.notifications_lb.addItem(row)
-
+        t_karma_lt = bwb_model.KarmaM.get_all()
+        for karma_item in t_karma_lt:
+            duration_sg = "x"
+            latest_diary_entry = bwb_model.DiaryM.get_latest_for_karma(karma_item.observance_ref_it, karma_item.pos_it)
+            days_since_last_done_it = -1
+            if latest_diary_entry != None:
+                diary_entry_date_added = datetime.datetime.fromtimestamp(latest_diary_entry.date_added_it)
+                today = datetime.datetime.today()
+                time_delta = today - diary_entry_date_added
+                days_since_last_done_it = time_delta.days
+                duration_sg = str(days_since_last_done_it)
+            row = QListWidgetItem("{" + duration_sg + "}" + karma_item.description_sg)
+            if days_since_last_done_it > karma_item.days_before_notification_it:
+                self.notifications_lb.addItem(row)
 
 
     def update_gui_user_text(self, i_cur_sel_it):
