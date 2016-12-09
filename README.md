@@ -72,7 +72,7 @@ To use this file:
 
 * Works best on screens with a resolution of at least 1366x768
 * No network connection is needed
-* Does not take much processor and memory resources, should work on most system 
+* Does not take much processor and memory resources, expected to run smoothly on most system 
 
 
 ## Usage
