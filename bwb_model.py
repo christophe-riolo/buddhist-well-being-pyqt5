@@ -10,6 +10,7 @@ import datetime
 #################
 
 DATABASE_FILE_NAME = "bwb_database_file.db"
+DEFAULT_DAYS_BEFORE_NOTIFICATION = 4
 
 
 def get_schema_version(i_db_conn):
@@ -77,9 +78,18 @@ def upgrade_1_2(i_db_conn):
         + DbSchemaM.ObservancesTable.Cols.user_text + " TEXT DEFAULT ''"
     )
 
+
+def upgrade_2_3(i_db_conn):
+    i_db_conn.execute(
+        "ALTER TABLE " + DbSchemaM.KarmaTable.name
+        + " ADD COLUMN " + DbSchemaM.KarmaTable.Cols.days_before_notification
+        + " INTEGER DEFAULT " + str(DEFAULT_DAYS_BEFORE_NOTIFICATION)
+    )
+
 upgrade_steps = {
     1: initial_schema_and_setup,
-    2: upgrade_1_2
+    2: upgrade_1_2,
+    3: upgrade_2_3
 }
 
 
@@ -132,6 +142,7 @@ class DbSchemaM:
             list_pos = "list_pos"  # Key
             description = "description"
             observance_id = "observance_id"  # Ref, Key
+            days_before_notification = "days_before_notification"
 
     class DiaryTable:
         name = "diary"
@@ -199,23 +210,41 @@ class ObservanceM:
         db_connection.commit()
 
 class KarmaM:
-    def __init__(self, i_observance_ref_it, i_pos_it, i_description_sg):
+    def __init__(self, i_observance_ref_it, i_pos_it, i_description_sg, i_days_before_notification_it):
         self.observance_ref_it = i_observance_ref_it
         self.pos_it = i_pos_it
         self.description_sg = i_description_sg
+        self.days_before_notification_it = i_days_before_notification_it
 
     @staticmethod
-    def add(i_observance_ref_id_it, i_pos_it, i_description_sg):
+    def add(i_observance_ref_id_it, i_pos_it, i_description_sg, i_days_before_notification_it):
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
         db_cursor.execute(
             "INSERT INTO " + DbSchemaM.KarmaTable.name + "("
             + DbSchemaM.KarmaTable.Cols.observance_id + ", "
             + DbSchemaM.KarmaTable.Cols.list_pos + ", "
-            + DbSchemaM.KarmaTable.Cols.description
-            + ") VALUES (?, ?, ?)", (i_observance_ref_id_it, i_pos_it, i_description_sg)
+            + DbSchemaM.KarmaTable.Cols.description + ", "
+            + DbSchemaM.KarmaTable.Cols.days_before_notification
+            + ") VALUES (?, ?, ?, ?)",
+            (i_observance_ref_id_it, i_pos_it, i_description_sg, i_days_before_notification_it)
         )
         db_connection.commit()
+
+    @staticmethod
+    def get_all():
+        db_connection = DbHelperM.get_db_connection()
+        db_cursor = db_connection.cursor()
+        db_cursor_result = db_cursor.execute(
+            "SELECT * FROM " + DbSchemaM.KarmaTable.name)
+        t_karma_tuple_list_from_db = db_cursor_result.fetchall()
+        db_connection.commit()
+
+        karma_list_lt = []
+        for karma_db_item in t_karma_tuple_list_from_db:
+            karma_list_lt.append(KarmaM(karma_db_item[0], karma_db_item[1], karma_db_item[2], karma_db_item[3]))
+
+        return karma_list_lt
 
     @staticmethod
     def get_all_for_observance(i_observance_id_it):
@@ -229,7 +258,7 @@ class KarmaM:
 
         karma_list_lt = []
         for karma_db_item in t_karma_tuple_list_from_db:
-            karma_list_lt.append(KarmaM(karma_db_item[0], karma_db_item[1], karma_db_item[2]))
+            karma_list_lt.append(KarmaM(karma_db_item[0], karma_db_item[1], karma_db_item[2], karma_db_item[3]))
 
         return karma_list_lt
 
@@ -245,10 +274,10 @@ class KarmaM:
             + " WHERE " + DbSchemaM.KarmaTable.Cols.observance_id + "=" + str(i_observance_id_it)
             + " AND " + DbSchemaM.KarmaTable.Cols.list_pos + "=" + str(i_karma_pos_it)
         )
-        t_karma_tuple_from_db = db_cursor_result.fetchone()
+        karma_db_item = db_cursor_result.fetchone()
         db_connection.commit()
 
-        return KarmaM(t_karma_tuple_from_db[0], t_karma_tuple_from_db[1], t_karma_tuple_from_db[2])
+        return KarmaM(karma_db_item[0], karma_db_item[1], karma_db_item[2], karma_db_item[3])
         #TODO (low prio): Handle "data error" when one of the three has "nonetype"
 
 class DiaryM:

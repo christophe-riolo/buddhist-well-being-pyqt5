@@ -236,7 +236,7 @@ class WellBeingWindow(QMainWindow):
         self.notifications_lb.clear()
         if i_cur_sel_it != -1:
             logging.debug("i_cur_sel_it = " + str(i_cur_sel_it))
-            t_karma_lt = bwb_model.KarmaM.get_all_for_observance(i_cur_sel_it)
+            t_karma_lt = bwb_model.KarmaM.get_all()
 
             for karma_item in t_karma_lt:
                 duration_sg = "x"
@@ -249,7 +249,7 @@ class WellBeingWindow(QMainWindow):
                     days_since_last_done_it = time_delta.days
                     duration_sg = str(days_since_last_done_it)
                 row = QListWidgetItem("{" + duration_sg + "}" + karma_item.description_sg)
-                if days_since_last_done_it > 10:
+                if days_since_last_done_it > karma_item.days_before_notification_it:
                     self.notifications_lb.addItem(row)
 
 
