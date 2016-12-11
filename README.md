@@ -81,10 +81,6 @@ To use this file:
 2. Type and run `python3 buddhist-well-being-pyqt5.py` on GNU/Linux systems or `python buddhist-well-being-pyqt5.py` on Windows (TBD: MacOS)
 
 
-## Contributing
-
-
-
 ## Feedback
 
 Feedback is very welcome! If you send us feedback it can help improve the software
