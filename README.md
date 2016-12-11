@@ -9,8 +9,7 @@ It's a cross-platform desktop application and is in an early development/prototy
 1. [Description](#description)
 2. [Installation](#installation)
 3. [Usage](#usage)
-4. [Contributing](#contributing)
-5. [Feedback](#feedback)
+4. [Feedback](#feedback)
 
 
 ## Description
