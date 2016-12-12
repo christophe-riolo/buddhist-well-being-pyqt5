@@ -86,7 +86,7 @@ Feedback is very welcome! If you send us feedback it can help improve the softwa
 
 ### Ideas for improving the software
 
-https://github.com/SunyataZero/buddhist-well-being-pyqt5/issues
+https://www.loomio.org/g/6szAVPlR/buddhist-well-being
 
 ### Reporting bugs
 
@@ -94,6 +94,6 @@ Please use the GitHub issue tracker: https://github.com/SunyataZero/buddhist-wel
 
 Don't hesitate to file a bug! *You are helping to improve the software*. Also if something is unclear in the *documentation* that counts as a bug as well, so please report it
 
-### Praise :)
+### What is already working well
 
 This is good to know so that we know what to keep, also it gives motiviation to continue working on the software
