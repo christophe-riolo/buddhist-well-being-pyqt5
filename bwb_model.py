@@ -217,7 +217,8 @@ class KarmaM:
         self.days_before_notification_it = i_days_before_notification_it
 
     @staticmethod
-    def add(i_observance_ref_id_it, i_pos_it, i_description_sg, i_days_before_notification_it):
+    def add(i_observance_ref_id_it, i_pos_it, i_description_sg,
+            i_days_before_notification_it = DEFAULT_DAYS_BEFORE_NOTIFICATION):
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
         db_cursor.execute(

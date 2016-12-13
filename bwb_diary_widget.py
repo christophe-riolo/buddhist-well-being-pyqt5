@@ -33,6 +33,7 @@ class DiaryListWidget(QWidget):
 
 
     # http://doc.qt.io/qt-5/qwidget.html#contextMenuEvent
+    # Overridden
     def contextMenuEvent(self, i_QContextMenuEvent):
         self.right_click_menu = QMenu()
 
