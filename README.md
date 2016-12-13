@@ -9,8 +9,7 @@ It's a cross-platform desktop application and is in an early development/prototy
 1. [Description](#description)
 2. [Installation](#installation)
 3. [Usage](#usage)
-4. [Contributing](#contributing)
-5. [Feedback](#feedback)
+4. [Feedback](#feedback)
 
 
 ## Description
@@ -28,7 +27,7 @@ This software project is inspired by a buddhist sutra about "achiveing true happ
 * Living with an awareness of the Four Noble Truths (Non-buddhists: Self-compassion and compassion)
 * Meditation
 
-What this application does is to help the user keep these ten principles ("observances") in mind by allowing the user to select them when writing diary entries/notes. Also it can be used in a more casual fashion by adding actions connected to the ten observances and then using these actions by adding them to the diary (optionally with notes)
+The application helps the user to keep these ten principles ("observances") in mind by allowing the user to select them when writing diary entries/notes. Also it can be used in a more casual fashion by adding actions connected to the ten observances and then using these actions by adding them to the diary (optionally with notes)
 
 Also planned:
 * Adding a reminder system for the actions (karma)
@@ -68,15 +67,17 @@ To use this file:
 2. Copy the `bwb.desktop` file to your desktop or any place where you want to be able to start the application from
 3. Copy the `bwb.desktop` file to `/usr/share/applications/` using `sudo` - this will make the application visible in any start-menu-like menu (in Lubuntu this is called the "main menu" and it's shown when clicking the button in the lower left, "vanilla" (the ordinary) Ubuntu may not have a menu like this
 
+### Hardware recommendations
+
+* Works best on screens with a resolution of at least 1366x768
+* No network connection is needed
+* Does not take much processor and memory resources, expected to run smoothly on most system 
+
 
 ## Usage
 
 1. Change directory to where the software files have been extracted
 2. Type and run `python3 buddhist-well-being-pyqt5.py` on GNU/Linux systems or `python buddhist-well-being-pyqt5.py` on Windows (TBD: MacOS)
-
-
-## Contributing
-
 
 
 ## Feedback
@@ -85,7 +86,7 @@ Feedback is very welcome! If you send us feedback it can help improve the softwa
 
 ### Ideas for improving the software
 
-https://github.com/SunyataZero/buddhist-well-being-pyqt5/issues
+https://www.loomio.org/g/6szAVPlR/buddhist-well-being
 
 ### Reporting bugs
 
@@ -93,6 +94,6 @@ Please use the GitHub issue tracker: https://github.com/SunyataZero/buddhist-wel
 
 Don't hesitate to file a bug! *You are helping to improve the software*. Also if something is unclear in the *documentation* that counts as a bug as well, so please report it
 
-### Praise :)
+### What is already working well
 
 This is good to know so that we know what to keep, also it gives motiviation to continue working on the software
