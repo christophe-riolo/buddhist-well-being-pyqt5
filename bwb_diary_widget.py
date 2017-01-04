@@ -74,8 +74,10 @@ class DiaryListWidget(QWidget):
 
 
             if prev_diary_item == None or not is_same_day(prev_diary_item.date_added_it, diary_item.date_added_it):
-                t_date_sg = datetime.datetime.fromtimestamp(diary_item.date_added_it).strftime("%A")
-                self.list_widget.addItem(t_date_sg)
+                t_date_as_weekday_sg = datetime.datetime.fromtimestamp(diary_item.date_added_it).strftime("%A")
+                ### t_date_as_weekday_formatted_ll = QLabel("<i>" + t_date_as_weekday_sg + "</i>")
+                self.list_widget.addItem("        " + t_date_as_weekday_sg.title())
+                ### self.list_widget.addW.addItem(t_date_as_weekday_formatted_ll)
 
 
 
@@ -128,6 +130,8 @@ class DiaryListWidget(QWidget):
                 """
 
             prev_diary_item = diary_item # -used for the weekday labels
+
+        self.list_widget.scrollToBottom()
 
         #self.show()
 

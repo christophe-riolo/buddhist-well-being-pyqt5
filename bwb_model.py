@@ -331,7 +331,7 @@ class DiaryM:
         return DiaryM(t_diary_tuple_from_db[0], t_diary_tuple_from_db[1], t_diary_tuple_from_db[2], t_diary_tuple_from_db[3])
 
     @staticmethod
-    def get_all(i_reverse_bl = True):
+    def get_all(i_reverse_bl = False):
         ret_diary_lt = []
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
