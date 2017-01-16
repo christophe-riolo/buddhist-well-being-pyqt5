@@ -44,7 +44,7 @@ GPLv3
 
 ## Installation
 
-There is no installation packages but it's really simple to install by following these steps:
+There are no installation packages but it's really simple to install by following these steps:
 
 1. Download the Python 3.x installation package for your platform: https://www.python.org/downloads/
 2. Install Python 3.x
@@ -55,7 +55,7 @@ There is no installation packages but it's really simple to install by following
 
 ### Advanced setup (optional)
 
-Please note: *This is not necessary for running the application*
+Please note: *This is not necessary for running the application*, instead you can skip directly to the [usage](#usage) section
 
 #### GNU/Linux systems
 
