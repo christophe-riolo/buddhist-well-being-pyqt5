@@ -2,13 +2,13 @@ import bwb_model
 import datetime
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore
-from PyQt5.QtGui import *
-from PyQt5.Qt import *
+from PyQt5 import QtGui
 
 """
 Inspiration for this class:
 http://stackoverflow.com/questions/20041385/python-pyqt-setting-scroll-area
 """
+
 
 class DiaryListWidget(QWidget):
     def __init__(self):
@@ -35,7 +35,7 @@ class DiaryListWidget(QWidget):
     # http://doc.qt.io/qt-5/qwidget.html#contextMenuEvent
     # Overridden
     def contextMenuEvent(self, i_QContextMenuEvent):
-        self.right_click_menu = QMenu()
+        self.right_click_menu = QtGui.QMenu()
 
         rename_action = QAction("Rename")
         rename_action.triggered.connect(self.rename_action_fn)
@@ -44,17 +44,17 @@ class DiaryListWidget(QWidget):
         delete_action.triggered.connect(self.delete_action_fn)
         self.right_click_menu.addAction(delete_action)
 
-        self.right_click_menu.exec_(QCursor.pos())
+        self.right_click_menu.exec_(QtGui.QCursor.pos())
 
     def delete_action_fn(self):
         print("now in delete_action_fn function")
-        bwb_model.DiaryM.remove(int(self.row_last_clicked.data(Qt.UserRole)))
+        bwb_model.DiaryM.remove(int(self.row_last_clicked.data(QtCore.Qt.UserRole)))
         self.update_gui(-1)
 
     # http://doc.qt.io/qt-5/qinputdialog.html#getText
     def rename_action_fn(self):
         print("now in rename_action_fn")
-        last_clicked_date_dbkey_it = int(self.row_last_clicked.data(Qt.UserRole))
+        last_clicked_date_dbkey_it = int(self.row_last_clicked.data(QtCore.Qt.UserRole))
         t_diary_item = bwb_model.DiaryM.get(last_clicked_date_dbkey_it)
 
         #bwb_model.DiaryM.remove(int(self.row_last_clicked.data(Qt.UserRole)))
@@ -71,15 +71,13 @@ class DiaryListWidget(QWidget):
             karma = bwb_model.KarmaM.get_for_observance_and_pos(
                 diary_item.observance_ref, diary_item.karma_ref)
 
-
-
-            if prev_diary_item == None or not is_same_day(prev_diary_item.date_added_it, diary_item.date_added_it):
+            if (prev_diary_item is None) or (not is_same_day(prev_diary_item.date_added_it, diary_item.date_added_it)):
                 t_date_as_weekday_sg = datetime.datetime.fromtimestamp(diary_item.date_added_it).strftime("%A")
                 ### t_date_as_weekday_formatted_ll = QLabel("<i>" + t_date_as_weekday_sg + "</i>")
-                self.list_widget.addItem("        " + t_date_as_weekday_sg.title())
+                list_item = QListWidgetItem("        " + t_date_as_weekday_sg.title())
+                list_item.setFlags(list_item.flags() & ~ QtCore.Qt.ItemIsSelectable & QtCore.Qt.ItemIsUserCheckable)
+                self.list_widget.addItem(list_item)
                 ### self.list_widget.addW.addItem(t_date_as_weekday_formatted_ll)
-
-
 
             if karma is None:
                 t_diary_entry_karma_sg = ""
@@ -93,7 +91,7 @@ class DiaryListWidget(QWidget):
             ###t_diary_entry_ll.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
 
 
-            label = QLabel(label_text_sg)
+            #label = QLabel(label_text_sg)
 
             """
             palette = QPalette()
@@ -110,16 +108,19 @@ class DiaryListWidget(QWidget):
 
             #label.setStyleSheet("border: 1px solid black")
             ############label.setFrameStyle(QFrame.StyledPanel)
-            label.setWordWrap(True)
+            #label.setWordWrap(True)
             list_item = QListWidgetItem(label_text_sg)
             #list_item = QListWidgetItem()
-            list_item.setData(Qt.UserRole, diary_item.date_added_it)
+            list_item.setData(QtCore.Qt.UserRole, diary_item.date_added_it)
+
+            ######################list_item.setBackground(QtCore.Qt.red) <-----------------
+            #list_item.setFlags(list_item.flags() & ~ Qt.ItemIsSelectable)
             self.list_widget.setWordWrap(True)
             self.list_widget.addItem(list_item)
             #self.list_widget.setItemWidget(list_item, label) # -http://doc.qt.io/qt-5/qlistwidget.html#setItemWidget
 
             if i_cur_sel_it == diary_item.observance_ref:
-                label.setFrameStyle(QFrame.StyledPanel)
+                #label.setFrameStyle(QFrame.StyledPanel)
                 # -http://doc.qt.io/qt-4.8/qframe.html#setFrameStyle
                 # -http://nullege.com/codes/search/PyQt4.QtGui.QFrame.setFrameStyle
                 """

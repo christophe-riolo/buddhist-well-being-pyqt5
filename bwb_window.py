@@ -31,8 +31,8 @@ class WellBeingWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        # Initializaing window
-        self.setGeometry(40, 30, 1200, 700)
+        # Initializing window
+        self.setGeometry(40, 30, 1050, 700)
         self.setWindowTitle("Buddhist Well-Being")
         self.setWindowIcon(QtGui.QIcon("icon.png"))
         self.global_widget_w1 = QWidget()
@@ -40,31 +40,25 @@ class WellBeingWindow(QMainWindow):
 
         # Creating layouts..
         global_hbox_l2 = QHBoxLayout()
-        #..leftmost column (column 1)
+        # ..leftmost column (column 1)
         col1_vbox_w3 = QWidget()
         col1_vbox_l4 = QVBoxLayout()
         col1_vbox_w3.setLayout(col1_vbox_l4)
         col1_vbox_w3.setFixedWidth(240)
         global_hbox_l2.addWidget(col1_vbox_w3)
-        #..column 2
+        # ..column 2
         self.col2_vbox_w3 = QWidget()
         self.col2_vbox_l4 = QVBoxLayout()
         self.col2_vbox_w3.setLayout(self.col2_vbox_l4)
         global_hbox_l2.addWidget(self.col2_vbox_w3)
-        #..column 3
+        # ..column 3
         col3_vbox_w3 = QWidget()
         col3_vbox_l4 = QVBoxLayout()
         col3_vbox_w3.setLayout(col3_vbox_l4)
         col3_vbox_w3.setFixedWidth(240)
         global_hbox_l2.addWidget(col3_vbox_w3)
-        #..column 4
-        col4_vbox_w3 = QWidget()
-        col4_vbox_l4 = QVBoxLayout()
-        col4_vbox_w3.setLayout(col4_vbox_l4)
-        col4_vbox_w3.setFixedWidth(240)
-        global_hbox_l2.addWidget(col4_vbox_w3)
 
-        #..
+        # ..
         self.global_widget_w1.setLayout(global_hbox_l2)
 
         # Creating widgets..
@@ -73,6 +67,7 @@ class WellBeingWindow(QMainWindow):
         col1_vbox_l4.addWidget(ten_obs_label)
         self.ten_obs_lb_w5 = QListWidget()
         self.ten_obs_lb_w5.setFixedHeight(360)
+        #############self.ten_obs_lb_w5.setSelectionMode(QAbstractItemView.MultiSelection)
         col1_vbox_l4.addWidget(self.ten_obs_lb_w5)
         self.ten_obs_lb_w5.currentItemChanged.connect(self.on_observance_selected)
         ##self.ten_observances_lb.setSizeAdjustPolicy(QListWidget.AdjustToContents)
@@ -121,48 +116,6 @@ class WellBeingWindow(QMainWindow):
         col3_vbox_l4.addWidget(notifications_label)
         self.notifications_lb = QListWidget()
         col3_vbox_l4.addWidget(self.notifications_lb)
-        #..for the four immeasurable minds
-        """
-        http://doc.qt.io/qt-4.8/stylesheet-examples.html#customizing-qslider
-        palette = QtGui.QPalette()
-        colour = QtGui.QColor(0, 199, 0)
-        palette.setColor(self.loving_kindness_slider.backgroundRole(), colour)
-        self.loving_kindness_slider.setAutoFillBackground(True)
-        self.loving_kindness_slider.setPalette(palette)
-        """
-        self.loving_kindness_label = QLabel("Loving kindness")
-        col4_vbox_l4.addWidget(self.loving_kindness_label)
-        self.loving_kindness_slider = QSlider(QtCore.Qt.Horizontal, self)
-        col4_vbox_l4.addWidget(self.loving_kindness_slider)
-        self.compassion_label = QLabel("Compassion")
-        col4_vbox_l4.addWidget(self.compassion_label)
-        self.compassion_slider = QSlider(QtCore.Qt.Horizontal, self)
-        col4_vbox_l4.addWidget(self.compassion_slider)
-        self.joy_label = QLabel("Joy")
-        col4_vbox_l4.addWidget(self.joy_label)
-        self.joy_slider = QSlider(QtCore.Qt.Horizontal, self)
-        col4_vbox_l4.addWidget(self.joy_slider)
-        self.equanimity_label = QLabel("Equanimity (non-discrimination)")
-        col4_vbox_l4.addWidget(self.equanimity_label)
-        self.equanimity_slider = QSlider(QtCore.Qt.Horizontal, self)
-        col4_vbox_l4.addWidget(self.equanimity_slider)
-
-        self.body_label = QLabel("Body")
-        col4_vbox_l4.addWidget(self.body_label)
-        self.body_slider = QSlider(QtCore.Qt.Horizontal, self)
-        col4_vbox_l4.addWidget(self.body_slider)
-        self.feelings_label = QLabel("Feelings")
-        col4_vbox_l4.addWidget(self.feelings_label)
-        self.feelings_slider = QSlider(QtCore.Qt.Horizontal, self)
-        col4_vbox_l4.addWidget(self.feelings_slider)
-        self.mind_label = QLabel("Mind")
-        col4_vbox_l4.addWidget(self.mind_label)
-        self.mind_slider = QSlider(QtCore.Qt.Horizontal, self)
-        col4_vbox_l4.addWidget(self.mind_slider)
-        self.equanimity_label = QLabel("Objects of Mind")
-        col4_vbox_l4.addWidget(self.equanimity_label)
-        self.equanimity_slider = QSlider(QtCore.Qt.Horizontal, self)
-        col4_vbox_l4.addWidget(self.equanimity_slider)
 
         # Creating the menu bar..
         # ..setup of actions
@@ -180,9 +133,9 @@ class WellBeingWindow(QMainWindow):
         self.menu_bar = self.menuBar()
         file_menu = self.menu_bar.addMenu("&File")
         debug_menu = self.menu_bar.addMenu("Debu&g")
-        observance_menu = self.menu_bar.addMenu("&Observance")
-        karma_menu = self.menu_bar.addMenu("&Karma")
-        diary_note_menu = self.menu_bar.addMenu("&Diary note")
+        # observance_menu = self.menu_bar.addMenu("&Observance")
+        # karma_menu = self.menu_bar.addMenu("&Karma")
+        # diary_note_menu = self.menu_bar.addMenu("&Diary note")
         help_menu = self.menu_bar.addMenu("&Help")
         file_menu.addAction(export_action)
         file_menu.addAction(exit_action)
@@ -210,7 +163,7 @@ class WellBeingWindow(QMainWindow):
 
     def on_observance_selected(self, i_curr_item, i_prev_item):
         selection_it = self.ten_obs_lb_w5.currentRow() #.selectedItems()[0]
-        if 0 <= selection_it <= 9:
+        if 0 <= selection_it < self.ten_obs_lb_w5.count():
             t_observance = bwb_model.ObservanceM.get(selection_it)
             self.ten_obs_details_ll.setText(t_observance.sutra_text_sg)
         elif selection_it == -1:
@@ -240,6 +193,8 @@ class WellBeingWindow(QMainWindow):
 
     def on_add_text_to_diary_button_pressed(self):
         t_observance_pos_it = self.ten_obs_lb_w5.currentRow()
+
+        ######t_selected_observances_it_lt = [x.row() for x in self.ten_obs_lb_w5.selectedIndexes()]
 
         t_karma_pos_it = self.karma_lb.currentRow()
 

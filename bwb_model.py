@@ -290,7 +290,7 @@ class DiaryM:
 
     @staticmethod
     def add(i_date_added_it, i_observance_ref_id_it, i_karma_ref_id_it, i_notes_sg):
-        if i_observance_ref_id_it > 9:
+        if i_observance_ref_id_it > 9: # TODO: Change to length of list instead of static check
             None
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
