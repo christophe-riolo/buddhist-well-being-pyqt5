@@ -45,6 +45,8 @@ This document can be read by everyone, both tech and non-tech people. This docum
 
 Building a desktop application that helps Buddhist laypeople achieve true happiness
 
+TBD: Non-buddhists as well?
+
 
 ### 1.5 References
 <List any other documents or Web addresses to which this SRS refers. These may include user interface style guides, contracts, standards, system requirements specifications, use case documents, or a vision and scope document. Provide enough information so that the reader could access a copy of each reference, including title, author, version number, date, and source or location.>
