@@ -22,7 +22,9 @@ class DiaryListWidget(QWidget):
 
         self.scroll_area.setWidgetResizable(True)
 
-        self.list_widget.itemPressed.connect(self.item_clicked_fn) # Clicked doesn't work
+        self.list_widget.itemPressed.connect(self.item_clicked_fn)  # Clicked doesn't work
+
+        # TODO: Change to using self.list_widget.verticalScrollBar()
 
         self.row_last_clicked = None
 
@@ -62,14 +64,20 @@ class DiaryListWidget(QWidget):
         text_input_dialog.getText(self, "Rename dialog", "New name: ", text=t_diary_item.notes_sg)
         self.update_gui(-1)
 
-    def update_gui(self, i_cur_sel_it):
+    def update_gui(self, i_obs_sel_list):
         self.list_widget.clear()
         prev_diary_item = None
 
         for diary_item in bwb_model.DiaryM.get_all():
-            diary_entry_obs_sg = bwb_model.ObservanceM.get(diary_item.observance_ref).short_name_sg
-            karma = bwb_model.KarmaM.get_for_observance_and_pos(
-                diary_item.observance_ref, diary_item.karma_ref)
+            t_observance_list = bwb_model.ObservanceM.get_all_for_diary_id(diary_item.id)
+            t_observance = None
+            diary_entry_obs_sg = ""
+            if t_observance_list is not None and t_observance_list != []:
+                t_observance = t_observance_list[0]
+                for obs_item in t_observance_list:
+                    diary_entry_obs_sg = diary_entry_obs_sg + obs_item.title + ", "
+
+            karma = bwb_model.KarmaM.get(diary_item.ref_karma_id)  ### Previous: get_for_obs_and_pos
 
             if (prev_diary_item is None) or (not is_same_day(prev_diary_item.date_added_it, diary_item.date_added_it)):
                 t_date_as_weekday_sg = datetime.datetime.fromtimestamp(diary_item.date_added_it).strftime("%A")
@@ -79,12 +87,12 @@ class DiaryListWidget(QWidget):
                 self.list_widget.addItem(list_item)
                 ### self.list_widget.addW.addItem(t_date_as_weekday_formatted_ll)
 
-            if karma is None:
-                t_diary_entry_karma_sg = ""
-            else:
-                t_diary_entry_karma_sg = karma.description_sg.strip() + " "
+            t_diary_entry_karma_sg = ""
+            if karma is not None:
+                t_diary_entry_karma_sg = karma.title_sg.strip() + " "
 
-            label_text_sg = t_diary_entry_karma_sg + "[" + diary_entry_obs_sg.strip() + "] " + diary_item.notes_sg.strip()
+            label_text_sg = t_diary_entry_karma_sg + "[" + diary_entry_obs_sg.strip() + "] "\
+                + diary_item.diary_text.strip()
 
             ###t_diary_entry_ll.bind("<Button-1>", self.diary_entry_clicked)
             #######self.right_vbox.pack_start(t_diary_entry_ll, True, True, 0)
@@ -111,7 +119,7 @@ class DiaryListWidget(QWidget):
             #label.setWordWrap(True)
             list_item = QListWidgetItem(label_text_sg)
             #list_item = QListWidgetItem()
-            list_item.setData(QtCore.Qt.UserRole, diary_item.date_added_it)
+            list_item.setData(QtCore.Qt.UserRole, diary_item.id)  # to read: .data
 
             ######################list_item.setBackground(QtCore.Qt.red) <-----------------
             #list_item.setFlags(list_item.flags() & ~ Qt.ItemIsSelectable)
@@ -119,16 +127,16 @@ class DiaryListWidget(QWidget):
             self.list_widget.addItem(list_item)
             #self.list_widget.setItemWidget(list_item, label) # -http://doc.qt.io/qt-5/qlistwidget.html#setItemWidget
 
+            """
             if i_cur_sel_it == diary_item.observance_ref:
                 #label.setFrameStyle(QFrame.StyledPanel)
                 # -http://doc.qt.io/qt-4.8/qframe.html#setFrameStyle
                 # -http://nullege.com/codes/search/PyQt4.QtGui.QFrame.setFrameStyle
-                """
                 palette = QPalette()
                 palette.setColor(label.backgroundRole(), QColor("yellow"))
                 label.setAutoFillBackground(True)
                 label.setPalette(palette)
-                """
+            """
 
             prev_diary_item = diary_item # -used for the weekday labels
 
