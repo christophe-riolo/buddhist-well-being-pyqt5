@@ -72,10 +72,11 @@ class DiaryListWidget(QWidget):
             t_observance_list = bwb_model.ObservanceM.get_all_for_diary_id(diary_item.id)
             t_observance = None
             diary_entry_obs_sg = ""
+            t_delimeter_sg = ", "
             if t_observance_list is not None and t_observance_list != []:
                 t_observance = t_observance_list[0]
                 for obs_item in t_observance_list:
-                    diary_entry_obs_sg = diary_entry_obs_sg + obs_item.title + ", "
+                    diary_entry_obs_sg = diary_entry_obs_sg + obs_item.title + t_delimeter_sg
 
             karma = bwb_model.KarmaM.get(diary_item.ref_karma_id)  ### Previous: get_for_obs_and_pos
 
@@ -91,7 +92,7 @@ class DiaryListWidget(QWidget):
             if karma is not None:
                 t_diary_entry_karma_sg = karma.title_sg.strip() + " "
 
-            label_text_sg = t_diary_entry_karma_sg + "[" + diary_entry_obs_sg.strip() + "] "\
+            label_text_sg = t_diary_entry_karma_sg + "[" + diary_entry_obs_sg.strip(t_delimeter_sg) + "] "\
                 + diary_item.diary_text.strip()
 
             ###t_diary_entry_ll.bind("<Button-1>", self.diary_entry_clicked)
