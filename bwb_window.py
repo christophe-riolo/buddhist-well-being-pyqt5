@@ -28,6 +28,7 @@ class EventSource(enum.Enum):
 #
 #################
 class WellBeingWindow(QMainWindow):
+    # noinspection PyArgumentList,PyUnresolvedReferences
     def __init__(self):
         super().__init__()
 
@@ -238,7 +239,7 @@ class WellBeingWindow(QMainWindow):
 
     def on_add_text_to_diary_button_pressed(self):
         obs_selected_item_list = self.ten_obs_lb_w5.selectedItems()
-        if obs_selected_item_list is not None:
+        if obs_selected_item_list is not None and len(obs_selected_item_list) > 0:
             t_karma_current_item = self.karma_lb.currentItem()
             t_karma_id = -1
             if t_karma_current_item is not None:
@@ -247,11 +248,16 @@ class WellBeingWindow(QMainWindow):
             obs_selected_item_id_list = [x.data(QtCore.Qt.UserRole) for x in obs_selected_item_list]
             bwb_model.DiaryM.add(int(time.time()), notes_pre_sg, t_karma_id, obs_selected_item_id_list)
 
+            self.adding_text_to_diary_te_w6.clear()
+
             self.update_gui()
 
-            self.adding_text_to_diary_te_w6.clear()
-            ##self.ten_observances_lb.selection_clear(0)  # Clearing the selection
-            ##self.karma_lb.selection_clear(0)
+        else:
+            message_box = QMessageBox.information(
+                self, "About Buddhist Well-Being",
+                ("Please select at least one observance before adding a new diary entry")
+            )
+
 
         """
         if selected_item is not None and selected_item.text != "":
