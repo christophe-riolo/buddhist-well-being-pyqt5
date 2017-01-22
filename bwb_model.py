@@ -6,6 +6,15 @@ import datetime
 #################
 #
 # Model
+# This module contains everything related to the model for the application:
+# * The db schema
+# * The db connection
+# * Data structure classes (each of which contains functions for reading and writing to the db):
+#   * ObservanceM
+#   * KarmaM
+#   * DiaryM
+# * Database creation and setup
+# * Various functions (for backing up the db etc)
 #
 #################
 
@@ -92,7 +101,7 @@ def initial_schema_and_setup(i_db_conn):
     )
 
 """
-Example:
+Example of db upgrade code:
 def upgrade_1_2(i_db_conn):
     backup_db_file()
     i_db_conn.execute(
@@ -358,38 +367,6 @@ class KarmaM:
 
         return ret_karma_list
 
-
-    """
-
-    @staticmethod
-    def get_for_observance_list(i_observance_id_list):
-        db_connection = DbHelperM.get_db_connection()
-        db_cursor = db_connection.cursor()
-
-        db_cursor_result = db_cursor.execute(
-            "SELECT * FROM " + DbSchemaM.KarmaObsRefTable.name
-            + " WHERE " + DbSchemaM.KarmaObsRefTable.Cols.observance_ref + "=" + str(i_observance_id_it))
-        t_karma_ref_list = [x[0] for x in db_cursor_result.fetchall()]
-        db_connection.commit()
-
-        ret_karma_list = []
-
-        for karma_id_ref in t_karma_ref_list:
-            db_cursor_result = db_cursor.execute(
-                "SELECT * FROM " + DbSchemaM.KarmaTable.name
-                + " WHERE " + DbSchemaM.KarmaTable.Cols.id + "=" + str(karma_id_ref)
-            )
-            t_karma_tuple = db_cursor_result.fetchone()
-            ret_karma_list.append(KarmaM(
-                t_karma_tuple[0],
-                t_karma_tuple[1],
-                t_karma_tuple[2]))
-            db_connection.commit()
-
-        return ret_karma_list
-
-    """
-
     @staticmethod
     def get(i_id):
         if i_id is None or i_id == -1:
@@ -409,22 +386,6 @@ class KarmaM:
             karma_db_item[1],
             karma_db_item[2]
         )
-        #TODO (low prio): Handle "data error" when one of the three has "nonetype"
-
-    """
-    @staticmethod
-    def get_for_diary_id(i_diary_id):
-        db_connection = DbHelperM.get_db_connection()
-        db_cursor = db_connection.cursor()
-        db_cursor_result = db_cursor.execute(
-            "SELECT * FROM " + DbSchemaM.DiaryTable.name
-            + " WHERE " + DbSchemaM.DiaryTable.Cols.ref_karma_id + "=" + str(i_id)
-        )
-        karma_db_item = db_cursor_result.fetchone()
-        db_connection.commit()
-
-        return KarmaM(karma_db_item[0], karma_db_item[1], karma_db_item[2])
-    """
 
 
 class DiaryM:
@@ -437,8 +398,6 @@ class DiaryM:
     @staticmethod
     def add(i_date_added_it, i_diary_text, i_karma_ref, i_observance_ref_id_it_list):
 
-        ####if i_observance_ref_id_it > 9: # TODO: Change to length of list instead of static check
-        ####    None
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
         db_cursor.execute(
@@ -550,7 +509,6 @@ class DiaryM:
 
         return ret_diary_lt
 
-    # Can be used for notifications, and for displaying the number of days since the last time the user has done a karma
     @staticmethod
     def get_latest_for_karma(i_karma_id_it):
         db_connection = DbHelperM.get_db_connection()
@@ -574,21 +532,15 @@ class DiaryM:
 
 def export_all():
     csv_writer = csv.writer(open("exported.csv", "w"))
-
     t_space_tab_sg = "    "
-
     for obs_item in ObservanceM.get_all():
         csv_writer.writerow((obs_item.short_name_sg, obs_item.sutra_text_sg))
-
     csv_writer.writerow(("\n\n\n",))
-
     for index in range(0, len(ObservanceM.get_all())):
         csv_writer.writerow((ObservanceM.get(index).title,))
         for karma_item in KarmaM.get_all_for_observance(index):
             csv_writer.writerow((t_space_tab_sg + karma_item.description_sg,))
-
     csv_writer.writerow(("\n\n\n",))
-
     for diary_item in DiaryM.get_all():
         t_diary_entry_obs_sg = ObservanceM.get(diary_item.observance_ref).title
         t_karma = KarmaM.get(diary_item.karma_ref)
@@ -596,7 +548,6 @@ def export_all():
             t_diary_entry_karma_sg = ""
         else:
             t_diary_entry_karma_sg = t_karma.title_sg
-
         csv_writer.writerow((t_diary_entry_obs_sg, t_diary_entry_karma_sg, diary_item.notes_sg))
 
 
@@ -604,7 +555,7 @@ def backup_db_file():
     date_sg = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     new_file_name_sg = DATABASE_FILE_NAME + "_" + date_sg
     copyfile(DATABASE_FILE_NAME, new_file_name_sg)
-
+    return
     """
     Alternative: Appending a number to the end of the file name
     i = 1
