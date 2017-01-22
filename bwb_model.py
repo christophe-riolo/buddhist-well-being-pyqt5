@@ -20,6 +20,7 @@ import datetime
 
 DATABASE_FILE_NAME = "bwb_database_file.db"
 DEFAULT_DAYS_BEFORE_NOTIFICATION = 4
+NO_NOTIFICATION = -1
 
 
 def get_schema_version(i_db_conn):
@@ -65,7 +66,7 @@ def initial_schema_and_setup(i_db_conn):
         + DbSchemaM.DiaryTable.Cols.date_added + " INTEGER" + ", "
         + DbSchemaM.DiaryTable.Cols.diary_text + " TEXT" + ", "
         + DbSchemaM.DiaryTable.Cols.karma_ref + " INTEGER"
-            + " INTEGER REFERENCES " + DbSchemaM.ObservancesTable.name
+            + " INTEGER REFERENCES " + DbSchemaM.KarmaTable.name
         + ")"
     )
     i_db_conn.execute(
