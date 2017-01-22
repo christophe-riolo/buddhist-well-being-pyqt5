@@ -55,9 +55,11 @@ def initial_schema_and_setup(i_db_conn):
         "CREATE TABLE " + DbSchemaM.KarmaObsRefTable.name + "("
         + DbSchemaM.KarmaObsRefTable.Cols.id + " INTEGER PRIMARY KEY" + ", "
         + DbSchemaM.KarmaObsRefTable.Cols.karma_ref
-            + " INTEGER REFERENCES " + DbSchemaM.KarmaTable.name + ", "
+            + " INTEGER REFERENCES " + DbSchemaM.KarmaTable.name
+            + "(" + DbSchemaM.KarmaTable.Cols.id + ")" + ", "
         + DbSchemaM.KarmaObsRefTable.Cols.observance_ref
             + " INTEGER REFERENCES " + DbSchemaM.ObservancesTable.name
+            + "(" + DbSchemaM.ObservancesTable.Cols.id + ")"
         + ")"
     )
     i_db_conn.execute(
@@ -67,15 +69,18 @@ def initial_schema_and_setup(i_db_conn):
         + DbSchemaM.DiaryTable.Cols.diary_text + " TEXT" + ", "
         + DbSchemaM.DiaryTable.Cols.karma_ref + " INTEGER"
             + " INTEGER REFERENCES " + DbSchemaM.KarmaTable.name
+            + "(" + DbSchemaM.KarmaTable.Cols.id + ")"
         + ")"
     )
     i_db_conn.execute(
         "CREATE TABLE " + DbSchemaM.DiaryObsRefTable.name + "("
         + DbSchemaM.DiaryObsRefTable.Cols.id + " INTEGER PRIMARY KEY" + ", "
         + DbSchemaM.DiaryObsRefTable.Cols.diary_ref
-            + " INTEGER REFERENCES " + DbSchemaM.DiaryTable.name + ", "
+            + " INTEGER REFERENCES " + DbSchemaM.DiaryTable.name
+            + "(" + DbSchemaM.KarmaTable.Cols.id + ")" + ", "
         + DbSchemaM.DiaryObsRefTable.Cols.observance_ref
             + " INTEGER REFERENCES " + DbSchemaM.ObservancesTable.name
+            + "(" + DbSchemaM.ObservancesTable.Cols.id + ")"
         + ")"
     )
 
