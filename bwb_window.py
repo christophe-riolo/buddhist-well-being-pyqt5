@@ -246,7 +246,12 @@ class WellBeingWindow(QMainWindow):
             notes_pre_sg = self.adding_text_to_diary_te_w6.toPlainText().strip()
             obs_selected_item_id_list = [x.data(QtCore.Qt.UserRole) for x in obs_selected_item_list]
             bwb_model.DiaryM.add(int(time.time()), notes_pre_sg, t_karma_id, obs_selected_item_id_list)
+
             self.update_gui()
+
+            self.adding_text_to_diary_te_w6.clear()
+            ##self.ten_observances_lb.selection_clear(0)  # Clearing the selection
+            ##self.karma_lb.selection_clear(0)
 
         """
         if selected_item is not None and selected_item.text != "":
