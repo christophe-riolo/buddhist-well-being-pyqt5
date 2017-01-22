@@ -37,7 +37,7 @@ class DiaryListWidget(QWidget):
     # http://doc.qt.io/qt-5/qwidget.html#contextMenuEvent
     # Overridden
     def contextMenuEvent(self, i_QContextMenuEvent):
-        self.right_click_menu = QtGui.QMenu()
+        self.right_click_menu = QMenu()
 
         rename_action = QAction("Rename")
         rename_action.triggered.connect(self.rename_action_fn)
@@ -56,12 +56,14 @@ class DiaryListWidget(QWidget):
     # http://doc.qt.io/qt-5/qinputdialog.html#getText
     def rename_action_fn(self):
         print("now in rename_action_fn")
-        last_clicked_date_dbkey_it = int(self.row_last_clicked.data(QtCore.Qt.UserRole))
-        t_diary_item = bwb_model.DiaryM.get(last_clicked_date_dbkey_it)
+        t_last_clicked_date_dbkey_it = int(self.row_last_clicked.data(QtCore.Qt.UserRole))
+        t_diary_item = bwb_model.DiaryM.get(t_last_clicked_date_dbkey_it)
 
         #bwb_model.DiaryM.remove(int(self.row_last_clicked.data(Qt.UserRole)))
         text_input_dialog = QInputDialog()
-        text_input_dialog.getText(self, "Rename dialog", "New name: ", text=t_diary_item.notes_sg)
+        t_new_text_qstring = text_input_dialog.getText(self, "Rename dialog", "New name: ", text=t_diary_item.diary_text)
+        print("t_new_text_sg = " + str(t_new_text_qstring))
+        bwb_model.DiaryM.update_note(t_last_clicked_date_dbkey_it, t_new_text_qstring[0])
         self.update_gui(-1)
 
     def update_gui(self, i_obs_sel_list):

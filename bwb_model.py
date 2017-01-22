@@ -430,24 +430,33 @@ class DiaryM:
             db_connection.commit()
 
     @staticmethod
-    def remove(i_date_added_it):
+    def update_note(i_id_it, i_new_text_sg):
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
         db_cursor.execute(
-            "DELETE FROM " + DbSchemaM.DiaryTable.name + " WHERE "
-            + DbSchemaM.DiaryTable.Cols.date_added + "=?",
-            (str(i_date_added_it),)
+            "UPDATE " + DbSchemaM.DiaryTable.name
+            + " SET " + DbSchemaM.DiaryTable.Cols.diary_text + " = " + "'" + str(i_new_text_sg) + "'"
+            + " WHERE " + DbSchemaM.DiaryTable.Cols.id + "=" + str(i_id_it)
         )
         db_connection.commit()
 
     @staticmethod
-    def get(i_date_added_it):
+    def remove(i_id_it):
+        db_connection = DbHelperM.get_db_connection()
+        db_cursor = db_connection.cursor()
+        db_cursor.execute(
+            "DELETE FROM " + DbSchemaM.DiaryTable.name
+            + " WHERE " + DbSchemaM.DiaryTable.Cols.id + "=" + str(i_id_it)
+        )
+        db_connection.commit()
+
+    @staticmethod
+    def get(i_id_it):
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
         db_cursor_result = db_cursor.execute(
             "SELECT * FROM " + DbSchemaM.DiaryTable.name + " WHERE "
-            + DbSchemaM.DiaryTable.Cols.date_added + "=?",
-            (str(i_date_added_it),)
+            + DbSchemaM.DiaryTable.Cols.id + "=" + str(i_id_it)
         )
         t_diary_tuple_from_db = db_cursor_result.fetchone()
         db_connection.commit()
