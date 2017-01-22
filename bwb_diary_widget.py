@@ -50,8 +50,14 @@ class DiaryListWidget(QWidget):
 
     def delete_action_fn(self):
         print("now in delete_action_fn function")
-        bwb_model.DiaryM.remove(int(self.row_last_clicked.data(QtCore.Qt.UserRole)))
-        self.update_gui(-1)
+        t_message_box_reply = QMessageBox.question(
+            self, "Remove diary entry?", "Are you sure that you want to remove this diary entry?"
+        )
+        if t_message_box_reply == QMessageBox.Yes:
+            bwb_model.DiaryM.remove(int(self.row_last_clicked.data(QtCore.Qt.UserRole)))
+            self.update_gui(-1)
+        else:
+            pass  # -Do nothing
 
     # http://doc.qt.io/qt-5/qinputdialog.html#getText
     def rename_action_fn(self):
