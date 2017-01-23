@@ -367,7 +367,8 @@ class WellBeingWindow(QMainWindow):
                 t_day_as_int = int(time.mktime((datetime.date.today() - datetime.timedelta(days=day_it)).timetuple()))
                 t_diary_filtered_list = bwb_model.DiaryM.get_all_for_obs_and_day(observance_item.id, t_day_as_int)
                 total_number_it = len(t_diary_filtered_list)
-                total_number_week_list.append(total_number_it)
+                t_weekday_one_char_sg = datetime.datetime.fromtimestamp(t_day_as_int).strftime("%a")[0]
+                total_number_week_list.append(t_weekday_one_char_sg.upper() + str(total_number_it))
 
             observance_short_formatted_sg = "<b>" + observance_item.title + "</b>"
             row_label_w8 = QLabel(
