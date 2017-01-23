@@ -6,6 +6,7 @@ import datetime
 #################
 #
 # Model
+#
 # This module contains everything related to the model for the application:
 # * The db schema
 # * The db connection
@@ -15,6 +16,10 @@ import datetime
 #   * DiaryM
 # * Database creation and setup
 # * Various functions (for backing up the db etc)
+#
+# Notes:
+# * When inserting vales, it's best to use "VALUES (?, ?)" because then the sqlite3 module will take care of
+#   escaping values for us
 #
 #################
 
@@ -37,7 +42,8 @@ def initial_schema_and_setup(i_db_conn):
     i_db_conn.execute(
         "CREATE TABLE " + DbSchemaM.ObservancesTable.name + "("
         + DbSchemaM.ObservancesTable.Cols.id + " INTEGER PRIMARY KEY" + ", "
-        + DbSchemaM.ObservancesTable.Cols.title + " TEXT" + ", "
+        + DbSchemaM.ObservancesTable.Cols.title + " TEXT"
+            + " NOT NULL" + ", "
         + DbSchemaM.ObservancesTable.Cols.description + " TEXT" + ", "
         + DbSchemaM.ObservancesTable.Cols.user_text + " TEXT"
             + " DEFAULT " + "''"
@@ -56,10 +62,12 @@ def initial_schema_and_setup(i_db_conn):
         + DbSchemaM.KarmaObsRefTable.Cols.id + " INTEGER PRIMARY KEY" + ", "
         + DbSchemaM.KarmaObsRefTable.Cols.karma_ref
             + " INTEGER REFERENCES " + DbSchemaM.KarmaTable.name
-            + "(" + DbSchemaM.KarmaTable.Cols.id + ")" + ", "
+            + "(" + DbSchemaM.KarmaTable.Cols.id + ")"
+            + " NOT NULL" + ", "
         + DbSchemaM.KarmaObsRefTable.Cols.observance_ref
             + " INTEGER REFERENCES " + DbSchemaM.ObservancesTable.name
             + "(" + DbSchemaM.ObservancesTable.Cols.id + ")"
+            + " NOT NULL"
         + ")"
     )
     i_db_conn.execute(
@@ -70,6 +78,7 @@ def initial_schema_and_setup(i_db_conn):
         + DbSchemaM.DiaryTable.Cols.karma_ref + " INTEGER"
             + " INTEGER REFERENCES " + DbSchemaM.KarmaTable.name
             + "(" + DbSchemaM.KarmaTable.Cols.id + ")"
+            + " NOT NULL"
         + ")"
     )
     i_db_conn.execute(
@@ -77,10 +86,12 @@ def initial_schema_and_setup(i_db_conn):
         + DbSchemaM.DiaryObsRefTable.Cols.id + " INTEGER PRIMARY KEY" + ", "
         + DbSchemaM.DiaryObsRefTable.Cols.diary_ref
             + " INTEGER REFERENCES " + DbSchemaM.DiaryTable.name
-            + "(" + DbSchemaM.KarmaTable.Cols.id + ")" + ", "
+            + "(" + DbSchemaM.KarmaTable.Cols.id + ")"
+            + " NOT NULL" + ", "
         + DbSchemaM.DiaryObsRefTable.Cols.observance_ref
             + " INTEGER REFERENCES " + DbSchemaM.ObservancesTable.name
             + "(" + DbSchemaM.ObservancesTable.Cols.id + ")"
+            + " NOT NULL"
         + ")"
     )
 
@@ -344,20 +355,15 @@ class KarmaM:
         t_karma_id_list = [x.id for x in KarmaM.get_all()]
 
         for obs_item_id in i_observance_id_list:
-            pass
-
             db_cursor_result = db_cursor.execute(
                 "SELECT * FROM " + DbSchemaM.KarmaObsRefTable.name
                 + " WHERE " + DbSchemaM.KarmaObsRefTable.Cols.observance_ref + "=" + str(obs_item_id)
             )
             t_temp_karma_ref_list = [x[1] for x in db_cursor_result.fetchall()]
             db_connection.commit()
-
             t_karma_id_list = list(set(t_karma_id_list) & set(t_temp_karma_ref_list))
 
-
         ret_karma_list = []
-
         for karma_id_ref in t_karma_id_list:
             db_cursor_result = db_cursor.execute(
                 "SELECT * FROM " + DbSchemaM.KarmaTable.name
@@ -370,7 +376,6 @@ class KarmaM:
                 t_karma_tuple[2]
             ))
             db_connection.commit()
-
         return ret_karma_list
 
     @staticmethod
