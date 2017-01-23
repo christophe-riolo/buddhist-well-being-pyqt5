@@ -66,7 +66,7 @@ class WellBeingWindow(QMainWindow):
         col1_vbox_l4.addWidget(ten_obs_label)
         self.ten_obs_lb_w5 = QListWidget()
         obs_dock_w2.setWidget(self.ten_obs_lb_w5)
-        self.ten_obs_lb_w5.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.ten_obs_lb_w5.setSelectionMode(QAbstractItemView.MultiSelection)
         col1_vbox_l4.addWidget(self.ten_obs_lb_w5)
         self.ten_obs_lb_w5.itemSelectionChanged.connect(self.on_item_selection_changed)
         # -currentItemChanged cannot be used since it is activated before the list of selected items is updated
