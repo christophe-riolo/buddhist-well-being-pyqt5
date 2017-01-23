@@ -36,38 +36,36 @@ class WellBeingWindow(QMainWindow):
         self.setGeometry(40, 30, 1050, 700)
         self.setWindowTitle("Buddhist Well-Being")
         self.setWindowIcon(QtGui.QIcon("icon.png"))
-        self.global_widget_w1 = QWidget()
-        self.setCentralWidget(self.global_widget_w1)
 
         # Creating layouts..
-        global_hbox_l2 = QHBoxLayout()
+        obs_dock_w2 = QDockWidget("Observances", self)
+        karma_dock_w2 = QDockWidget("Karma", self)
         # ..leftmost column (column 1)
-        #######TODO: col1_dock_widget_2 = QDockWidget("Dock Widget 2", self)
         col1_vbox_w3 = QWidget()
         col1_vbox_l4 = QVBoxLayout()
         col1_vbox_w3.setLayout(col1_vbox_l4)
-        col1_vbox_w3.setFixedWidth(240)
-        global_hbox_l2.addWidget(col1_vbox_w3)
+        ######col1_vbox_w3.setFixedWidth(240)
+        ###global_hbox_l2.addWidget(col1_vbox_w3)
         # ..column 2
         self.col2_vbox_w3 = QWidget()
-        self.col2_vbox_l4 = QVBoxLayout()
-        self.col2_vbox_w3.setLayout(self.col2_vbox_l4)
-        global_hbox_l2.addWidget(self.col2_vbox_w3)
+        self.diary_vbox_l4 = QVBoxLayout()
+        self.col2_vbox_w3.setLayout(self.diary_vbox_l4)
+        self.setCentralWidget(self.col2_vbox_w3)
         # ..column 3
         col3_vbox_w3 = QWidget()
         col3_vbox_l4 = QVBoxLayout()
         col3_vbox_w3.setLayout(col3_vbox_l4)
-        col3_vbox_w3.setFixedWidth(240)
-        global_hbox_l2.addWidget(col3_vbox_w3)
+        ###col3_vbox_w3.setFixedWidth(240)
+        ####global_hbox_l2.addWidget(col3_vbox_w3)
         # ..
-        self.global_widget_w1.setLayout(global_hbox_l2)
+        ####self.global_widget_w1.setLayout(global_hbox_l2)
 
         # Creating widgets..
         # ..for ten practices (left column)
         ten_obs_label = QLabel("<h3>Ten Observances</h3>") #<b></b>
         col1_vbox_l4.addWidget(ten_obs_label)
         self.ten_obs_lb_w5 = QListWidget()
-        self.ten_obs_lb_w5.setFixedHeight(360)
+        obs_dock_w2.setWidget(self.ten_obs_lb_w5)
         self.ten_obs_lb_w5.setSelectionMode(QAbstractItemView.ExtendedSelection)
         col1_vbox_l4.addWidget(self.ten_obs_lb_w5)
         self.ten_obs_lb_w5.itemSelectionChanged.connect(self.on_item_selection_changed)
@@ -85,14 +83,14 @@ class WellBeingWindow(QMainWindow):
         col1_vbox_l4.addWidget(self.custom_user_text_te)
         #.. for diary (middle column)
         diary_label = QLabel("<h3>Diary</h3>")
-        self.col2_vbox_l4.addWidget(diary_label)
+        self.diary_vbox_l4.addWidget(diary_label)
         self.diary_lb = bwb_diary_widget.DiaryListWidget()
-        self.col2_vbox_l4.addWidget(self.diary_lb)
+        self.diary_vbox_l4.addWidget(self.diary_lb)
         # ..for adding new a diary entry (middle column)
         diary_entry_label = QLabel("<h4>New diary entry</h4>")
-        self.col2_vbox_l4.addWidget(diary_entry_label)
+        self.diary_vbox_l4.addWidget(diary_entry_label)
         edit_diary_entry_hbox_l5 = QHBoxLayout()
-        self.col2_vbox_l4.addLayout(edit_diary_entry_hbox_l5)
+        self.diary_vbox_l4.addLayout(edit_diary_entry_hbox_l5)
         self.adding_text_to_diary_te_w6 = QTextEdit()
         edit_diary_entry_hbox_l5.addWidget(self.adding_text_to_diary_te_w6)
         self.adding_text_to_diary_te_w6.setFixedHeight(50)
@@ -100,7 +98,7 @@ class WellBeingWindow(QMainWindow):
         edit_diary_entry_hbox_l5.addWidget(self.adding_to_diary_date_ey_w6)
         self.adding_to_diary_date_ey_w6.setCalendarPopup(True)
         self.adding_diary_entry_bn_w5 = QPushButton("Add new")
-        self.col2_vbox_l4.addWidget(self.adding_diary_entry_bn_w5)
+        self.diary_vbox_l4.addWidget(self.adding_diary_entry_bn_w5)
         self.adding_diary_entry_bn_w5.clicked.connect(self.on_add_text_to_diary_button_pressed)
         #..for karma list (left column)
         karma_label = QLabel("<h3>Karma</h3>")
@@ -144,6 +142,18 @@ class WellBeingWindow(QMainWindow):
         debug_menu.addAction(redraw_action)
         help_menu.addAction(about_action)
         debug_menu.addAction(backup_action)
+
+
+
+
+        obs_dock_w2.setWidget(col1_vbox_w3)
+        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, obs_dock_w2)
+
+        karma_dock_w2.setWidget(col3_vbox_w3)
+        self.addDockWidget(QtCore.Qt.RightDockWidgetArea, karma_dock_w2)
+
+
+
 
         self.update_gui()
         self.show()
@@ -367,8 +377,8 @@ class WellBeingWindow(QMainWindow):
                 t_day_as_int = int(time.mktime((datetime.date.today() - datetime.timedelta(days=day_it)).timetuple()))
                 t_diary_filtered_list = bwb_model.DiaryM.get_all_for_obs_and_day(observance_item.id, t_day_as_int)
                 total_number_it = len(t_diary_filtered_list)
-                t_weekday_one_char_sg = datetime.datetime.fromtimestamp(t_day_as_int).strftime("%a")[0]
-                total_number_week_list.append(t_weekday_one_char_sg.upper() + str(total_number_it))
+                t_weekday_one_char_sg = datetime.datetime.fromtimestamp(t_day_as_int).strftime("%A")[0:1]
+                total_number_week_list.append(t_weekday_one_char_sg.capitalize() + str(total_number_it))
 
             observance_short_formatted_sg = "<b>" + observance_item.title + "</b>"
             row_label_w8 = QLabel(

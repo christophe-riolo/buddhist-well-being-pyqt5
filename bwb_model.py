@@ -408,7 +408,6 @@ class DiaryM:
 
     @staticmethod
     def add(i_date_added_it, i_diary_text, i_karma_ref, i_observance_ref_id_it_list):
-
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
         db_cursor.execute(
