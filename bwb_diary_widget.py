@@ -13,26 +13,23 @@ http://stackoverflow.com/questions/20041385/python-pyqt-setting-scroll-area
 class DiaryListWidget(QWidget):
     def __init__(self):
         super().__init__()
-
         self.v_box_layout = QVBoxLayout(self)
-        self.scroll_area = QScrollArea()
         self.list_widget = QListWidget()
+        self.v_box_layout.addWidget(self.list_widget)
+        self.list_widget.itemPressed.connect(self.item_clicked_fn)  # Clicked doesn't work
+        self.row_last_clicked = None
+        """
+        Old:
+        self.scroll_area = QScrollArea()
         self.scroll_area.setWidget(self.list_widget)
         self.v_box_layout.addWidget(self.scroll_area)
-
         self.scroll_area.setWidgetResizable(True)
-
-        self.list_widget.itemPressed.connect(self.item_clicked_fn)  # Clicked doesn't work
-
-        # TODO: Change to using self.list_widget.verticalScrollBar()
-
-        self.row_last_clicked = None
+        """
 
     def item_clicked_fn(self, i_listwidgetitem):
         t_index_it = i_listwidgetitem.listWidget().row(i_listwidgetitem)
         print("cell clicked. row = " + str(t_index_it))
         self.row_last_clicked = i_listwidgetitem
-
 
     # http://doc.qt.io/qt-5/qwidget.html#contextMenuEvent
     # Overridden
