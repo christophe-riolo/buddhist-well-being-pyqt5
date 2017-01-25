@@ -13,18 +13,32 @@ http://stackoverflow.com/questions/20041385/python-pyqt-setting-scroll-area
 class DiaryListWidget(QWidget):
     def __init__(self):
         super().__init__()
+
+        # Alternatively:
         self.v_box_layout = QVBoxLayout(self)
         self.list_widget = QListWidget()
         self.v_box_layout.addWidget(self.list_widget)
         self.list_widget.itemPressed.connect(self.item_clicked_fn)  # Clicked doesn't work
         self.row_last_clicked = None
+
+        self.list_widget.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+
         """
-        Old:
+        # Alternatively:
+
+        self.v_box_layout = QVBoxLayout(self)
+
+        self.list_widget = QListWidget()
+
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidget(self.list_widget)
         self.v_box_layout.addWidget(self.scroll_area)
         self.scroll_area.setWidgetResizable(True)
+
+        self.list_widget.itemPressed.connect(self.item_clicked_fn)  # Clicked doesn't work
+        self.row_last_clicked = None
         """
+
 
     def item_clicked_fn(self, i_listwidgetitem):
         t_index_it = i_listwidgetitem.listWidget().row(i_listwidgetitem)
@@ -100,48 +114,48 @@ class DiaryListWidget(QWidget):
             label_text_sg = t_diary_entry_karma_sg + "[" + diary_entry_obs_sg.strip(t_delimeter_sg) + "] "\
                 + diary_item.diary_text.strip()
 
-            ###t_diary_entry_ll.bind("<Button-1>", self.diary_entry_clicked)
-            #######self.right_vbox.pack_start(t_diary_entry_ll, True, True, 0)
-            ###t_diary_entry_ll.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
 
 
-            #label = QLabel(label_text_sg)
-
-            """
-            palette = QPalette()
-            color = QColor(100, 100, 100, 100)
-            palette.setColor(QPalette.Foreground, color)
-            #label.setAutoFillBackground(True)
-            label.setPalette(palette)
-            """
-
-            ########label.setStyleSheet("color: rgba(0, 255, 255, 255)")
-
-            #layout = QVBoxLayout()
-            #layout.addWidget(label)
-
-            #label.setStyleSheet("border: 1px solid black")
-            ############label.setFrameStyle(QFrame.StyledPanel)
             #label.setWordWrap(True)
-            list_item = QListWidgetItem(label_text_sg)
+            list_item = QListWidgetItem()
             #list_item = QListWidgetItem()
             list_item.setData(QtCore.Qt.UserRole, diary_item.id)  # to read: .data
 
-            ######################list_item.setBackground(QtCore.Qt.red) <-----------------
-            #list_item.setFlags(list_item.flags() & ~ Qt.ItemIsSelectable)
-            self.list_widget.setWordWrap(True)
+
+
+            row_layout_l7 = QHBoxLayout()
+            row_label_w8 = QLabel(label_text_sg)
+            row_label_w8.setWordWrap(True)
+            row_layout_l7.addWidget(row_label_w8, 1)  # - the 2nd argument is the stretch factor
+
+            t_label = QLabel("12:00")
+            t_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+            row_layout_l7.addWidget(t_label)  # , QtCore.Qt.AlignRight
+            row_layout_l7.setContentsMargins(0, 3, 0, 3)
+            # -if this is not set we will get a default that is big and looks strange for a list
+            row_layout_l7.setSpacing(2)
+            row_w6 = QWidget()
+            row_w6.setLayout(row_layout_l7)
+            row_w6.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Minimum)
+            row_w6.adjustSize()
+
+            list_item.setSizeHint(row_w6.sizeHint())
+
+
+
+            ###self.list_widget.setWordWrap(True)
             self.list_widget.addItem(list_item)
-            #self.list_widget.setItemWidget(list_item, label) # -http://doc.qt.io/qt-5/qlistwidget.html#setItemWidget
+            self.list_widget.setItemWidget(list_item, row_w6) # -http://doc.qt.io/qt-5/qlistwidget.html#setItemWidget
 
             """
             if i_cur_sel_it == diary_item.observance_ref:
                 #label.setFrameStyle(QFrame.StyledPanel)
                 # -http://doc.qt.io/qt-4.8/qframe.html#setFrameStyle
                 # -http://nullege.com/codes/search/PyQt4.QtGui.QFrame.setFrameStyle
-                palette = QPalette()
-                palette.setColor(label.backgroundRole(), QColor("yellow"))
-                label.setAutoFillBackground(True)
-                label.setPalette(palette)
+
+                #list_item.setFlags(list_item.flags() & ~ Qt.ItemIsSelectable)
+                ######################list_item.setBackground(QtCore.Qt.red) <-----------------
             """
 
             prev_diary_item = diary_item # -used for the weekday labels
