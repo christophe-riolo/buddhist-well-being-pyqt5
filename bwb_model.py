@@ -293,8 +293,9 @@ class ObservanceM:
         db_cursor = db_connection.cursor()
         db_cursor.execute(
             "UPDATE " + DbSchemaM.ObservancesTable.name
-            + " SET " + DbSchemaM.ObservancesTable.Cols.user_text + " = " + "'" + str(i_text) + "'"
-            + " WHERE " + DbSchemaM.ObservancesTable.Cols.title + " = " + str(i_id)
+            + " SET " + DbSchemaM.ObservancesTable.Cols.user_text + " = ?"
+            + " WHERE " + DbSchemaM.ObservancesTable.Cols.title + " = ?",
+            (i_text, i_id)
         )
         db_connection.commit()
 
@@ -439,8 +440,9 @@ class DiaryM:
         db_cursor = db_connection.cursor()
         db_cursor.execute(
             "UPDATE " + DbSchemaM.DiaryTable.name
-            + " SET " + DbSchemaM.DiaryTable.Cols.diary_text + " = " + "'" + str(i_new_text_sg) + "'"
-            + " WHERE " + DbSchemaM.DiaryTable.Cols.id + "=" + str(i_id_it)
+            + " SET " + DbSchemaM.DiaryTable.Cols.diary_text + " = ?"
+            + " WHERE " + DbSchemaM.DiaryTable.Cols.id + " = ?",
+            (i_new_text_sg, str(i_id_it))
         )
         db_connection.commit()
 
