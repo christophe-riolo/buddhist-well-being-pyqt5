@@ -128,10 +128,14 @@ class DiaryListWidget(QWidget):
             row_label_w8.setWordWrap(True)
             row_layout_l7.addWidget(row_label_w8, 1)  # - the 2nd argument is the stretch factor
 
-            t_label = QLabel("12:00")
-            t_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+            t_time_of_day_format_string_1 = "%I:%M %p"  # Ex: US
+            t_time_of_day_format_string_2 = "%H:%M"  # Ex: Sweden
+            time_of_day_sg = datetime.datetime.fromtimestamp(diary_item.date_added_it)\
+                .strftime(t_time_of_day_format_string_2)
+            t_time_of_day_label = QLabel(time_of_day_sg)
+            t_time_of_day_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-            row_layout_l7.addWidget(t_label)  # , QtCore.Qt.AlignRight
+            row_layout_l7.addWidget(t_time_of_day_label)  # , QtCore.Qt.AlignRight
             row_layout_l7.setContentsMargins(0, 3, 0, 3)
             # -if this is not set we will get a default that is big and looks strange for a list
             row_layout_l7.setSpacing(2)

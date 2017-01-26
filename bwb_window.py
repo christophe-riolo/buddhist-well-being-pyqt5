@@ -22,9 +22,9 @@ class EventSource(enum.Enum):
 # View and controller
 #
 # Suffix explanation:
-# w: widget
-# l: layout
-# Number: The level in the layout stack
+# _w: widget
+# _l: layout
+# _Number: The level in the layout stack
 #
 #################
 class WellBeingWindow(QMainWindow):
@@ -94,9 +94,14 @@ class WellBeingWindow(QMainWindow):
         self.adding_text_to_diary_te_w6 = QTextEdit()
         edit_diary_entry_hbox_l5.addWidget(self.adding_text_to_diary_te_w6)
         self.adding_text_to_diary_te_w6.setFixedHeight(50)
-        self.adding_to_diary_date_ey_w6 = QDateTimeEdit()
+        self.adding_to_diary_date_ey_w6 = QTimeEdit()
+
+        # TODO: Do we want to move this somewhere else?
+        t_date_time = QtCore.QDateTime()
+        t_date_time.setMSecsSinceEpoch(time.time() * 1000)
+        self.adding_to_diary_date_ey_w6.setDateTime(t_date_time)
+
         edit_diary_entry_hbox_l5.addWidget(self.adding_to_diary_date_ey_w6)
-        self.adding_to_diary_date_ey_w6.setCalendarPopup(True)
         self.adding_diary_entry_bn_w5 = QPushButton("Add new")
         self.diary_vbox_l4.addWidget(self.adding_diary_entry_bn_w5)
         self.adding_diary_entry_bn_w5.clicked.connect(self.on_add_text_to_diary_button_pressed)
@@ -253,10 +258,15 @@ class WellBeingWindow(QMainWindow):
             t_karma_current_item = self.karma_lb.currentItem()
             t_karma_id = -1
             if t_karma_current_item is not None:
-                t_karma_id = self.karma_lb.currentItem().data(QtCore.Qt.UserRole)  # TODO: update data in karma update function
+                t_karma_id = self.karma_lb.currentItem().data(QtCore.Qt.UserRole)
             notes_pre_sg = self.adding_text_to_diary_te_w6.toPlainText().strip()
             obs_selected_item_id_list = [x.data(QtCore.Qt.UserRole) for x in obs_selected_item_list]
-            bwb_model.DiaryM.add(int(time.time()), notes_pre_sg, t_karma_id, obs_selected_item_id_list)
+            time_qdatetime = self.adding_to_diary_date_ey_w6.dateTime()
+            ###time_of_day_minutes_it = 60 * time_of_day_qtime.hour() + time_of_day_qtime.minute()
+            t_unix_time_it = time_qdatetime.toMSecsSinceEpoch() // 1000
+            print("t_unix_time_it = " + str(t_unix_time_it))
+            bwb_model.DiaryM.add(t_unix_time_it, notes_pre_sg, t_karma_id, obs_selected_item_id_list)
+            # int(time.time())
 
             self.adding_text_to_diary_te_w6.clear()
 
