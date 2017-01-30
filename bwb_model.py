@@ -456,6 +456,12 @@ class DiaryM:
         )
         db_connection.commit()
 
+        db_cursor.execute(
+            "DELETE FROM " + DbSchemaM.DiaryObsRefTable.name
+            + " WHERE " + DbSchemaM.DiaryObsRefTable.Cols.diary_ref + "=" + str(i_id_it)
+        )
+        db_connection.commit()
+
     @staticmethod
     def get(i_id_it):
         db_connection = DbHelperM.get_db_connection()
