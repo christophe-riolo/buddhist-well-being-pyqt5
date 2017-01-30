@@ -59,7 +59,7 @@ Please note: *This is not necessary for running the application*, instead you ca
 
 #### GNU/Linux systems
 
-For desktop systems that are compatible with the [freedesktop](https://www.freedesktop.org/) standard - for example Gnome and KDE - you can use the bwb.desktop file included in the source
+For desktop systems that are compatible with the [freedesktop](https://www.freedesktop.org/) standard - for example Gnome and KDE - you can use the bwb.desktop file included in the source (please note that if using a file manager such as the Gnome file manager you may see the name displayed as "Buddhist Well-Being" rather than the file name)
 
 To use this file:
 
