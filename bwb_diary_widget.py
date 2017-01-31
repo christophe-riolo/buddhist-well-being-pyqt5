@@ -24,6 +24,8 @@ class DiaryListWidget(QWidget):
         self.list_widget.itemPressed.connect(self.item_clicked_fn)  # Clicked doesn't work
         self.row_last_clicked = None
 
+        self.list_widget.setSelectionMode(QAbstractItemView.NoSelection)
+
         self.list_widget.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         #self.list_widget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
@@ -72,7 +74,7 @@ class DiaryListWidget(QWidget):
             bwb_model.DiaryM.remove(int(self.row_last_clicked.data(QtCore.Qt.UserRole)))
             self.update_gui(-1)
         else:
-            pass  # -Do nothing
+            pass  # -do nothing
 
     # http://doc.qt.io/qt-5/qinputdialog.html#getText
     def rename_action_fn(self):
@@ -83,9 +85,13 @@ class DiaryListWidget(QWidget):
         #bwb_model.DiaryM.remove(int(self.row_last_clicked.data(Qt.UserRole)))
         text_input_dialog = QInputDialog()
         t_new_text_qstring = text_input_dialog.getText(self, "Rename dialog", "New name: ", text=t_diary_item.diary_text)
-        print("t_new_text_sg = " + str(t_new_text_qstring))
-        bwb_model.DiaryM.update_note(t_last_clicked_date_dbkey_it, t_new_text_qstring[0])
-        self.update_gui(-1)
+
+        if t_new_text_qstring[0]:
+            print("t_new_text_qstring = " + str(t_new_text_qstring))
+            bwb_model.DiaryM.update_note(t_last_clicked_date_dbkey_it, t_new_text_qstring[0])
+            self.update_gui(-1)
+        else:
+            pass  # -do nothing
 
     def update_gui(self, i_obs_sel_list):
         self.list_widget.clear()
