@@ -85,8 +85,10 @@ class WellBeingWindow(QMainWindow):
         #.. for diary (middle column)
         diary_label = QLabel("<h3>Diary</h3>")
         self.diary_vbox_l4.addWidget(diary_label)
-        self.diary_lb = bwb_diary_widget.DiaryListWidget()
-        self.diary_vbox_l4.addWidget(self.diary_lb)
+        self.diary_widget = bwb_diary_widget.DiaryListWidget()  # - diary_lb contains a list widget
+        ##bwb_diary_widget.DiaryListWidget.list_widget.currentRowChanged.connect(self.on_diary_row_changed)
+
+        self.diary_vbox_l4.addWidget(self.diary_widget)
         # ..for adding new a diary entry (middle column)
         diary_entry_label = QLabel("<h4>New diary entry</h4>")
         self.diary_vbox_l4.addWidget(diary_entry_label)
@@ -99,6 +101,7 @@ class WellBeingWindow(QMainWindow):
 
         self.adding_to_diary_date_ey_w6 = QDateTimeEdit()
         self.adding_to_diary_date_ey_w6.setDisplayFormat("dddd")
+        self.adding_to_diary_date_ey_w6.setCalendarPopup(True)
         self.update_gui_date()
 
         edit_diary_entry_hbox_l5.addWidget(self.adding_to_diary_date_ey_w6)
@@ -176,6 +179,15 @@ class WellBeingWindow(QMainWindow):
         self.hide()
         ###########trayicon.show()
         i_QCloseEvent.ignore()
+    """
+
+    """
+    def on_diary_row_changed(self):
+        t_current_row_it = bwb_diary_widget.DiaryListWidget.list_widget.currentRow()
+        t_current_list_item = bwb_diary_widget.DiaryListWidget.list_widget.item(t_current_row_it)
+        t_diary_entry = bwb_model.DiaryM.get(t_current_list_item.data(QtCore.Qt.UserRole))
+
+        self.adding_text_to_diary_te_w6.setText(t_diary_entry.diary_text)
     """
 
     def on_custom_user_text_text_changed(self):
@@ -366,7 +378,7 @@ class WellBeingWindow(QMainWindow):
         t_obs_selected_list = self.get_obs_selected_list()
         if i_event_source != EventSource.karma_current_row_changed:
             self.update_gui_karma(t_obs_selected_list)
-        self.diary_lb.update_gui(t_obs_selected_list)
+        self.diary_widget.update_gui(t_obs_selected_list)
         self.update_gui_user_text(t_current_obs_item)
         self.update_gui_notifications()
 

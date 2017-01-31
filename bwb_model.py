@@ -486,6 +486,18 @@ class DiaryM:
         db_connection.commit()
 
     @staticmethod
+    def update_date(i_id_it, i_new_time_it):
+        db_connection = DbHelperM.get_db_connection()
+        db_cursor = db_connection.cursor()
+        db_cursor.execute(
+            "UPDATE " + DbSchemaM.DiaryTable.name
+            + " SET " + DbSchemaM.DiaryTable.Cols.date_added + " = ?"
+            + " WHERE " + DbSchemaM.DiaryTable.Cols.id + " = ?",
+            (str(i_new_time_it), str(i_id_it))
+        )
+        db_connection.commit()
+
+    @staticmethod
     def remove(i_id_it):
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()

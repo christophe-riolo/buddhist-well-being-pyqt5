@@ -4,6 +4,8 @@ import time
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore
 from PyQt5 import QtGui
+import bwb_date_time_dialog
+
 
 """
 Inspiration for this class:
@@ -18,6 +20,7 @@ class DiaryListWidget(QWidget):
         # Alternatively:
         self.v_box_layout = QVBoxLayout(self)
         self.list_widget = QListWidget()
+
         #####self.list_widget.setMinimumWidth(530)
         # -strange but we have to set a min width to avoid seeing the horizontal scrollbar
         self.v_box_layout.addWidget(self.list_widget)
@@ -62,6 +65,9 @@ class DiaryListWidget(QWidget):
         delete_action = QAction("Delete")
         delete_action.triggered.connect(self.delete_action_fn)
         self.right_click_menu.addAction(delete_action)
+        change_date_action = QAction("Change date")
+        change_date_action.triggered.connect(self.change_date_action_fn)
+        self.right_click_menu.addAction(change_date_action)
 
         self.right_click_menu.exec_(QtGui.QCursor.pos())
 
@@ -79,13 +85,25 @@ class DiaryListWidget(QWidget):
     # http://doc.qt.io/qt-5/qinputdialog.html#getText
     def rename_action_fn(self):
         print("now in rename_action_fn")
-        t_last_clicked_date_dbkey_it = int(self.row_last_clicked.data(QtCore.Qt.UserRole))
-        t_diary_item = bwb_model.DiaryM.get(t_last_clicked_date_dbkey_it)
+        t_last_clicked_row_dbkey_it = int(self.row_last_clicked.data(QtCore.Qt.UserRole))
+        t_diary_item = bwb_model.DiaryM.get(t_last_clicked_row_dbkey_it)
         text_input_dialog = QInputDialog()
         t_new_text_qstring = text_input_dialog.getText(self, "Rename dialog", "New name: ", text=t_diary_item.diary_text)
         if t_new_text_qstring[0]:
             print("t_new_text_qstring = " + str(t_new_text_qstring))
-            bwb_model.DiaryM.update_note(t_last_clicked_date_dbkey_it, t_new_text_qstring[0])
+            bwb_model.DiaryM.update_note(t_last_clicked_row_dbkey_it, t_new_text_qstring[0])
+            self.update_gui(-1)
+        else:
+            pass  # -do nothing
+
+    def change_date_action_fn(self):
+        print("now in change_date_action_fn")
+        t_last_clicked_row_dbkey_it = int(self.row_last_clicked.data(QtCore.Qt.UserRole))
+        t_diary_item = bwb_model.DiaryM.get(t_last_clicked_row_dbkey_it)
+
+        t_result_tuple = bwb_date_time_dialog.DateTimeDialog.get_date_time_dialog(t_diary_item.date_added_it)
+        if t_result_tuple[0]:
+            bwb_model.DiaryM.update_date(t_diary_item.id, t_result_tuple[1])
             self.update_gui(-1)
         else:
             pass  # -do nothing
@@ -142,15 +160,15 @@ class DiaryListWidget(QWidget):
             time_of_day_sg = datetime.datetime.fromtimestamp(diary_item.date_added_it)\
                 .strftime(t_time_of_day_format_string)
             t_time_of_day_label = QLabel(time_of_day_sg)
-            ###t_time_of_day_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)  # horizontal, vertical
+            t_time_of_day_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.MinimumExpanding)  # horizontal, vertical
 
             ###row_layout_l7.addWidget(t_time_of_day_label)  # , QtCore.Qt.AlignRight
-            row_layout_l7.setContentsMargins(0, 0, 0, 0)
+            row_layout_l7.setContentsMargins(5, 5, 5, 5)
             # -if this is not set we will get a default that is big and looks strange for a list
-            row_layout_l7.setSpacing(0)
+            row_layout_l7.setSpacing(2)
             row_w6 = QWidget()
             row_w6.setLayout(row_layout_l7)
-            ###row_w6.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
+            row_w6.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.MinimumExpanding)
             row_w6.adjustSize()
 
             list_item.setSizeHint(row_w6.sizeHint())
