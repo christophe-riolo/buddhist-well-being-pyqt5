@@ -269,6 +269,44 @@ class ObservanceM:
         return ret_obs_list
 
     @staticmethod
+    def get_all_for_karma_id(i_karma_id):
+        db_connection = DbHelperM.get_db_connection()
+        db_cursor = db_connection.cursor()
+        db_cursor_result = db_cursor.execute(
+            "SELECT * FROM " + DbSchemaM.KarmaObsRefTable.name
+            + " WHERE " + DbSchemaM.KarmaObsRefTable.Cols.karma_ref + "=" + str(i_karma_id)
+        )
+        t_karma_obs_ref_tuple_list = db_cursor_result.fetchall()
+        db_connection.commit()
+
+        if t_karma_obs_ref_tuple_list is None:
+            return None
+
+        ret_obs_list = []
+
+        for t_karma_obs_tuple in t_karma_obs_ref_tuple_list:
+            t_obs_id = t_karma_obs_tuple[2]
+
+            db_connection = DbHelperM.get_db_connection()
+            db_cursor = db_connection.cursor()
+            db_cursor_result = db_cursor.execute(
+                "SELECT * FROM " + DbSchemaM.ObservancesTable.name
+                + " WHERE " + DbSchemaM.ObservancesTable.Cols.id + "=" + str(t_obs_id)
+            )
+            t_obs_tuple = db_cursor_result.fetchone()
+            db_connection.commit()
+
+            ret_obs_list.append(
+                ObservanceM(
+                    t_obs_tuple[0],
+                    t_obs_tuple[1],
+                    t_obs_tuple[2],
+                    t_obs_tuple[3]
+                )
+            )
+        return ret_obs_list
+
+    @staticmethod
     def get_all():
         ret_observance_lt = []
         db_connection = DbHelperM.get_db_connection()
