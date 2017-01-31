@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtCore
 from PyQt5 import Qt
 import bwb_window
+import bwb_model
 import sqlite3
 
 ######################
@@ -39,5 +40,7 @@ if __name__ == "__main__":
     print("Qt version: " + str(QtCore.qVersion()))
     print("PyQt (Python module) version: " + str(Qt.PYQT_VERSION_STR))
     print("Buddhist Well-Being application version: " + str(BWB_APPLICATION_VERSION_SG))
+    t_db_conn = bwb_model.DbHelperM.get_db_connection()
+    print("Buddhist Well-Being database schema version: " + str(bwb_model.get_schema_version(t_db_conn)))
 
     sys.exit(app.exec_())
