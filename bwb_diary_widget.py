@@ -1,5 +1,6 @@
 import bwb_model
 import datetime
+import time
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore
 from PyQt5 import QtGui
@@ -17,11 +18,14 @@ class DiaryListWidget(QWidget):
         # Alternatively:
         self.v_box_layout = QVBoxLayout(self)
         self.list_widget = QListWidget()
+        #####self.list_widget.setMinimumWidth(530)
+        # -strange but we have to set a min width to avoid seeing the horizontal scrollbar
         self.v_box_layout.addWidget(self.list_widget)
         self.list_widget.itemPressed.connect(self.item_clicked_fn)  # Clicked doesn't work
         self.row_last_clicked = None
 
         self.list_widget.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        #self.list_widget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
         """
         # Alternatively:
@@ -125,27 +129,30 @@ class DiaryListWidget(QWidget):
 
             row_layout_l7 = QHBoxLayout()
             row_label_w8 = QLabel(label_text_sg)
+            row_label_w8.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
             row_label_w8.setWordWrap(True)
             row_layout_l7.addWidget(row_label_w8, 1)  # - the 2nd argument is the stretch factor
 
-            t_time_of_day_format_string_1 = "%I:%M %p"  # Ex: US
-            t_time_of_day_format_string_2 = "%H:%M"  # Ex: Sweden
-            time_of_day_sg = datetime.datetime.fromtimestamp(diary_item.date_added_it)\
-                .strftime(t_time_of_day_format_string_2)
-            t_time_of_day_label = QLabel(time_of_day_sg)
-            t_time_of_day_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-            row_layout_l7.addWidget(t_time_of_day_label)  # , QtCore.Qt.AlignRight
-            row_layout_l7.setContentsMargins(0, 3, 0, 3)
+            t_time_of_day_format_string = "%H:%M"  # Ex: Sweden
+            if time.strftime("%p"):  # Checking if the string is empty (and therefore "falsy")
+                t_time_of_day_format_string = "%I:%M %p"  # Ex: US
+
+            time_of_day_sg = datetime.datetime.fromtimestamp(diary_item.date_added_it)\
+                .strftime(t_time_of_day_format_string)
+            t_time_of_day_label = QLabel(time_of_day_sg)
+            ###t_time_of_day_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)  # horizontal, vertical
+
+            ###row_layout_l7.addWidget(t_time_of_day_label)  # , QtCore.Qt.AlignRight
+            row_layout_l7.setContentsMargins(0, 0, 0, 0)
             # -if this is not set we will get a default that is big and looks strange for a list
-            row_layout_l7.setSpacing(2)
+            row_layout_l7.setSpacing(0)
             row_w6 = QWidget()
             row_w6.setLayout(row_layout_l7)
-            row_w6.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Minimum)
+            ###row_w6.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
             row_w6.adjustSize()
 
             list_item.setSizeHint(row_w6.sizeHint())
-
 
 
             ###self.list_widget.setWordWrap(True)
