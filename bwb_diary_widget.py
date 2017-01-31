@@ -81,11 +81,8 @@ class DiaryListWidget(QWidget):
         print("now in rename_action_fn")
         t_last_clicked_date_dbkey_it = int(self.row_last_clicked.data(QtCore.Qt.UserRole))
         t_diary_item = bwb_model.DiaryM.get(t_last_clicked_date_dbkey_it)
-
-        #bwb_model.DiaryM.remove(int(self.row_last_clicked.data(Qt.UserRole)))
         text_input_dialog = QInputDialog()
         t_new_text_qstring = text_input_dialog.getText(self, "Rename dialog", "New name: ", text=t_diary_item.diary_text)
-
         if t_new_text_qstring[0]:
             print("t_new_text_qstring = " + str(t_new_text_qstring))
             bwb_model.DiaryM.update_note(t_last_clicked_date_dbkey_it, t_new_text_qstring[0])
@@ -99,11 +96,9 @@ class DiaryListWidget(QWidget):
 
         for diary_item in bwb_model.DiaryM.get_all():
             t_observance_list = bwb_model.ObservanceM.get_all_for_diary_id(diary_item.id)
-            t_observance = None
             diary_entry_obs_sg = ""
             t_delimeter_sg = ", "
             if t_observance_list is not None and t_observance_list != []:
-                t_observance = t_observance_list[0]
                 for obs_item in t_observance_list:
                     diary_entry_obs_sg = diary_entry_obs_sg + obs_item.title + t_delimeter_sg
 

@@ -374,7 +374,8 @@ class KarmaM:
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
         db_cursor_result = db_cursor.execute(
-            "SELECT * FROM " + DbSchemaM.KarmaTable.name)
+            "SELECT * FROM " + DbSchemaM.KarmaTable.name
+        )
         t_karma_tuple_list_from_db = db_cursor_result.fetchall()
         db_connection.commit()
         karma_list_lt = []
@@ -520,10 +521,16 @@ class DiaryM:
 
     @staticmethod
     def get_all(i_reverse_bl = False):
+        t_direction_sg = "ASC"
+        if i_reverse_bl:
+            t_direction_sg = "DESC"
         ret_diary_lt = []
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
-        db_cursor_result = db_cursor.execute("SELECT * FROM " + DbSchemaM.DiaryTable.name)
+        db_cursor_result = db_cursor.execute(
+            "SELECT * FROM " + DbSchemaM.DiaryTable.name
+            + " ORDER BY " + DbSchemaM.DiaryTable.Cols.date_added + " " + t_direction_sg
+        )
         t_diary_from_db = db_cursor_result.fetchall()
         for t_tuple in t_diary_from_db:
             ret_diary_lt.append(DiaryM(
@@ -533,8 +540,6 @@ class DiaryM:
                 t_tuple[3]
             ))
         db_connection.commit()
-        if i_reverse_bl:
-            ret_diary_lt.reverse()
         return ret_diary_lt
 
     @staticmethod
