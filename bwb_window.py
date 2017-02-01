@@ -283,14 +283,17 @@ class WellBeingWindow(QMainWindow):
 
     def on_add_new_karma_button_pressed(self):
         obs_selected_item_list = self.ten_obs_lb_w5.selectedItems()
-        if obs_selected_item_list is not None:
+        if obs_selected_item_list is not None and len(obs_selected_item_list) >= 1:
             obs_selected_item_id_list = [x.data(QtCore.Qt.UserRole) for x in obs_selected_item_list]
             t_text_sg = self.adding_new_karma_ey.text().strip() # strip is needed to remove a newline at the end (why?)
             if not (t_text_sg and t_text_sg.strip()):
                 return
         ###t_last_pos_it = len(bwb_model.KarmaM.get_all_for_observance(observance_pos_it))
         else:
-            # TODO: User message: Please select at least one observance
+            message_box = QMessageBox.information(
+                self, "About Buddhist Well-Being",
+                ("Please select at least one observance before adding a new karma")
+            )
             return
 
         bwb_model.KarmaM.add(obs_selected_item_id_list, t_text_sg)
