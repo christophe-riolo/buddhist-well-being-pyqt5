@@ -4,6 +4,7 @@ from PyQt5 import QtCore
 
 import bwb_model
 import bwb_diary_widget
+import bwb_karma
 
 import time
 import datetime
@@ -53,11 +54,13 @@ class WellBeingWindow(QMainWindow):
         self.col2_vbox_w3.setLayout(self.diary_vbox_l4)
         self.setCentralWidget(self.col2_vbox_w3)
         # ..column 3
-        col3_vbox_w3 = QWidget()
-        col3_vbox_l4 = QVBoxLayout()
-        col3_vbox_w3.setLayout(col3_vbox_l4)
-        ###col3_vbox_w3.setFixedWidth(240)
-        ####global_hbox_l2.addWidget(col3_vbox_w3)
+        self.karma_composite_widget_w3 = bwb_karma.KarmaCompositeWidget()
+
+        self.karma_composite_widget_w3.karma_current_row_changed_signal.connect(self.on_karma_current_row_changed)
+        ##########col3_vbox_l4 = QVBoxLayout()
+        ##########karma_composite_widget_w3.setLayout(col3_vbox_l4)
+        ###karma_composite_widget_w3.setFixedWidth(240)
+        ####global_hbox_l2.addWidget(karma_composite_widget_w3)
         # ..
         ####self.global_widget_w1.setLayout(global_hbox_l2)
 
@@ -100,7 +103,7 @@ class WellBeingWindow(QMainWindow):
 
 
         self.adding_to_diary_date_ey_w6 = QDateTimeEdit()
-        self.adding_to_diary_date_ey_w6.setDisplayFormat("dddd")
+        self.adding_to_diary_date_ey_w6.setDisplayFormat("dddd - HH:00")
         self.adding_to_diary_date_ey_w6.setCalendarPopup(True)
         self.update_gui_date()
 
@@ -110,27 +113,17 @@ class WellBeingWindow(QMainWindow):
         self.adding_to_diary_now.pressed.connect(self.on_today_button_pressed)
         edit_diary_entry_hbox_l5.addWidget(self.adding_to_diary_now)
 
-
         self.adding_diary_entry_bn_w5 = QPushButton("Add new")
         self.diary_vbox_l4.addWidget(self.adding_diary_entry_bn_w5)
         self.adding_diary_entry_bn_w5.clicked.connect(self.on_add_text_to_diary_button_pressed)
-        #..for karma list (left column)
-        karma_label = QLabel("<h3>Karma</h3>")
-        col3_vbox_l4.addWidget(karma_label)
-        self.karma_lb = QListWidget()
-        self.karma_lb.currentRowChanged.connect(self.on_karma_current_row_changed)
-        col3_vbox_l4.addWidget(self.karma_lb)
-        #..for adding new karma (left column)
-        self.adding_new_karma_ey = QLineEdit()
-        col3_vbox_l4.addWidget(self.adding_new_karma_ey)
-        self.adding_new_karma_bn = QPushButton("Add new")
-        col3_vbox_l4.addWidget(self.adding_new_karma_bn)
-        self.adding_new_karma_bn.clicked.connect(self.on_add_new_karma_button_pressed)
-        #..for notifications
-        notifications_label = QLabel("<h4>Notifications</h4>")
-        col3_vbox_l4.addWidget(notifications_label)
-        self.notifications_lb = QListWidget()
-        col3_vbox_l4.addWidget(self.notifications_lb)
+
+
+
+
+        ##### karma_widget
+
+
+
 
         # Creating the menu bar..
         # ..setup of actions
@@ -164,7 +157,7 @@ class WellBeingWindow(QMainWindow):
         obs_dock_w2.setWidget(col1_vbox_w3)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, obs_dock_w2)
 
-        karma_dock_w2.setWidget(col3_vbox_w3)
+        karma_dock_w2.setWidget(self.karma_composite_widget_w3)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, karma_dock_w2)
 
 
@@ -254,24 +247,6 @@ class WellBeingWindow(QMainWindow):
                 diary_item.marked_bl = True
         """
 
-    def on_karma_current_row_changed(self):
-        # Updating the obs list selection
-        t_current_karma_row_it = self.karma_lb.currentRow()
-        if t_current_karma_row_it == -1:
-            return
-        t_current_karma_item = self.karma_lb.item(t_current_karma_row_it)
-        t_karma = bwb_model.KarmaM.get(t_current_karma_item.data(QtCore.Qt.UserRole))
-        self.ten_obs_lb_w5.clearSelection()
-        t_observance_list = bwb_model.ObservanceM.get_all_for_karma_id(t_karma.id)
-        t_count = self.ten_obs_lb_w5.count()
-        for i in range(0, t_count):
-            t_obs_item = self.ten_obs_lb_w5.item(i)
-            for obs in t_observance_list:
-                if t_obs_item.data(QtCore.Qt.UserRole) == obs.id:
-                    t_obs_item.setSelected(True)
-        self.update_gui(EventSource.karma_current_row_changed)
-
-
     def get_obs_selected_list(self, i_curr_item=None):
         t_obs_selected_item_list = self.ten_obs_lb_w5.selectedItems()
         ret_obs_selected_id_list = []
@@ -281,24 +256,6 @@ class WellBeingWindow(QMainWindow):
             ret_obs_selected_id_list = [x.data(QtCore.Qt.UserRole) for x in t_obs_selected_item_list]
         return ret_obs_selected_id_list
 
-    def on_add_new_karma_button_pressed(self):
-        obs_selected_item_list = self.ten_obs_lb_w5.selectedItems()
-        if obs_selected_item_list is not None and len(obs_selected_item_list) >= 1:
-            obs_selected_item_id_list = [x.data(QtCore.Qt.UserRole) for x in obs_selected_item_list]
-            t_text_sg = self.adding_new_karma_ey.text().strip() # strip is needed to remove a newline at the end (why?)
-            if not (t_text_sg and t_text_sg.strip()):
-                return
-        ###t_last_pos_it = len(bwb_model.KarmaM.get_all_for_observance(observance_pos_it))
-        else:
-            message_box = QMessageBox.information(
-                self, "About Buddhist Well-Being",
-                ("Please select at least one observance before adding a new karma")
-            )
-            return
-
-        bwb_model.KarmaM.add(obs_selected_item_id_list, t_text_sg)
-        self.adding_new_karma_ey.clear()
-        self.update_gui()
 
     def on_add_text_to_diary_button_pressed(self):
         obs_selected_item_list = self.ten_obs_lb_w5.selectedItems()
@@ -357,6 +314,18 @@ class WellBeingWindow(QMainWindow):
     def on_today_button_pressed(self):
         self.update_gui_date()
 
+    def on_karma_current_row_changed(self, i_karma_id_it):
+        self.ten_obs_lb_w5.clearSelection()
+        t_observance_list = bwb_model.ObservanceM.get_all_for_karma_id(i_karma_id_it)
+        t_count_it = self.ten_obs_lb_w5.count()
+        for i in range(0, t_count_it):
+            t_obs_item = self.ten_obs_lb_w5.item(i)
+            for obs in t_observance_list:
+                if t_obs_item.data(QtCore.Qt.UserRole) == obs.id:
+                    t_obs_item.setSelected(True)
+        self.update_gui(EventSource.karma_current_row_changed)
+
+
     def show_about_box(self):
         message_box = QMessageBox.about(
             self, "About Buddhist Well-Being",
@@ -366,13 +335,6 @@ class WellBeingWindow(QMainWindow):
             "Art license: CC BY-SA 4.0")
         )
 
-    def open_karma_context_menu(self, i_event):
-        print("opening menu")
-        #TBD
-
-    def delete_karma(self, i_it):
-        print("deleting karma. i_it = " + str(i_it))
-        #TBD
 
     def update_gui(self, i_event_source = EventSource.undefined):
         if i_event_source != EventSource.obs_selection_changed and i_event_source != EventSource.karma_current_row_changed:
@@ -380,13 +342,14 @@ class WellBeingWindow(QMainWindow):
         t_current_obs_item = self.ten_obs_lb_w5.currentItem()  # , i_curr_item = None
         t_obs_selected_list = self.get_obs_selected_list()
         if i_event_source != EventSource.karma_current_row_changed:
-            self.update_gui_karma(t_obs_selected_list)
+            self.karma_composite_widget_w3.update_gui_karma(t_obs_selected_list)
+            ## Old: self.update_gui_karma(t_obs_selected_list)
         self.diary_widget.update_gui(t_obs_selected_list)
         self.update_gui_user_text(t_current_obs_item)
         self.update_gui_notifications()
 
     def update_gui_notifications(self):
-        self.notifications_lb.clear()
+        #######self.notifications_lb.clear()
         t_karma_lt = bwb_model.KarmaM.get_all()
         for karma_item in t_karma_lt:
             duration_sg = "x"
@@ -408,24 +371,6 @@ class WellBeingWindow(QMainWindow):
                 bwb_model.ObservanceM.get(i_current_item.data(QtCore.Qt.UserRole)).user_text
             )
 
-    def update_gui_karma(self, i_obs_sel_list):
-        self.karma_lb.clear()
-
-        if i_obs_sel_list is not None:
-            logging.debug("i_obs_sel_list = " + str(i_obs_sel_list))
-            t_karma_lt = bwb_model.KarmaM.get_for_observance_list(i_obs_sel_list)
-
-            for karma_item in t_karma_lt:
-                duration_sg = "x"
-                latest_diary_entry = bwb_model.DiaryM.get_latest_for_karma(karma_item.id)
-                if latest_diary_entry is not None:
-                    diary_entry_date_added = datetime.datetime.fromtimestamp(latest_diary_entry.date_added_it)
-                    today = datetime.datetime.today()
-                    time_delta = today - diary_entry_date_added
-                    duration_sg = str(time_delta.days)
-                row = QListWidgetItem("{" + duration_sg + "}" + karma_item.title_sg)
-                row.setData(QtCore.Qt.UserRole, karma_item.id)
-                self.karma_lb.addItem(row)
 
     def update_gui_ten_obs(self):
         self.ten_obs_lb_w5.clear()

@@ -24,7 +24,7 @@ class DiaryListWidget(QWidget):
         #####self.list_widget.setMinimumWidth(530)
         # -strange but we have to set a min width to avoid seeing the horizontal scrollbar
         self.v_box_layout.addWidget(self.list_widget)
-        self.list_widget.itemPressed.connect(self.item_clicked_fn)  # Clicked doesn't work
+        self.list_widget.itemPressed.connect(self.item_pressed_fn)  # Clicked doesn't work
         self.row_last_clicked = None
 
         self.list_widget.setSelectionMode(QAbstractItemView.NoSelection)
@@ -49,9 +49,9 @@ class DiaryListWidget(QWidget):
         """
 
 
-    def item_clicked_fn(self, i_listwidgetitem):
+    def item_pressed_fn(self, i_listwidgetitem):
         t_index_it = i_listwidgetitem.listWidget().row(i_listwidgetitem)
-        print("cell clicked. row = " + str(t_index_it))
+        print("cell clicked -- row = " + str(t_index_it))
         self.row_last_clicked = i_listwidgetitem
 
     # http://doc.qt.io/qt-5/qwidget.html#contextMenuEvent
