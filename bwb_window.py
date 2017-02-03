@@ -260,7 +260,7 @@ class WellBeingWindow(QMainWindow):
     def on_add_text_to_diary_button_pressed(self):
         obs_selected_item_list = self.ten_obs_lb_w5.selectedItems()
         if obs_selected_item_list is not None and len(obs_selected_item_list) > 0:
-            t_karma_current_item = self.karma_lb.currentItem()
+            t_karma_current_item = self.karma_composite_widget_w3.karma_lb.currentItem()
             t_karma_id = -1
             if t_karma_current_item is not None:
                 t_karma_id = self.karma_lb.currentItem().data(QtCore.Qt.UserRole)
