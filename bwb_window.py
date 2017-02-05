@@ -56,7 +56,9 @@ class WellBeingWindow(QMainWindow):
         # ..column 3
         self.karma_composite_widget_w3 = bwb_karma.KarmaCompositeWidget()
 
-        self.karma_composite_widget_w3.karma_current_row_changed_signal.connect(self.on_karma_current_row_changed)
+        self.karma_composite_widget_w3.current_row_changed_signal.connect(self.on_karma_current_row_changed)
+        self.karma_composite_widget_w3.new_karma_button_pressed_signal.connect(self.on_add_new_karma_button_pressed)
+
         ##########col3_vbox_l4 = QVBoxLayout()
         ##########karma_composite_widget_w3.setLayout(col3_vbox_l4)
         ###karma_composite_widget_w3.setFixedWidth(240)
@@ -324,6 +326,20 @@ class WellBeingWindow(QMainWindow):
                 if t_obs_item.data(QtCore.Qt.UserRole) == obs.id:
                     t_obs_item.setSelected(True)
         self.update_gui(EventSource.karma_current_row_changed)
+
+    def on_add_new_karma_button_pressed(self, i_karma_text_sg):
+        obs_selected_item_list = self.ten_obs_lb_w5.selectedItems()
+        if obs_selected_item_list is not None and len(obs_selected_item_list) >= 1:
+            obs_selected_item_id_list = [x.data(QtCore.Qt.UserRole) for x in obs_selected_item_list]
+        else:
+            message_box = QMessageBox.information(
+                self, "About Buddhist Well-Being",
+                ("Please select at least one observance before adding a new karma")
+            )
+            return
+
+        bwb_model.KarmaM.add(obs_selected_item_id_list, i_karma_text_sg)
+        self.update_gui()
 
 
     def show_about_box(self):
