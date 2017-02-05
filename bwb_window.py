@@ -362,8 +362,9 @@ class WellBeingWindow(QMainWindow):
             ## Old: self.update_gui_karma(t_obs_selected_list)
         self.diary_widget.update_gui(t_obs_selected_list)
         self.update_gui_user_text(t_current_obs_item)
-        self.update_gui_notifications()
+        ###self.update_gui_notifications()
 
+    """
     def update_gui_notifications(self):
         #######self.notifications_lb.clear()
         t_karma_lt = bwb_model.KarmaM.get_all()
@@ -380,6 +381,7 @@ class WellBeingWindow(QMainWindow):
             row = QListWidgetItem("{" + duration_sg + "}" + karma_item.title_sg)
             if days_since_last_done_it > karma_item.days_before_notification_it:
                 self.notifications_lb.addItem(row)
+    """
 
     def update_gui_user_text(self, i_current_item):
         if i_current_item is not None:
