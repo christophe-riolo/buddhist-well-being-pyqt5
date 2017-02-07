@@ -18,9 +18,8 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
         col3_vbox_l4 = QtWidgets.QVBoxLayout()
         self.setLayout(col3_vbox_l4)
 
-
         # ..for karma list (left column)
-        karma_label = QtWidgets.QLabel("<h3>Karma</h3>")
+        karma_label = QtWidgets.QLabel("<h3>Activities</h3>")
         col3_vbox_l4.addWidget(karma_label)
         self.karma_lb = QtWidgets.QListWidget()
         self.karma_lb.currentRowChanged.connect(self.on_karma_current_row_changed)
@@ -39,8 +38,6 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
         col3_vbox_l4.addWidget(self.notifications_lb)
         """
 
-
-    # TODO: Sending signal back to bwb_window
     def on_karma_current_row_changed(self):
         # Updating the obs list selection
         t_current_karma_row_it = self.karma_lb.currentRow()
