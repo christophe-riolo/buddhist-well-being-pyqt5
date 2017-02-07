@@ -26,7 +26,8 @@ import datetime
 DATABASE_FILE_NAME = "bwb_database_file.db"
 DEFAULT_DAYS_BEFORE_NOTIFICATION = 4
 NO_NOTIFICATION = -1
-
+SQLITE_FALSE = 0
+SQLITE_TRUE = 1
 
 def get_schema_version(i_db_conn):
     t_cursor = i_db_conn.execute("PRAGMA user_version")
@@ -127,8 +128,16 @@ def upgrade_1_2(i_db_conn):
     )
 """
 
+def upgrade_1_2(i_db_conn):
+    backup_db_file()
+    i_db_conn.execute(
+        "ALTER TABLE " + DbSchemaM.KarmaTable.name + " ADD COLUMN "
+        + DbSchemaM.KarmaTable.Cols.archived + " INTEGER DEFAULT '" + str(SQLITE_FALSE) + "'"
+    )
+
 upgrade_steps = {
     1: initial_schema_and_setup,
+    2: upgrade_1_2
     # Example: 2: upgrade_1_2
 }
 
@@ -178,6 +187,7 @@ class DbSchemaM:
             id = "id"  # key
             title = "title"
             days_before_notification = "days_before_notification"
+            archived = "archived"
 
     class DiaryTable:
         name = "diary"
@@ -375,6 +385,7 @@ class KarmaM:
         db_cursor = db_connection.cursor()
         db_cursor_result = db_cursor.execute(
             "SELECT * FROM " + DbSchemaM.KarmaTable.name
+            + " WHERE " + DbSchemaM.KarmaTable.Cols.archived + "=" + str(SQLITE_FALSE)
         )
         t_karma_tuple_list_from_db = db_cursor_result.fetchall()
         db_connection.commit()
@@ -408,6 +419,7 @@ class KarmaM:
             db_cursor_result = db_cursor.execute(
                 "SELECT * FROM " + DbSchemaM.KarmaTable.name
                 + " WHERE " + DbSchemaM.KarmaTable.Cols.id + "=" + str(karma_id_ref)
+                + " AND " + DbSchemaM.KarmaTable.Cols.archived + "=" + str(SQLITE_FALSE)
             )
             t_karma_tuple = db_cursor_result.fetchone()
             ret_karma_list.append(KarmaM(
@@ -438,6 +450,17 @@ class KarmaM:
             karma_db_item[2]
         )
 
+    @staticmethod
+    def archive(i_id_it):
+        db_connection = DbHelperM.get_db_connection()
+        db_cursor = db_connection.cursor()
+        db_cursor.execute(
+            "UPDATE " + DbSchemaM.KarmaTable.name
+            + " SET " + DbSchemaM.KarmaTable.Cols.archived + " = ?"
+            + " WHERE " + DbSchemaM.KarmaTable.Cols.id + " = ?",
+            (str(SQLITE_TRUE), str(i_id_it))
+        )
+        db_connection.commit()
 
 class DiaryM:
     def __init__(self, i_id, i_date_added_it, i_diary_text="", i_ref_karma_id=-1):

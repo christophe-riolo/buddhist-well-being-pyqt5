@@ -56,6 +56,7 @@ class WellBeingWindow(QMainWindow):
         self.karma_composite_widget_w3 = bwb_karma.KarmaCompositeWidget()
         self.karma_composite_widget_w3.current_row_changed_signal.connect(self.on_karma_current_row_changed)
         self.karma_composite_widget_w3.new_karma_button_pressed_signal.connect(self.on_karma_add_new_button_pressed)
+        self.karma_composite_widget_w3.delete_signal.connect(self.on_karma_deleted)
         karma_dock_w2.setWidget(self.karma_composite_widget_w3)
         karma_dock_w2.setFeatures(QDockWidget.DockWidgetMovable | QDockWidget.DockWidgetFloatable)
         karma_dock_w2.setAllowedAreas(QtCore.Qt.LeftDockWidgetArea | QtCore.Qt.RightDockWidgetArea)
@@ -146,7 +147,10 @@ class WellBeingWindow(QMainWindow):
             self.obs_composite_w3.update_gui()
         t_obs_selected_list = self.obs_composite_w3.get_selected_id_list()
         if i_event_source != EventSource.karma_current_row_changed:
-            self.karma_composite_widget_w3.update_gui_karma(t_obs_selected_list)
+            self.karma_composite_widget_w3.update_gui(t_obs_selected_list)
         self.diary_composite_w2.update_gui()
         ###self.update_gui_user_text(t_current_obs_item)
         ###self.update_gui_notifications()
+
+    def on_karma_deleted(self):
+        self.update_gui()  # - EventSource.karma_current_row_changed

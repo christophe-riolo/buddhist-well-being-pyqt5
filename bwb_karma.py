@@ -11,6 +11,8 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
 
     current_row_changed_signal = QtCore.pyqtSignal(int)
     new_karma_button_pressed_signal = QtCore.pyqtSignal(str)
+    delete_signal = QtCore.pyqtSignal()
+    last_clicked_list_item = None
 
     def __init__(self):
         super().__init__()
@@ -42,9 +44,14 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
         current_karma_row_it = self.list_widget.currentRow()
         if current_karma_row_it == -1:
             return
-        current_karma_list_item = self.list_widget.item(current_karma_row_it)
-        karma_entry = bwb_model.KarmaM.get(current_karma_list_item.data(QtCore.Qt.UserRole))
-        self.current_row_changed_signal.emit(karma_entry.id)
+        self.last_clicked_list_item = self.list_widget.item(current_karma_row_it)
+
+        if QtWidgets.QApplication.mouseButtons() == QtCore.Qt.RightButton:
+            print("Right button clicked")
+        else:
+            current_karma_list_item = self.list_widget.item(current_karma_row_it)
+            karma_entry = bwb_model.KarmaM.get(current_karma_list_item.data(QtCore.Qt.UserRole))
+            self.current_row_changed_signal.emit(karma_entry.id)
 
     def on_add_new_karma_button_pressed(self):
         t_text_sg = self.adding_new_karma_ey.text().strip()  # strip is needed to remove a newline at the end (why?)
@@ -53,15 +60,7 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
         self.new_karma_button_pressed_signal.emit(t_text_sg)
         self.adding_new_karma_ey.clear()
 
-    def open_karma_context_menu(self, i_event):
-        print("opening menu")
-        #TBD
-
-    def delete_karma(self, i_it):
-        print("deleting karma. i_it = " + str(i_it))
-        #TBD
-
-    def update_gui_karma(self, i_obs_sel_list):
+    def update_gui(self, i_obs_sel_list):
         self.list_widget.clear()
         if i_obs_sel_list is not None:
             logging.debug("i_obs_sel_list = " + str(i_obs_sel_list))
@@ -77,4 +76,26 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
                 row = QtWidgets.QListWidgetItem("{" + duration_sg + "}" + karma_item.title_sg)
                 row.setData(QtCore.Qt.UserRole, karma_item.id)
                 self.list_widget.addItem(row)
+
+    def contextMenuEvent(self, i_QContextMenuEvent):
+        """
+        Overridden
+        Docs: http://doc.qt.io/qt-5/qwidget.html#contextMenuEvent
+        """
+        self.right_click_menu = QtWidgets.QMenu()
+        delete_action = QtWidgets.QAction("Archive")
+        # - TODO: Maybe rename this, "delete" is not right, but "archive" implies that it can come back later
+        delete_action.triggered.connect(self.on_context_menu_delete)
+        self.right_click_menu.addAction(delete_action)
+        self.right_click_menu.exec_(QtGui.QCursor.pos())
+
+    def on_context_menu_delete(self):
+        message_box_reply = QtWidgets.QMessageBox.question(
+            self, "Remove activity?", "Are you sure that you want to remove this activity?"
+        )
+        if message_box_reply == QtWidgets.QMessageBox.Yes:
+            bwb_model.KarmaM.archive(int(self.last_clicked_list_item.data(QtCore.Qt.UserRole)))
+            self.delete_signal.emit()
+        else:
+            pass  # -do nothing
 
