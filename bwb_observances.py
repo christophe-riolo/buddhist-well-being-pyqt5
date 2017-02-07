@@ -9,32 +9,28 @@ import bwb_model
 
 
 class ObsCompositeWidget(QtWidgets.QWidget):
-
     item_selection_changed_signal = QtCore.pyqtSignal(int)
-    #####new_karma_button_pressed_signal = QtCore.pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
 
-        col1_vbox_l4 = QtWidgets.QVBoxLayout()
-        self.setLayout(col1_vbox_l4)
-
-
+        vbox = QtWidgets.QVBoxLayout()
+        self.setLayout(vbox)
 
         # ..for ten practices (left column)
         ten_obs_label = QtWidgets.QLabel("<h3>Ten Blessings</h3>") #<b></b>
-        col1_vbox_l4.addWidget(ten_obs_label)
+        vbox.addWidget(ten_obs_label)
         self.ten_obs_lb = QtWidgets.QListWidget()
         ############obs_dock_w2.setWidget(self.ten_obs_lb)
         self.ten_obs_lb.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
-        col1_vbox_l4.addWidget(self.ten_obs_lb)
+        vbox.addWidget(self.ten_obs_lb)
         self.ten_obs_lb.itemSelectionChanged.connect(self.on_item_selection_changed)
         # -currentItemChanged cannot be used since it is activated before the list of selected items is updated
         ##self.ten_observances_lb.setSizeAdjustPolicy(QListWidget.AdjustToContents)
         # ..for details (left column)
         self.ten_obs_details_ll = QtWidgets.QLabel("-----")
         self.ten_obs_details_ll.setWordWrap(True)
-        col1_vbox_l4.addWidget(self.ten_obs_details_ll)
+        vbox.addWidget(self.ten_obs_details_ll)
 
     def on_item_selection_changed(self):
         print("len(self.ten_obs_lb.selectedItems()) = " + str(len(self.ten_obs_lb.selectedItems())))
@@ -49,9 +45,7 @@ class ObsCompositeWidget(QtWidgets.QWidget):
         t_observance = bwb_model.ObservanceM.get(t_current_list_item.data(QtCore.Qt.UserRole))
         self.ten_obs_details_ll.setText(t_observance.description)
 
-
         self.item_selection_changed_signal.emit(t_current_row_it)
-
 
     def update_gui(self):
         self.ten_obs_lb.clear()
@@ -99,4 +93,13 @@ class ObsCompositeWidget(QtWidgets.QWidget):
             self.ten_obs_lb.setItemWidget(row_i6, row_w6)
 
             counter += 1
+
+    def get_selected_id_list(self, i_curr_item=None):
+        obs_selected_item_list = self.ten_obs_lb.selectedItems()
+        ret_obs_selected_id_list = []
+        if i_curr_item is not None and i_curr_item.isSelected():
+            obs_selected_item_list.append(i_curr_item)
+        if obs_selected_item_list is not None:
+            ret_obs_selected_id_list = [x.data(QtCore.Qt.UserRole) for x in obs_selected_item_list]
+        return ret_obs_selected_id_list
 

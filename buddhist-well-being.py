@@ -42,5 +42,6 @@ if __name__ == "__main__":
     print("Buddhist Well-Being application version: " + str(BWB_APPLICATION_VERSION_SG))
     t_db_conn = bwb_model.DbHelperM.get_db_connection()
     print("Buddhist Well-Being database schema version: " + str(bwb_model.get_schema_version(t_db_conn)))
+    print("=====")
 
     sys.exit(app.exec_())

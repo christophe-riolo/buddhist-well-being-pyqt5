@@ -15,41 +15,38 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
 
-        col3_vbox_l4 = QtWidgets.QVBoxLayout()
-        self.setLayout(col3_vbox_l4)
+        vbox = QtWidgets.QVBoxLayout()
+        self.setLayout(vbox)
 
         # ..for karma list (left column)
         karma_label = QtWidgets.QLabel("<h3>Activities</h3>")
-        col3_vbox_l4.addWidget(karma_label)
-        self.karma_lb = QtWidgets.QListWidget()
-        self.karma_lb.currentRowChanged.connect(self.on_karma_current_row_changed)
-        col3_vbox_l4.addWidget(self.karma_lb)
+        vbox.addWidget(karma_label)
+        self.list_widget = QtWidgets.QListWidget()
+        self.list_widget.currentRowChanged.connect(self.on_karma_current_row_changed)
+        vbox.addWidget(self.list_widget)
         # ..for adding new karma (left column)
         self.adding_new_karma_ey = QtWidgets.QLineEdit()
-        col3_vbox_l4.addWidget(self.adding_new_karma_ey)
+        vbox.addWidget(self.adding_new_karma_ey)
         self.adding_new_karma_bn = QtWidgets.QPushButton("Add new")
-        col3_vbox_l4.addWidget(self.adding_new_karma_bn)
+        vbox.addWidget(self.adding_new_karma_bn)
         self.adding_new_karma_bn.clicked.connect(self.on_add_new_karma_button_pressed)
         """
         #..for notifications
         notifications_label = QLabel("<h4>Notifications</h4>")
-        col3_vbox_l4.addWidget(notifications_label)
+        vbox.addWidget(notifications_label)
         self.notifications_lb = QListWidget()
-        col3_vbox_l4.addWidget(self.notifications_lb)
+        vbox.addWidget(self.notifications_lb)
         """
 
     def on_karma_current_row_changed(self):
-        # Updating the obs list selection
-        t_current_karma_row_it = self.karma_lb.currentRow()
-        if t_current_karma_row_it == -1:
+        current_karma_row_it = self.list_widget.currentRow()
+        if current_karma_row_it == -1:
             return
-        t_current_karma_item = self.karma_lb.item(t_current_karma_row_it)
-        t_karma = bwb_model.KarmaM.get(t_current_karma_item.data(QtCore.Qt.UserRole))
-
-        self.current_row_changed_signal.emit(t_karma.id)
+        current_karma_list_item = self.list_widget.item(current_karma_row_it)
+        karma_entry = bwb_model.KarmaM.get(current_karma_list_item.data(QtCore.Qt.UserRole))
+        self.current_row_changed_signal.emit(karma_entry.id)
 
     def on_add_new_karma_button_pressed(self):
-
         t_text_sg = self.adding_new_karma_ey.text().strip()  # strip is needed to remove a newline at the end (why?)
         if not (t_text_sg and t_text_sg.strip()):
             return
@@ -64,23 +61,20 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
         print("deleting karma. i_it = " + str(i_it))
         #TBD
 
-
     def update_gui_karma(self, i_obs_sel_list):
-        self.karma_lb.clear()
-
+        self.list_widget.clear()
         if i_obs_sel_list is not None:
             logging.debug("i_obs_sel_list = " + str(i_obs_sel_list))
-            t_karma_lt = bwb_model.KarmaM.get_for_observance_list(i_obs_sel_list)
-
-            for karma_item in t_karma_lt:
+            karma_entry_list = bwb_model.KarmaM.get_for_observance_list(i_obs_sel_list)
+            for karma_item in karma_entry_list:
                 duration_sg = "x"
                 latest_diary_entry = bwb_model.DiaryM.get_latest_for_karma(karma_item.id)
                 if latest_diary_entry is not None:
                     diary_entry_date_added = datetime.datetime.fromtimestamp(latest_diary_entry.date_added_it)
-                    today = datetime.datetime.today()
-                    time_delta = today - diary_entry_date_added
+                    today_datetime = datetime.datetime.today()
+                    time_delta = today_datetime - diary_entry_date_added
                     duration_sg = str(time_delta.days)
                 row = QtWidgets.QListWidgetItem("{" + duration_sg + "}" + karma_item.title_sg)
                 row.setData(QtCore.Qt.UserRole, karma_item.id)
-                self.karma_lb.addItem(row)
+                self.list_widget.addItem(row)
 

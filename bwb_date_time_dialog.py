@@ -6,52 +6,48 @@ import sys
 import time
 
 
-##
-# Inspiration: Answer by lou here:
-# https://stackoverflow.com/questions/18196799/how-can-i-show-a-pyqt-modal-dialog-and-get-data-out-of-its-controls-once-its-clo
-##
 class DateTimeDialog(QDialog):
+    """
+    Inspiration: Answer by lou here:
+    https://stackoverflow.com/questions/18196799/how-can-i-show-a-pyqt-modal-dialog-and-get-data-out-of-its-controls-once-its-clo
+    """
     def __init__(self, i_unix_time_it, i_parent = None):
         super(DateTimeDialog, self).__init__(i_parent)
 
-        ####self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-
-        t_vertical_layout = QVBoxLayout(self)
+        vbox = QVBoxLayout(self)
 
         self.date_time_edit = QDateTimeEdit(self)
         self.date_time_edit.setCalendarPopup(True)
-        t_date_time = QtCore.QDateTime()
-        t_date_time.setMSecsSinceEpoch(1000 * i_unix_time_it)
-        self.date_time_edit.setDateTime(t_date_time)
+        present_qdatetime = QtCore.QDateTime()
+        present_qdatetime.setMSecsSinceEpoch(1000 * i_unix_time_it)
+        self.date_time_edit.setDateTime(present_qdatetime)
+        vbox.addWidget(self.date_time_edit)
 
-        t_vertical_layout.addWidget(self.date_time_edit)
         self.button_box = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
             QtCore.Qt.Horizontal,
             self
         )
-        t_vertical_layout.addWidget(self.button_box)
-
+        vbox.addWidget(self.button_box)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
+        # -accept and reject are "slots" built into Qt
 
     def get_unix_time(self):
-        t_date_time = self.date_time_edit.dateTime()
-        t_unix_time_it = t_date_time.toMSecsSinceEpoch() // 1000
-        return t_unix_time_it
+        datetime = self.date_time_edit.dateTime()
+        unix_time_it = datetime.toMSecsSinceEpoch() // 1000
+        return unix_time_it
 
     @staticmethod
     def get_date_time_dialog(i_unix_time_it):
-        t_dialog = DateTimeDialog(i_unix_time_it)
-        t_dialog_result = t_dialog.exec_()
-        t_unix_time = t_dialog.get_unix_time()
-        t_result_bl = t_dialog_result == QDialog.Accepted
-        return (t_result_bl, t_unix_time)
+        dialog = DateTimeDialog(i_unix_time_it)
+        dialog_result = dialog.exec_()
+        unix_time = -1
+        if dialog_result == QDialog.Accepted:
+            unix_time = dialog.get_unix_time()
+        return unix_time
 
 if __name__ == "__main__":
-
     app = QApplication(sys.argv)
-    t_result_tuple = DateTimeDialog.get_date_time_dialog(time.time())
-    print("t_result_tuple = " + str(t_result_tuple))
-
+    result = DateTimeDialog.get_date_time_dialog(time.time())
     sys.exit(app.exec_())

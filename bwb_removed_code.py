@@ -105,3 +105,36 @@ def on_item_selection_changed(self):
     """
 
 
+
+
+"""
+bwb_diary_widget:
+init:
+
+# Alternatively:
+
+self.v_box_layout = QVBoxLayout(self)
+
+self.list_widget = QListWidget()
+
+self.scroll_area = QScrollArea()
+self.scroll_area.setWidget(self.list_widget)
+self.v_box_layout.addWidget(self.scroll_area)
+self.scroll_area.setWidgetResizable(True)
+
+self.list_widget.itemPressed.connect(self.item_clicked_fn)  # Clicked doesn't work
+self.row_last_clicked = None
+"""
+
+"""
+            t_time_of_day_format_string = "%H:%M"  # Ex: Sweden
+            if time.strftime("%p"):  # Checking if the string is empty (and therefore "falsy")
+                t_time_of_day_format_string = "%I:%M %p"  # Ex: US
+
+            time_of_day_sg = datetime.datetime.fromtimestamp(diary_entry.date_added_it)\
+                .strftime(t_time_of_day_format_string)
+            t_time_of_day_label = QLabel(time_of_day_sg)
+            ##t_time_of_day_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.MinimumExpanding)  # horizontal, vertical
+
+            ###row_layout_l7.addWidget(t_time_of_day_label)  # , QtCore.Qt.AlignRight
+"""
