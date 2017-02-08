@@ -17,7 +17,8 @@ import sys
 class EventSource(enum.Enum):
     undefined = -1
     obs_selection_changed = 1
-    karma_current_row_changed = 2
+    obs_current_row_changed = 2
+    karma_current_row_changed = 3
 
 #################
 # View and controller
@@ -43,6 +44,7 @@ class WellBeingWindow(QMainWindow):
         obs_dock_w2 = QDockWidget("Blessings", self)
         self.obs_composite_w3 = bwb_observances.ObsCompositeWidget()
         self.obs_composite_w3.item_selection_changed_signal.connect(self.on_obs_item_selection_changed)
+        self.obs_composite_w3.current_row_changed_signal.connect(self.on_obs_current_row_changed)
         obs_dock_w2.setWidget(self.obs_composite_w3)
         obs_dock_w2.setFeatures(QDockWidget.NoDockWidgetFeatures)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, obs_dock_w2)
@@ -89,6 +91,9 @@ class WellBeingWindow(QMainWindow):
         self.show()
 
     def on_karma_current_row_changed(self, i_karma_id_it):
+        # This works but is disabled for now:
+        """
+        """
         self.obs_composite_w3.ten_obs_lb.clearSelection()
         observance_list = bwb_model.ObservanceM.get_all_for_karma_id(i_karma_id_it)
         list_length_it = self.obs_composite_w3.ten_obs_lb.count()
@@ -97,8 +102,6 @@ class WellBeingWindow(QMainWindow):
             for obs in observance_list:
                 if obs_list_item.data(QtCore.Qt.UserRole) == obs.id:
                     obs_list_item.setSelected(True)
-                    # -TODO: Maybe we can change the background color instead? (Right now this does nothing because of
-                    # selection has been disabled for the observances list)
         self.update_gui(EventSource.karma_current_row_changed)
 
     def on_karma_add_new_button_pressed(self, i_karma_text_sg):
@@ -113,7 +116,10 @@ class WellBeingWindow(QMainWindow):
                 ("Please select at least one observance before adding a new karma")
             )
 
-    def on_obs_item_selection_changed(self, i_current_row_it):
+    def on_obs_current_row_changed(self, i_current_row_it):
+        self.update_gui(EventSource.obs_current_row_changed)
+
+    def on_obs_item_selection_changed(self):
         self.update_gui(EventSource.obs_selection_changed)  # Showing habits for practice etc
 
     def on_diary_add_entry_button_pressed(self, i_text_sg, i_unix_time_it):
@@ -143,11 +149,17 @@ class WellBeingWindow(QMainWindow):
         )
 
     def update_gui(self, i_event_source = EventSource.undefined):
-        if i_event_source != EventSource.obs_selection_changed and i_event_source != EventSource.karma_current_row_changed:
+        obs_current_row_item = self.obs_composite_w3.ten_obs_lb.currentItem()
+
+        if i_event_source == EventSource.undefined or EventSource.obs_current_row_changed:
+            if obs_current_row_item is not None:
+                obs_current_entry_id = obs_current_row_item.data(QtCore.Qt.UserRole)
+                if i_event_source != EventSource.karma_current_row_changed: ###### and i_event_source != EventSource.obs_selection_changed
+                    self.karma_composite_widget_w3.update_gui([obs_current_entry_id])
+                    # -the current row is sent instead of the list of selected rows, but the function is kept as it is in case
+                    #  we want to change things in the future
+        if i_event_source == EventSource.undefined or i_event_source == EventSource.karma_current_row_changed:
             self.obs_composite_w3.update_gui()
-        t_obs_selected_list = self.obs_composite_w3.get_selected_id_list()
-        if i_event_source != EventSource.karma_current_row_changed:
-            self.karma_composite_widget_w3.update_gui(t_obs_selected_list)
         self.diary_composite_w2.update_gui()
         ###self.update_gui_user_text(t_current_obs_item)
         ###self.update_gui_notifications()

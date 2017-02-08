@@ -24,7 +24,8 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
         karma_label = QtWidgets.QLabel("<h3>Activities</h3>")
         vbox.addWidget(karma_label)
         self.list_widget = QtWidgets.QListWidget()
-        self.list_widget.currentRowChanged.connect(self.on_karma_current_row_changed)
+        ##self.list_widget.currentRowChanged.connect(self.on_karma_current_row_changed)
+        self.list_widget.itemSelectionChanged.connect(self.on_karma_current_row_changed)
         vbox.addWidget(self.list_widget)
         # ..for adding new karma (left column)
         self.adding_new_karma_ey = QtWidgets.QLineEdit()
@@ -84,7 +85,7 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
         """
         self.right_click_menu = QtWidgets.QMenu()
         delete_action = QtWidgets.QAction("Archive")
-        # - TODO: Maybe rename this, "delete" is not right, but "archive" implies that it can come back later
+        # -TODO: Maybe rename this, "delete" is not right, but "archive" implies that it can come back later
         delete_action.triggered.connect(self.on_context_menu_delete)
         self.right_click_menu.addAction(delete_action)
         self.right_click_menu.exec_(QtGui.QCursor.pos())

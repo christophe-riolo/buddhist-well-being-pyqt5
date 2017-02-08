@@ -9,7 +9,8 @@ import bwb_model
 
 
 class ObsCompositeWidget(QtWidgets.QWidget):
-    item_selection_changed_signal = QtCore.pyqtSignal(int)
+    item_selection_changed_signal = QtCore.pyqtSignal()
+    current_row_changed_signal = QtCore.pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
@@ -27,13 +28,13 @@ class ObsCompositeWidget(QtWidgets.QWidget):
         self.ten_obs_lb.itemSelectionChanged.connect(self.on_item_selection_changed)
         # -currentItemChanged cannot be used since it is activated before the list of selected items is updated
         ##self.ten_observances_lb.setSizeAdjustPolicy(QListWidget.AdjustToContents)
+        self.ten_obs_lb.currentRowChanged.connect(self.on_current_row_changed)
         # ..for details (left column)
         self.ten_obs_details_ll = QtWidgets.QLabel("-----")
         self.ten_obs_details_ll.setWordWrap(True)
         vbox.addWidget(self.ten_obs_details_ll)
 
-    def on_item_selection_changed(self):
-        print("len(self.ten_obs_lb.selectedItems()) = " + str(len(self.ten_obs_lb.selectedItems())))
+    def on_current_row_changed(self):
         print("self.ten_obs_lb.currentRow() = " + str(self.ten_obs_lb.currentRow()))
 
         t_current_row_it = self.ten_obs_lb.currentRow()
@@ -45,7 +46,12 @@ class ObsCompositeWidget(QtWidgets.QWidget):
         t_observance = bwb_model.ObservanceM.get(t_current_list_item.data(QtCore.Qt.UserRole))
         self.ten_obs_details_ll.setText(t_observance.description)
 
-        self.item_selection_changed_signal.emit(t_current_row_it)
+        self.current_row_changed_signal.emit(t_current_row_it)
+
+    def on_item_selection_changed(self):
+        print("len(self.ten_obs_lb.selectedItems()) = " + str(len(self.ten_obs_lb.selectedItems())))
+
+        self.item_selection_changed_signal.emit()
 
     def update_gui(self):
         self.ten_obs_lb.clear()
