@@ -21,40 +21,50 @@ class ObsCompositeWidget(QtWidgets.QWidget):
         # ..for ten practices (left column)
         ten_obs_label = QtWidgets.QLabel("<h3>Ten Blessings</h3>") #<b></b>
         vbox.addWidget(ten_obs_label)
-        self.ten_obs_lb = QtWidgets.QListWidget()
+        self.list_widget = QtWidgets.QListWidget()
         ############obs_dock_w2.setWidget(self.ten_obs_lb)
-        self.ten_obs_lb.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
-        vbox.addWidget(self.ten_obs_lb)
-        self.ten_obs_lb.itemSelectionChanged.connect(self.on_item_selection_changed)
+        self.list_widget.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
+        vbox.addWidget(self.list_widget)
+        self.list_widget.itemSelectionChanged.connect(self.on_item_selection_changed)
         # -currentItemChanged cannot be used since it is activated before the list of selected items is updated
         ##self.ten_observances_lb.setSizeAdjustPolicy(QListWidget.AdjustToContents)
-        self.ten_obs_lb.currentRowChanged.connect(self.on_current_row_changed)
+        self.list_widget.currentRowChanged.connect(self.on_current_row_changed)
         # ..for details (left column)
         self.ten_obs_details_ll = QtWidgets.QLabel("-----")
         self.ten_obs_details_ll.setWordWrap(True)
         vbox.addWidget(self.ten_obs_details_ll)
 
     def on_current_row_changed(self):
-        print("self.ten_obs_lb.currentRow() = " + str(self.ten_obs_lb.currentRow()))
+        print("self.ten_obs_lb.currentRow() = " + str(self.list_widget.currentRow()))
 
-        t_current_row_it = self.ten_obs_lb.currentRow()
-        if t_current_row_it == -1:
+        current_row_it = self.list_widget.currentRow()
+        if current_row_it == -1:
             # We might get here when a karma item has been clicked
             return
 
-        t_current_list_item = self.ten_obs_lb.item(t_current_row_it)
+        t_current_list_item = self.list_widget.item(current_row_it)
         t_observance = bwb_model.ObservanceM.get(t_current_list_item.data(QtCore.Qt.UserRole))
         self.ten_obs_details_ll.setText(t_observance.description)
 
-        self.current_row_changed_signal.emit(t_current_row_it)
+        self.current_row_changed_signal.emit(current_row_it)
 
     def on_item_selection_changed(self):
-        print("len(self.ten_obs_lb.selectedItems()) = " + str(len(self.ten_obs_lb.selectedItems())))
+        print("len(self.ten_obs_lb.selectedItems()) = " + str(len(self.list_widget.selectedItems())))
 
         self.item_selection_changed_signal.emit()
 
     def update_gui(self):
-        self.ten_obs_lb.clear()
+        """
+        Signs to use for showing observance:
+        ☐ ☑ (Ballot ____, )
+        ✓
+        ◯ ⬤ (Large Circle, Black Large Circle)
+        ○ ● (White Circle, Black Circle (Please note that medium white/black cirlce is smaller than these))
+        More here:
+        https://unicode-table.com/en/blocks/geometric-shapes/
+        https://unicode-table.com/en/blocks/miscellaneous-symbols/
+        """
+        self.list_widget.clear()
         counter = 0
         for observance_item in bwb_model.ObservanceM.get_all():
             # Important: "Alternatively, if you want the widget to have a fixed size based on its contents,
@@ -66,17 +76,26 @@ class ObsCompositeWidget(QtWidgets.QWidget):
 
             # Updating frequency
             total_number_week_list = []
-            for day_it in range(0, 7):
-                t_day_as_int = int(time.mktime((datetime.date.today() - datetime.timedelta(days=day_it)).timetuple()))
-                t_diary_filtered_list = bwb_model.DiaryM.get_all_for_obs_and_day(observance_item.id, t_day_as_int)
+            today_datetime = datetime.datetime.now()
+            today_weekday_nr_it = datetime.datetime.now().weekday()
+            #start_weekday_it = today_weekday_nr_it  # (Ex: Monday in Sweden, Sunday in the US)
+            for day_weekday_nr_it in range(0, 7):
+                check_box_sign_sg = "○"
+                day_datetime = today_datetime\
+                    - datetime.timedelta(days=today_datetime.weekday() + 1)\
+                    + datetime.timedelta(days=day_weekday_nr_it)
+                day_unixtime_it = day_datetime.timestamp()
+                t_diary_filtered_list = bwb_model.DiaryM.get_all_for_obs_and_day(observance_item.id, day_unixtime_it)
                 total_number_it = len(t_diary_filtered_list)
-                t_weekday_one_char_sg = datetime.datetime.fromtimestamp(t_day_as_int).strftime("%A")[0:1]
-                total_number_week_list.append(t_weekday_one_char_sg.capitalize() + str(total_number_it))
+                if total_number_it > 0:
+                    check_box_sign_sg = "●"
+                t_weekday_one_char_sg = datetime.datetime.fromtimestamp(day_unixtime_it).strftime("%A")[0:1]
+                total_number_week_list.append(check_box_sign_sg)  # t_weekday_one_char_sg.capitalize() +
 
-            observance_short_formatted_sg = "<b>" + observance_item.title + "</b>"
+            observance_short_formatted_sg = "" + observance_item.title + ""
             row_label_w8 = QtWidgets.QLabel(
                 observance_short_formatted_sg
-                + "<br>[" + ' '.join(str(x) for x in reversed(total_number_week_list)) + "]"
+                + "<br>" + ' '.join(x for x in total_number_week_list) + ""
             )
 
             row_label_w8.adjustSize()
@@ -91,17 +110,17 @@ class ObsCompositeWidget(QtWidgets.QWidget):
 
             row_i6.setData(QtCore.Qt.UserRole, observance_item.id)
 
-            my_size = QtCore.QSize(-1, row_w6.height())
+            #my_size = QtCore.QSize(-1, row_w6.height())
 
             row_i6.setSizeHint(row_w6.sizeHint())
             # - Please note: If we set the size hint to (-1, height) we will get overflow towards the bottom
-            self.ten_obs_lb.addItem(row_i6)
-            self.ten_obs_lb.setItemWidget(row_i6, row_w6)
+            self.list_widget.addItem(row_i6)
+            self.list_widget.setItemWidget(row_i6, row_w6)
 
             counter += 1
 
     def get_selected_id_list(self, i_curr_item=None):
-        obs_selected_item_list = self.ten_obs_lb.selectedItems()
+        obs_selected_item_list = self.list_widget.selectedItems()
         ret_obs_selected_id_list = []
         if i_curr_item is not None and i_curr_item.isSelected():
             obs_selected_item_list.append(i_curr_item)

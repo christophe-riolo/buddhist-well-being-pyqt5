@@ -139,7 +139,7 @@ class DiaryListWidget(QtWidgets.QWidget):
             # Setting up the display
             list_item = QtWidgets.QListWidgetItem()
             list_item.setData(QtCore.Qt.UserRole, diary_entry.id)  # to read: .data
-            row_layout_l7 = QHBoxLayout()
+            row_layout_l7 = QtWidgets.QHBoxLayout()
             row_label_w8 = QtWidgets.QLabel(label_text_sg)
             ##row_label_w8.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
             row_label_w8.setWordWrap(True)

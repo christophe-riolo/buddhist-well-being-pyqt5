@@ -92,17 +92,17 @@ class WellBeingWindow(QtWidgets.QMainWindow):
         self.show()
 
     def on_karma_current_row_changed(self, i_karma_id_it):
-        self.obs_composite_w3.ten_obs_lb.clearSelection()
+        self.obs_composite_w3.list_widget.clearSelection()
         observance_list = bwb_model.ObservanceM.get_all_for_karma_id(i_karma_id_it)
-        list_length_it = self.obs_composite_w3.ten_obs_lb.count()
+        list_length_it = self.obs_composite_w3.list_widget.count()
         for i in range(0, list_length_it):
-            obs_list_item = self.obs_composite_w3.ten_obs_lb.item(i)
+            obs_list_item = self.obs_composite_w3.list_widget.item(i)
             for obs in observance_list:
                 if obs_list_item.data(QtCore.Qt.UserRole) == obs.id:
                     obs_list_item.setSelected(True)
 
     def on_karma_add_new_button_pressed(self, i_karma_text_sg):
-        obs_selected_item_list = self.obs_composite_w3.ten_obs_lb.selectedItems()
+        obs_selected_item_list = self.obs_composite_w3.list_widget.selectedItems()
         if obs_selected_item_list is not None and len(obs_selected_item_list) >= 1:
             obs_selected_item_id_list = [x.data(QtCore.Qt.UserRole) for x in obs_selected_item_list]
             bwb_model.KarmaM.add(obs_selected_item_id_list, i_karma_text_sg)
@@ -120,7 +120,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
         self.update_gui(EventSource.obs_selection_changed)  # Showing habits for practice etc
 
     def on_diary_add_entry_button_pressed(self, i_text_sg, i_unix_time_it):
-        obs_selected_item_list = self.obs_composite_w3.ten_obs_lb.selectedItems()
+        obs_selected_item_list = self.obs_composite_w3.list_widget.selectedItems()
         if obs_selected_item_list is not None and len(obs_selected_item_list) > 0:
             t_karma_current_item = self.karma_composite_widget_w3.list_widget.currentItem()
             t_karma_id = -1
@@ -146,7 +146,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
         )
 
     def update_gui(self, i_event_source = EventSource.undefined):
-        obs_current_row_item = self.obs_composite_w3.ten_obs_lb.currentItem()
+        obs_current_row_item = self.obs_composite_w3.list_widget.currentItem()
         if i_event_source == EventSource.obs_current_row_changed:
             if obs_current_row_item is not None:
                 obs_current_entry_id = obs_current_row_item.data(QtCore.Qt.UserRole)
