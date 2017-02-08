@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import *
+from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
 
@@ -14,6 +14,7 @@ import warnings
 import logging
 import sys
 
+
 class EventSource(enum.Enum):
     undefined = -1
     obs_selection_changed = 1
@@ -21,7 +22,7 @@ class EventSource(enum.Enum):
     ##karma_current_row_changed = 3
 
 
-class WellBeingWindow(QMainWindow):
+class WellBeingWindow(QtWidgets.QMainWindow):
     """
     View and controller
     Suffix explanation:
@@ -34,18 +35,18 @@ class WellBeingWindow(QMainWindow):
         super().__init__()
 
         # Initializing window
-        self.setGeometry(40, 30, 900, 700)
+        self.setGeometry(40, 30, 800, 700)
         self.setWindowTitle("Buddhist Well-Being")
         self.setWindowIcon(QtGui.QIcon("icon.png"))
 
         # Setup of widgets..
         # ..observances
-        obs_dock_w2 = QDockWidget("Blessings", self)
+        obs_dock_w2 = QtWidgets.QDockWidget("Blessings", self)
         self.obs_composite_w3 = bwb_observances.ObsCompositeWidget()
         self.obs_composite_w3.item_selection_changed_signal.connect(self.on_obs_item_selection_changed)
         self.obs_composite_w3.current_row_changed_signal.connect(self.on_obs_current_row_changed)
         obs_dock_w2.setWidget(self.obs_composite_w3)
-        obs_dock_w2.setFeatures(QDockWidget.NoDockWidgetFeatures)
+        obs_dock_w2.setFeatures(QtWidgets.QDockWidget.NoDockWidgetFeatures)
         obs_dock_w2.setFixedHeight(440)  # -TODO: Find a better way to do this
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, obs_dock_w2)
         # ..diary
@@ -54,27 +55,27 @@ class WellBeingWindow(QMainWindow):
             self.on_diary_add_entry_button_pressed)
         self.setCentralWidget(self.diary_composite_w2)
         # ..karma
-        karma_dock_w2 = QDockWidget("Activities", self)
+        karma_dock_w2 = QtWidgets.QDockWidget("Activities", self)
         self.karma_composite_widget_w3 = bwb_karma.KarmaCompositeWidget()
         self.karma_composite_widget_w3.current_row_changed_signal.connect(self.on_karma_current_row_changed)
         self.karma_composite_widget_w3.new_karma_button_pressed_signal.connect(self.on_karma_add_new_button_pressed)
         self.karma_composite_widget_w3.delete_signal.connect(self.on_karma_deleted)
         karma_dock_w2.setWidget(self.karma_composite_widget_w3)
-        karma_dock_w2.setFeatures(QDockWidget.DockWidgetMovable | QDockWidget.DockWidgetFloatable)
+        karma_dock_w2.setFeatures(QtWidgets.QDockWidget.DockWidgetMovable)
         karma_dock_w2.setAllowedAreas(QtCore.Qt.LeftDockWidgetArea | QtCore.Qt.RightDockWidgetArea)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, karma_dock_w2)
 
         # Creating the menu bar..
         # ..setup of actions
-        export_action = QAction("Export", self)
+        export_action = QtWidgets.QAction("Export", self)
         export_action.triggered.connect(bwb_model.export_all)
-        exit_action = QAction("Exit", self)
+        exit_action = QtWidgets.QAction("Exit", self)
         exit_action.triggered.connect(lambda x: sys.exit())
-        redraw_action = QAction("Redraw", self)
+        redraw_action = QtWidgets.QAction("Redraw", self)
         redraw_action.triggered.connect(self.update_gui)
-        about_action = QAction("About", self)
+        about_action = QtWidgets.QAction("About", self)
         about_action.triggered.connect(self.show_about_box)
-        backup_action = QAction("Backup db", self)
+        backup_action = QtWidgets.QAction("Backup db", self)
         backup_action.triggered.connect(bwb_model.backup_db_file)
         # ..adding menu items
         self.menu_bar = self.menuBar()
@@ -107,9 +108,9 @@ class WellBeingWindow(QMainWindow):
             bwb_model.KarmaM.add(obs_selected_item_id_list, i_karma_text_sg)
             self.update_gui()
         else:
-            message_box = QMessageBox.information(
-                self, "About Buddhist Well-Being",
-                ("Please select at least one observance before adding a new karma")
+            message_box = QtWidgets.QMessageBox.information(
+                self, "New Activity Message",
+                ("Please select at least one observance before adding a new activity")
             )
 
     def on_obs_current_row_changed(self, i_current_row_it):
@@ -130,13 +131,13 @@ class WellBeingWindow(QMainWindow):
             bwb_model.DiaryM.add(i_unix_time_it, i_text_sg, t_karma_id, obs_selected_item_id_list)
             self.update_gui()
         else:
-            message_box = QMessageBox.information(
-                self, "About Buddhist Well-Being",
+            message_box = QtWidgets.QMessageBox.information(
+                self, "New Diary Entry Message",
                 ("Please select at least one observance before adding a new diary entry")
             )
 
     def show_about_box(self):
-        message_box = QMessageBox.about(
+        message_box = QtWidgets.QMessageBox.about(
             self, "About Buddhist Well-Being",
             ("Concept and programming by Tord Dellsén\n"
             'Photography (for icons) by Torgny Dellsén - <a href="torgnydellsen.zenfolio.com">asdf</a><br>'
