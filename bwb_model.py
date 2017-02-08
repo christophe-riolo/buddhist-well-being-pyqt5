@@ -639,22 +639,33 @@ def export_all():
     csv_writer = csv.writer(open("exported.csv", "w"))
     t_space_tab_sg = "    "
     for obs_item in ObservanceM.get_all():
-        csv_writer.writerow((obs_item.short_name_sg, obs_item.sutra_text_sg))
+        csv_writer.writerow((obs_item.title, obs_item.description))
     csv_writer.writerow(("\n\n\n",))
-    for index in range(0, len(ObservanceM.get_all())):
-        csv_writer.writerow((ObservanceM.get(index).title,))
-        for karma_item in KarmaM.get_all_for_observance(index):
-            csv_writer.writerow((t_space_tab_sg + karma_item.description_sg,))
+    for obs in ObservanceM.get_all():  # -TODO: This doesn't work since we may skip indexes
+        csv_writer.writerow((obs.title,))
+        for karma_item in KarmaM.get_for_observance_list([obs.id]):
+            csv_writer.writerow((t_space_tab_sg + karma_item.title_sg,))
     csv_writer.writerow(("\n\n\n",))
+
+    # TODO:
+    """
     for diary_item in DiaryM.get_all():
         t_diary_entry_obs_sg = ObservanceM.get(diary_item.observance_ref).title
         t_karma = KarmaM.get(diary_item.karma_ref)
-        if t_karma == None:
+        if t_karma is None:
             t_diary_entry_karma_sg = ""
         else:
             t_diary_entry_karma_sg = t_karma.title_sg
-        csv_writer.writerow((t_diary_entry_obs_sg, t_diary_entry_karma_sg, diary_item.notes_sg))
+        csv_writer.writerow((t_diary_entry_obs_sg, t_diary_entry_karma_sg, diary_item.diary_text))
+    """
 
+    for diary_item in DiaryM.get_all():
+        t_karma = KarmaM.get(diary_item.ref_karma_id)
+        if t_karma is None:
+            t_diary_entry_karma_sg = ""
+        else:
+            t_diary_entry_karma_sg = t_karma.title_sg
+        csv_writer.writerow((t_diary_entry_karma_sg, diary_item.diary_text))
 
 def backup_db_file():
     date_sg = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
