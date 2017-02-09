@@ -54,6 +54,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
         self.diary_composite_w2.add_text_to_diary_button_pressed_signal.connect(
             self.on_diary_add_entry_button_pressed)
         self.diary_composite_w2.context_menu_change_date_signal.connect(self.on_diary_context_menu_change_date)
+        self.diary_composite_w2.context_menu_delete_signal.connect(self.on_diary_context_menu_delete)
         self.setCentralWidget(self.diary_composite_w2)
         # ..karma
         karma_dock_w2 = QtWidgets.QDockWidget("Activities", self)
@@ -93,6 +94,9 @@ class WellBeingWindow(QtWidgets.QMainWindow):
         self.show()
 
     def on_diary_context_menu_change_date(self):
+        self.update_gui()
+
+    def on_diary_context_menu_delete(self):
         self.update_gui()
 
     def on_karma_current_row_changed(self, i_karma_id_it):

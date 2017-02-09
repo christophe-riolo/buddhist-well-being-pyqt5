@@ -15,6 +15,7 @@ class DiaryListWidget(QtWidgets.QWidget):
 
     add_text_to_diary_button_pressed_signal = QtCore.pyqtSignal(str, int)
     context_menu_change_date_signal = QtCore.pyqtSignal()
+    context_menu_delete_signal = QtCore.pyqtSignal()
 
     row_last_clicked = None
 
@@ -84,6 +85,7 @@ class DiaryListWidget(QtWidgets.QWidget):
         if message_box_reply == QtWidgets.QMessageBox.Yes:
             bwb_model.DiaryM.remove(int(self.row_last_clicked.data(QtCore.Qt.UserRole)))
             self.update_gui()
+            self.context_menu_delete_signal.emit()
         else:
             pass  # -do nothing
 
