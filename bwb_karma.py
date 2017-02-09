@@ -58,6 +58,7 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
         t_text_sg = self.adding_new_karma_ey.text().strip()  # strip is needed to remove a newline at the end (why?)
         if not (t_text_sg and t_text_sg.strip()):
             return
+        #######self.list_widget.setCurrentRow(-1)  # -experimental
         self.new_karma_button_pressed_signal.emit(t_text_sg)
         self.adding_new_karma_ey.clear()
 
@@ -66,17 +67,19 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
         if i_obs_sel_list is not None:
             logging.debug("i_obs_sel_list = " + str(i_obs_sel_list))
             karma_entry_list = bwb_model.KarmaM.get_for_observance_list(i_obs_sel_list)
-            for karma_item in karma_entry_list:
-                duration_sg = "x"
-                latest_diary_entry = bwb_model.DiaryM.get_latest_for_karma(karma_item.id)
-                if latest_diary_entry is not None:
-                    diary_entry_date_added = datetime.datetime.fromtimestamp(latest_diary_entry.date_added_it)
-                    today_datetime = datetime.datetime.today()
-                    time_delta = today_datetime - diary_entry_date_added
-                    duration_sg = str(time_delta.days)
-                row = QtWidgets.QListWidgetItem("{" + duration_sg + "}" + karma_item.title_sg)
-                row.setData(QtCore.Qt.UserRole, karma_item.id)
-                self.list_widget.addItem(row)
+        else:
+            karma_entry_list = bwb_model.KarmaM.get_all()
+        for karma_item in karma_entry_list:
+            duration_sg = "x"
+            latest_diary_entry = bwb_model.DiaryM.get_latest_for_karma(karma_item.id)
+            if latest_diary_entry is not None:
+                diary_entry_date_added = datetime.datetime.fromtimestamp(latest_diary_entry.date_added_it)
+                today_datetime = datetime.datetime.today()
+                time_delta = today_datetime - diary_entry_date_added
+                duration_sg = str(time_delta.days)
+            row = QtWidgets.QListWidgetItem("{" + duration_sg + "}" + karma_item.title_sg)
+            row.setData(QtCore.Qt.UserRole, karma_item.id)
+            self.list_widget.addItem(row)
 
     def contextMenuEvent(self, i_QContextMenuEvent):
         """
