@@ -25,31 +25,32 @@ class ObsCompositeWidget(QtWidgets.QWidget):
         ############obs_dock_w2.setWidget(self.ten_obs_lb)
         self.list_widget.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
         vbox.addWidget(self.list_widget)
-        self.list_widget.itemSelectionChanged.connect(self.on_item_selection_changed)
+        #####self.list_widget.itemSelectionChanged.connect(self.on_item_selection_changed)
+        self.list_widget.itemPressed.connect(self.on_item_selection_changed)
+        # -itemClicked didn't work, unknown why (it worked on the first click but never when running in debug mode)
         # -currentItemChanged cannot be used since it is activated before the list of selected items is updated
         ##self.ten_observances_lb.setSizeAdjustPolicy(QListWidget.AdjustToContents)
-        self.list_widget.currentRowChanged.connect(self.on_current_row_changed)
+        ####self.list_widget.currentRowChanged.connect(self.on_current_row_changed)
         # ..for details (left column)
         self.ten_obs_details_ll = QtWidgets.QLabel("-----")
         self.ten_obs_details_ll.setWordWrap(True)
         vbox.addWidget(self.ten_obs_details_ll)
 
     def on_current_row_changed(self):
+        pass
+        ###self.current_row_changed_signal.emit(current_row_it)
+
+    def on_item_selection_changed(self, i_q_listwidget_item):
         print("self.ten_obs_lb.currentRow() = " + str(self.list_widget.currentRow()))
+        print("len(self.ten_obs_lb.selectedItems()) = " + str(len(self.list_widget.selectedItems())))
 
         current_row_it = self.list_widget.currentRow()
         if current_row_it == -1:
             # We might get here when a karma item has been clicked
             return
-
         t_current_list_item = self.list_widget.item(current_row_it)
         t_observance = bwb_model.ObservanceM.get(t_current_list_item.data(QtCore.Qt.UserRole))
         self.ten_obs_details_ll.setText(t_observance.description)
-
-        self.current_row_changed_signal.emit(current_row_it)
-
-    def on_item_selection_changed(self):
-        print("len(self.ten_obs_lb.selectedItems()) = " + str(len(self.list_widget.selectedItems())))
 
         self.item_selection_changed_signal.emit()
 

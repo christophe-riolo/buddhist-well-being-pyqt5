@@ -122,7 +122,8 @@ class WellBeingWindow(QtWidgets.QMainWindow):
             )
 
     def on_obs_current_row_changed(self, i_current_row_it):
-        self.update_gui(EventSource.obs_current_row_changed)
+        pass
+        #####self.update_gui(EventSource.obs_current_row_changed)
 
     def on_obs_item_selection_changed(self):
         self.update_gui(EventSource.obs_selection_changed)  # Showing habits for practice etc
@@ -156,13 +157,13 @@ class WellBeingWindow(QtWidgets.QMainWindow):
     def update_gui(self, i_event_source = EventSource.undefined):
         obs_current_row_item = self.obs_composite_w3.list_widget.currentItem()
         obs_nr_of_selected_rows_it = len(self.obs_composite_w3.list_widget.selectedItems())
-        if i_event_source == EventSource.obs_current_row_changed or i_event_source == EventSource.undefined:
+        if i_event_source == EventSource.obs_selection_changed or i_event_source == EventSource.undefined:
             if obs_current_row_item is not None:
                 obs_current_entry_id = obs_current_row_item.data(QtCore.Qt.UserRole)
                 self.karma_composite_widget_w3.update_gui([obs_current_entry_id])
                 # -the current row is sent instead of the list of selected rows, but the function is kept as it is
                 #  in case we want to change things in the future
-        if obs_nr_of_selected_rows_it == 0 and i_event_source != EventSource.obs_current_row_changed:
+        if obs_nr_of_selected_rows_it == 0:
             # -the current row changed signal is activated before the selection is updated, therefore
             #  we have to exclude this event source here
             self.karma_composite_widget_w3.update_gui(None)
