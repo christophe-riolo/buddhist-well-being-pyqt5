@@ -14,6 +14,8 @@ class DiaryListWidget(QtWidgets.QWidget):
     """
 
     add_text_to_diary_button_pressed_signal = QtCore.pyqtSignal(str, int)
+    context_menu_change_date_signal = QtCore.pyqtSignal()
+
     row_last_clicked = None
 
     def __init__(self):
@@ -108,6 +110,7 @@ class DiaryListWidget(QtWidgets.QWidget):
         if updated_time_unix_time_it != -1:
             bwb_model.DiaryM.update_date(diary_item.id, updated_time_unix_time_it)
             self.update_gui()
+            self.context_menu_change_date_signal.emit()
         else:
             pass  # -do nothing
 

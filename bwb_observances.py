@@ -76,26 +76,38 @@ class ObsCompositeWidget(QtWidgets.QWidget):
 
             # Updating frequency
             total_number_week_list = []
-            today_datetime = datetime.datetime.now()
-            today_weekday_nr_it = datetime.datetime.now().weekday()
+            today_date = datetime.date.today()
+            start_of_today_datetime = datetime.datetime(
+                year=today_date.year, month=today_date.month, day=today_date.day)
+            ####today_weekday_nr_it = datetime.datetime.now().weekday()
             #start_weekday_it = today_weekday_nr_it  # (Ex: Monday in Sweden, Sunday in the US)
+            total_number_for_week_it = 0
             for day_weekday_nr_it in range(0, 7):
                 check_box_sign_sg = "○"
-                day_datetime = today_datetime\
-                    - datetime.timedelta(days=today_datetime.weekday() + 1)\
+                start_of_day_datetime = start_of_today_datetime\
+                    - datetime.timedelta(days=today_date.weekday())\
                     + datetime.timedelta(days=day_weekday_nr_it)
-                day_unixtime_it = day_datetime.timestamp()
-                t_diary_filtered_list = bwb_model.DiaryM.get_all_for_obs_and_day(observance_item.id, day_unixtime_it)
-                total_number_it = len(t_diary_filtered_list)
-                if total_number_it > 0:
+                start_of_day_unixtime_it = int(start_of_day_datetime.timestamp())
+                t_diary_filtered_list = bwb_model.DiaryM.get_all_for_obs_and_day(observance_item.id, start_of_day_unixtime_it)
+                total_number_for_day_it = len(t_diary_filtered_list)
+                if total_number_for_day_it > 0:
                     check_box_sign_sg = "●"
-                t_weekday_one_char_sg = datetime.datetime.fromtimestamp(day_unixtime_it).strftime("%A")[0:1]
+                    total_number_for_week_it = total_number_for_week_it + 1
+                t_weekday_one_char_sg = datetime.datetime.fromtimestamp(start_of_day_unixtime_it).strftime("%A")[0:1]
                 total_number_week_list.append(check_box_sign_sg)  # t_weekday_one_char_sg.capitalize() +
+
+
+            # Experimental:
+            weekly_goal_reached_sg = ""
+            if total_number_for_week_it > 1:
+                weekly_goal_reached_sg = " ✔"
+
 
             observance_short_formatted_sg = "" + observance_item.title + ""
             row_label_w8 = QtWidgets.QLabel(
                 observance_short_formatted_sg
-                + "<br>" + ' '.join(x for x in total_number_week_list) + ""
+                + "<br>" + ' '.join(x for x in total_number_week_list)
+                + weekly_goal_reached_sg
             )
 
             row_label_w8.adjustSize()

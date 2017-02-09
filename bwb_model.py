@@ -578,7 +578,13 @@ class DiaryM:
         return ret_diary_lt
 
     @staticmethod
-    def get_all_for_obs_and_day(i_obs_id, day_as_unix_time_it, i_reverse_bl=True):
+    def get_all_for_obs_and_day(i_obs_id, i_start_of_day_as_unix_time_it, i_reverse_bl=True):
+        """
+        :param i_obs_id:
+        :param i_start_of_day_as_unix_time_it: It's very important that this is given as the start of the day
+        :param i_reverse_bl:
+        :return:
+        """
         ret_diary_lt = []
         db_connection = DbHelperM.get_db_connection()
 
@@ -596,8 +602,8 @@ class DiaryM:
             db_cursor_result = db_cursor.execute(
                 "SELECT * FROM " + DbSchemaM.DiaryTable.name
                 + " WHERE " + DbSchemaM.DiaryTable.Cols.id + "=" + str(t_diary_id)
-                + " AND " + DbSchemaM.DiaryTable.Cols.date_added + ">=" + str(day_as_unix_time_it)
-                + " AND " + DbSchemaM.DiaryTable.Cols.date_added + "<" + str(day_as_unix_time_it + 24 * 3600)
+                + " AND " + DbSchemaM.DiaryTable.Cols.date_added + ">=" + str(i_start_of_day_as_unix_time_it)
+                + " AND " + DbSchemaM.DiaryTable.Cols.date_added + "<" + str(i_start_of_day_as_unix_time_it + 24 * 3600)
             )
             t_diary_from_db = db_cursor_result.fetchall()
             for t_tuple in t_diary_from_db:
