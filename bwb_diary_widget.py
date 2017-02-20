@@ -35,11 +35,12 @@ class DiaryListWidget(QtWidgets.QWidget):
         self.list_widget.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
 
         # Adding new diary entry..
-        edit_diary_entry_hbox_l5 = QtWidgets.QHBoxLayout()
-        self.v_box.addLayout(edit_diary_entry_hbox_l5)
         # ..label
         diary_entry_label = QtWidgets.QLabel("<h4>New diary entry</h4>")
         self.v_box.addWidget(diary_entry_label)
+        # ..
+        edit_diary_entry_hbox_l5 = QtWidgets.QHBoxLayout()
+        self.v_box.addLayout(edit_diary_entry_hbox_l5)
         # ..text area
         self.adding_text_to_diary_textedit_w6 = QtWidgets.QTextEdit()
         edit_diary_entry_hbox_l5.addWidget(self.adding_text_to_diary_textedit_w6)
@@ -190,8 +191,6 @@ class DiaryListWidget(QtWidgets.QWidget):
         time_qdatetime = self.adding_to_diary_date_datetimeedit_w6.dateTime()
         unix_time_it = time_qdatetime.toMSecsSinceEpoch() // 1000
         self.add_text_to_diary_button_pressed_signal.emit(notes_sg, unix_time_it)
-        self.adding_text_to_diary_textedit_w6.clear()
-
 
 def is_same_day(i_first_date_it, i_second_date_it):
     first_date = datetime.datetime.fromtimestamp(i_first_date_it)

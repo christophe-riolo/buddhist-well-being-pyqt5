@@ -23,7 +23,7 @@ class ObsCompositeWidget(QtWidgets.QWidget):
         vbox.addWidget(ten_obs_label)
         self.list_widget = QtWidgets.QListWidget()
         ############obs_dock_w2.setWidget(self.ten_obs_lb)
-        self.list_widget.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
+        self.list_widget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         vbox.addWidget(self.list_widget)
         #####self.list_widget.itemSelectionChanged.connect(self.on_item_selection_changed)
         self.list_widget.itemPressed.connect(self.on_item_selection_changed)

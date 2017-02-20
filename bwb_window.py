@@ -139,6 +139,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
             print("t_unix_time_it = " + str(i_unix_time_it))
             bwb_model.DiaryM.add(i_unix_time_it, i_text_sg, t_karma_id, obs_selected_item_id_list)
             self.update_gui()
+            self.diary_composite_w2.adding_text_to_diary_textedit_w6.clear()
         else:
             message_box = QtWidgets.QMessageBox.information(
                 self, "New Diary Entry Message",
