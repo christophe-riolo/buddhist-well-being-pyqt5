@@ -76,8 +76,43 @@ To use this file:
 
 ## Usage
 
+### Starting
+
 1. Change directory to where the software files have been extracted
 2. Type and run `python3 buddhist-well-being-pyqt5.py` on GNU/Linux systems or `python buddhist-well-being-pyqt5.py` on Windows (TBD: MacOS)
+
+### Adding a diary entry
+
+1. Select at least one observance
+  * Multiple observances can be selected by using the ctrl key
+2. (Optional: Select an activity)
+3. (Optional: Write a diary note)
+4. Click on the "Add new diary entry" button
+
+### Adding a new activity
+
+1. Write the name of the activity in the lower left (default placement) text box
+2. Click on "Add new activity"
+
+### Editing
+
+By right clicking on entries you will get a small popup menu
+
+#### Editing the time for a diary entry
+
+1. Right click on the diary entry
+
+#### Editing the name for a diary entry
+
+1. Right click on the diary entry
+
+#### Deleting a diary entry
+
+1. Right click on the diary entry
+
+#### Archiving an activity
+
+1. Right click on the activity
 
 
 ## Feedback
