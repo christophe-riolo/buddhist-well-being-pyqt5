@@ -1,7 +1,6 @@
-
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
-from PyQt5 import QtGui
+# from PyQt5 import QtGui
 import sys
 import time
 
@@ -11,7 +10,7 @@ class DateTimeDialog(QtWidgets.QDialog):
     Inspiration: Answer by lou here:
     https://stackoverflow.com/questions/18196799/how-can-i-show-a-pyqt-modal-dialog-and-get-data-out-of-its-controls-once-its-clo
     """
-    def __init__(self, i_unix_time_it, i_parent = None):
+    def __init__(self, i_unix_time_it, i_parent=None):
         super(DateTimeDialog, self).__init__(i_parent)
 
         vbox = QtWidgets.QVBoxLayout(self)
@@ -46,6 +45,7 @@ class DateTimeDialog(QtWidgets.QDialog):
         if dialog_result == QtWidgets.QDialog.Accepted:
             unix_time = dialog.get_unix_time()
         return unix_time
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

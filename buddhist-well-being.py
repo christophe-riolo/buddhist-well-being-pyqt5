@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QApplication, QAction, QSystemTrayIcon, QMenu
 from PyQt5 import QtCore
 from PyQt5 import Qt
 import bwb_window
@@ -14,12 +14,11 @@ import sqlite3
 ######################
 
 BWB_APPLICATION_VERSION_SG = "private prototype"
-#BWB_APPLICATION_VERSION_IT = 1
+# BWB_APPLICATION_VERSION_IT = 1
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     main_window = bwb_window.WellBeingWindow()
-
 
     # System tray
     tray_icon = QSystemTrayIcon(QIcon("icon.png"), app)
@@ -39,9 +38,11 @@ if __name__ == "__main__":
     print("PySQLite (Python module) version: " + str(sqlite3.version))
     print("Qt version: " + str(QtCore.qVersion()))
     print("PyQt (Python module) version: " + str(Qt.PYQT_VERSION_STR))
-    print("Buddhist Well-Being application version: " + str(BWB_APPLICATION_VERSION_SG))
+    print("Buddhist Well-Being application version: "
+          + str(BWB_APPLICATION_VERSION_SG))
     t_db_conn = bwb_model.DbHelperM.get_db_connection()
-    print("Buddhist Well-Being database schema version: " + str(bwb_model.get_schema_version(t_db_conn)))
+    print("Buddhist Well-Being database schema version: "
+          + str(bwb_model.get_schema_version(t_db_conn)))
     print("=====")
 
     sys.exit(app.exec_())
