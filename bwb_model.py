@@ -10,7 +10,8 @@ import datetime
 # This module contains everything related to the model for the application:
 # * The db schema
 # * The db connection
-# * Data structure classes (each of which contains functions for reading and writing to the db):
+# * Data structure classes (each of which contains functions
+#   for reading and writing to the db):
 #   * ObservanceM
 #   * KarmaM
 #   * DiaryM
@@ -18,7 +19,8 @@ import datetime
 # * Various functions (for backing up the db etc)
 #
 # Notes:
-# * When inserting vales, it's best to use "VALUES (?, ?)" because then the sqlite3 module will take care of
+# * When inserting vales, it's best to use "VALUES (?, ?)"
+#   because then the sqlite3 module will take care of
 #   escaping values for us
 #
 #################
@@ -28,6 +30,7 @@ DEFAULT_DAYS_BEFORE_NOTIFICATION = 4
 NO_NOTIFICATION = -1
 SQLITE_FALSE = 0
 SQLITE_TRUE = 1
+
 
 def get_schema_version(i_db_conn):
     t_cursor = i_db_conn.execute("PRAGMA user_version")
@@ -44,10 +47,10 @@ def initial_schema_and_setup(i_db_conn):
         "CREATE TABLE " + DbSchemaM.ObservancesTable.name + "("
         + DbSchemaM.ObservancesTable.Cols.id + " INTEGER PRIMARY KEY" + ", "
         + DbSchemaM.ObservancesTable.Cols.title + " TEXT"
-            + " NOT NULL" + ", "
+        + " NOT NULL" + ", "
         + DbSchemaM.ObservancesTable.Cols.description + " TEXT" + ", "
         + DbSchemaM.ObservancesTable.Cols.user_text + " TEXT"
-            + " DEFAULT " + "''"
+        + " DEFAULT " + "''"
         + ")"
     )
     i_db_conn.execute(
@@ -55,20 +58,20 @@ def initial_schema_and_setup(i_db_conn):
         + DbSchemaM.KarmaTable.Cols.id + " INTEGER PRIMARY KEY" + ", "
         + DbSchemaM.KarmaTable.Cols.title + " TEXT" + ", "
         + DbSchemaM.KarmaTable.Cols.days_before_notification + " INTEGER"
-            + " DEFAULT " + "'" + str(DEFAULT_DAYS_BEFORE_NOTIFICATION) + "'"
+        + " DEFAULT " + "'" + str(DEFAULT_DAYS_BEFORE_NOTIFICATION) + "'"
         + ")"
     )
     i_db_conn.execute(
         "CREATE TABLE " + DbSchemaM.KarmaObsRefTable.name + "("
         + DbSchemaM.KarmaObsRefTable.Cols.id + " INTEGER PRIMARY KEY" + ", "
         + DbSchemaM.KarmaObsRefTable.Cols.karma_ref
-            + " INTEGER REFERENCES " + DbSchemaM.KarmaTable.name
-            + "(" + DbSchemaM.KarmaTable.Cols.id + ")"
-            + " NOT NULL" + ", "
+        + " INTEGER REFERENCES " + DbSchemaM.KarmaTable.name
+        + "(" + DbSchemaM.KarmaTable.Cols.id + ")"
+        + " NOT NULL" + ", "
         + DbSchemaM.KarmaObsRefTable.Cols.observance_ref
-            + " INTEGER REFERENCES " + DbSchemaM.ObservancesTable.name
-            + "(" + DbSchemaM.ObservancesTable.Cols.id + ")"
-            + " NOT NULL"
+        + " INTEGER REFERENCES " + DbSchemaM.ObservancesTable.name
+        + "(" + DbSchemaM.ObservancesTable.Cols.id + ")"
+        + " NOT NULL"
         + ")"
     )
     i_db_conn.execute(
@@ -77,46 +80,62 @@ def initial_schema_and_setup(i_db_conn):
         + DbSchemaM.DiaryTable.Cols.date_added + " INTEGER" + ", "
         + DbSchemaM.DiaryTable.Cols.diary_text + " TEXT" + ", "
         + DbSchemaM.DiaryTable.Cols.karma_ref + " INTEGER"
-            + " INTEGER REFERENCES " + DbSchemaM.KarmaTable.name
-            + "(" + DbSchemaM.KarmaTable.Cols.id + ")"
-            + " NOT NULL"
+        + " INTEGER REFERENCES " + DbSchemaM.KarmaTable.name
+        + "(" + DbSchemaM.KarmaTable.Cols.id + ")"
+        + " NOT NULL"
         + ")"
     )
     i_db_conn.execute(
         "CREATE TABLE " + DbSchemaM.DiaryObsRefTable.name + "("
         + DbSchemaM.DiaryObsRefTable.Cols.id + " INTEGER PRIMARY KEY" + ", "
         + DbSchemaM.DiaryObsRefTable.Cols.diary_ref
-            + " INTEGER REFERENCES " + DbSchemaM.DiaryTable.name
-            + "(" + DbSchemaM.KarmaTable.Cols.id + ")"
-            + " NOT NULL" + ", "
+        + " INTEGER REFERENCES " + DbSchemaM.DiaryTable.name
+        + "(" + DbSchemaM.KarmaTable.Cols.id + ")"
+        + " NOT NULL" + ", "
         + DbSchemaM.DiaryObsRefTable.Cols.observance_ref
-            + " INTEGER REFERENCES " + DbSchemaM.ObservancesTable.name
-            + "(" + DbSchemaM.ObservancesTable.Cols.id + ")"
-            + " NOT NULL"
+        + " INTEGER REFERENCES " + DbSchemaM.ObservancesTable.name
+        + "(" + DbSchemaM.ObservancesTable.Cols.id + ")"
+        + " NOT NULL"
         + ")"
     )
 
     # Adding observances
     t_observances_lt = [
-        ("Friends of virtue", "Foster relations with people of virtue and avoid the path of degradation"),
-        ("Environment", "Live in an environment that is conducive to spiritual practice and builds good character"),
+        ("Friends of virtue",
+            "Foster relations with people of virtue "
+            + "and avoid the path of degradation"),
+        ("Environment",
+            "Live in an environment that is conducive to spiritual practice "
+            + "and builds good character"),
         ("Learning",
-         "Foster opportunities to learn more about the Dharma, the precepts, and your own trade in greater depth"),
-        ("Caring", "Take the time to care well for your parents, spouse, and children"),
-        ("Sharing", "Share time, resources, and happiness with others"),
-        ("Cultivating Virtue", "Foster opportunities to cultivate virtue. Avoid alcohol and gambling"),
-        ("Gratitude", "Cultivate humility, gratitude, and simple living"),
-        ("Monks", "Seek opportunities to be close to bhikkhus in order to study the Way"),
-        ("Four Noble Truths", "Live a life based on the Four Noble Truths"),
-        ("Meditation", "Learn how to meditate in order to release sorrows and anxieties")
+         "Foster opportunities to learn more about the Dharma, the precepts, "
+         + "and your own trade in greater depth"),
+        ("Caring",
+            "Take the time to care well for your parents, "
+            + "spouse, and children"),
+        ("Sharing",
+            "Share time, resources, and happiness with others"),
+        ("Cultivating Virtue",
+            "Foster opportunities to cultivate virtue. "
+            + "Avoid alcohol and gambling"),
+        ("Gratitude",
+            "Cultivate humility, gratitude, and simple living"),
+        ("Monks",
+            "Seek opportunities to be close to bhikkhus "
+            + "in order to study the Way"),
+        ("Four Noble Truths",
+            "Live a life based on the Four Noble Truths"),
+        ("Meditation",
+            "Learn how to meditate in order to release sorrows and anxieties")
     ]
     i_db_conn.executemany(
         "INSERT INTO " + DbSchemaM.ObservancesTable.name + " ("
-            + DbSchemaM.ObservancesTable.Cols.title + ", "
-            + DbSchemaM.ObservancesTable.Cols.description
+        + DbSchemaM.ObservancesTable.Cols.title + ", "
+        + DbSchemaM.ObservancesTable.Cols.description
         + ")"
         + " VALUES (?, ?)", t_observances_lt
     )
+
 
 """
 Example of db upgrade code:
@@ -128,12 +147,17 @@ def upgrade_1_2(i_db_conn):
     )
 """
 
+
 def upgrade_1_2(i_db_conn):
     backup_db_file()
     i_db_conn.execute(
         "ALTER TABLE " + DbSchemaM.KarmaTable.name + " ADD COLUMN "
-        + DbSchemaM.KarmaTable.Cols.archived + " INTEGER DEFAULT '" + str(SQLITE_FALSE) + "'"
+        + DbSchemaM.KarmaTable.Cols.archived
+        + " INTEGER DEFAULT '"
+        + str(SQLITE_FALSE)
+        + "'"
     )
+
 
 upgrade_steps = {
     1: initial_schema_and_setup,
@@ -155,16 +179,22 @@ class DbHelperM(object):
             # Upgrading the database
             # Very good upgrade explanation:
             # http://stackoverflow.com/questions/19331550/database-change-with-software-update
-            # More info here: https://www.sqlite.org/pragma.html#pragma_schema_version
+            # More info here:
+            # https://www.sqlite.org/pragma.html#pragma_schema_version
             t_current_db_ver_it = get_schema_version(DbHelperM.__db_connection)
             t_target_db_ver_it = max(upgrade_steps)
-            for upgrade_step_it in range(t_current_db_ver_it + 1, t_target_db_ver_it + 1):
+            for upgrade_step_it in range(
+                    t_current_db_ver_it + 1,
+                    t_target_db_ver_it + 1):
                 if upgrade_step_it in upgrade_steps:
                     upgrade_steps[upgrade_step_it](DbHelperM.__db_connection)
-                    set_schema_version(DbHelperM.__db_connection, upgrade_step_it)
+                    set_schema_version(
+                            DbHelperM.__db_connection,
+                            upgrade_step_it)
             DbHelperM.__db_connection.commit()
 
-            # TODO: Where do we close the db connection? (Do we need to close it?)
+            # TODO: Where do we close the db connection?
+            # Do we need to close it?
             # http://stackoverflow.com/questions/3850261/doing-something-before-program-exit
 
         return DbHelperM.__db_connection
@@ -246,7 +276,10 @@ class ObservanceM:
         db_cursor = db_connection.cursor()
         db_cursor_result = db_cursor.execute(
             "SELECT * FROM " + DbSchemaM.DiaryObsRefTable.name
-            + " WHERE " + DbSchemaM.DiaryObsRefTable.Cols.diary_ref + "=" + str(i_diary_id)
+            + " WHERE "
+            + DbSchemaM.DiaryObsRefTable.Cols.diary_ref
+            + "="
+            + str(i_diary_id)
         )
         t_diary_obs_ref_tuple_list = db_cursor_result.fetchall()
         db_connection.commit()
@@ -262,8 +295,12 @@ class ObservanceM:
             db_connection = DbHelperM.get_db_connection()
             db_cursor = db_connection.cursor()
             db_cursor_result = db_cursor.execute(
-                "SELECT * FROM " + DbSchemaM.ObservancesTable.name
-                + " WHERE " + DbSchemaM.ObservancesTable.Cols.id + "=" + str(t_obs_id)
+                "SELECT * FROM "
+                + DbSchemaM.ObservancesTable.name
+                + " WHERE "
+                + DbSchemaM.ObservancesTable.Cols.id
+                + "="
+                + str(t_obs_id)
             )
             t_obs_tuple = db_cursor_result.fetchone()
             db_connection.commit()
@@ -284,7 +321,10 @@ class ObservanceM:
         db_cursor = db_connection.cursor()
         db_cursor_result = db_cursor.execute(
             "SELECT * FROM " + DbSchemaM.KarmaObsRefTable.name
-            + " WHERE " + DbSchemaM.KarmaObsRefTable.Cols.karma_ref + "=" + str(i_karma_id)
+            + " WHERE "
+            + DbSchemaM.KarmaObsRefTable.Cols.karma_ref
+            + "="
+            + str(i_karma_id)
         )
         t_karma_obs_ref_tuple_list = db_cursor_result.fetchall()
         db_connection.commit()
@@ -301,7 +341,10 @@ class ObservanceM:
             db_cursor = db_connection.cursor()
             db_cursor_result = db_cursor.execute(
                 "SELECT * FROM " + DbSchemaM.ObservancesTable.name
-                + " WHERE " + DbSchemaM.ObservancesTable.Cols.id + "=" + str(t_obs_id)
+                + " WHERE "
+                + DbSchemaM.ObservancesTable.Cols.id
+                + "="
+                + str(t_obs_id)
             )
             t_obs_tuple = db_cursor_result.fetchone()
             db_connection.commit()
@@ -321,7 +364,9 @@ class ObservanceM:
         ret_observance_lt = []
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
-        db_cursor_result = db_cursor.execute("SELECT * FROM " + DbSchemaM.ObservancesTable.name)
+        db_cursor_result = db_cursor.execute(
+                "SELECT * FROM "
+                + DbSchemaM.ObservancesTable.name)
         t_observances_from_db = db_cursor_result.fetchall()
         for t_tuple in t_observances_from_db:
             ret_observance_lt.append(
@@ -355,7 +400,9 @@ class KarmaM:
         self.days_before_notification_it = i_days_before_notification_it
 
     @staticmethod
-    def add(i_obs_ref_list, i_title_sg, i_days_before_notification_it=DEFAULT_DAYS_BEFORE_NOTIFICATION):
+    def add(i_obs_ref_list,
+            i_title_sg,
+            i_days_before_notification_it=DEFAULT_DAYS_BEFORE_NOTIFICATION):
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
         db_cursor.execute(
@@ -367,7 +414,8 @@ class KarmaM:
         )
         db_connection.commit()
 
-        t_karma_id = db_cursor.lastrowid  # <--- Nice! More info: https://stackoverflow.com/questions/6242756/how-to-retrieve-inserted-id-after-inserting-row-in-sqlite-using-python
+        # Nice! More info: https://tinyurl.com/pyIDretrieve
+        t_karma_id = db_cursor.lastrowid
 
         for obs_ref in i_obs_ref_list:
             db_cursor.execute(
@@ -384,8 +432,12 @@ class KarmaM:
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
         db_cursor_result = db_cursor.execute(
-            "SELECT * FROM " + DbSchemaM.KarmaTable.name
-            + " WHERE " + DbSchemaM.KarmaTable.Cols.archived + "=" + str(SQLITE_FALSE)
+            "SELECT * FROM "
+            + DbSchemaM.KarmaTable.name
+            + " WHERE "
+            + DbSchemaM.KarmaTable.Cols.archived
+            + "="
+            + str(SQLITE_FALSE)
         )
         t_karma_tuple_list_from_db = db_cursor_result.fetchall()
         db_connection.commit()
@@ -407,19 +459,26 @@ class KarmaM:
 
         for obs_item_id in i_observance_id_list:
             db_cursor_result = db_cursor.execute(
-                "SELECT * FROM " + DbSchemaM.KarmaObsRefTable.name
-                + " WHERE " + DbSchemaM.KarmaObsRefTable.Cols.observance_ref + "=" + str(obs_item_id)
+                "SELECT * FROM "
+                + DbSchemaM.KarmaObsRefTable.name
+                + " WHERE "
+                + DbSchemaM.KarmaObsRefTable.Cols.observance_ref
+                + "="
+                + str(obs_item_id)
             )
             t_temp_karma_ref_list = [x[1] for x in db_cursor_result.fetchall()]
             db_connection.commit()
-            t_karma_id_list = list(set(t_karma_id_list) & set(t_temp_karma_ref_list))
+            t_karma_id_list = list(set(t_karma_id_list)
+                                   & set(t_temp_karma_ref_list))
 
         ret_karma_list = []
         for karma_id_ref in t_karma_id_list:
             db_cursor_result = db_cursor.execute(
                 "SELECT * FROM " + DbSchemaM.KarmaTable.name
-                + " WHERE " + DbSchemaM.KarmaTable.Cols.id + "=" + str(karma_id_ref)
-                + " AND " + DbSchemaM.KarmaTable.Cols.archived + "=" + str(SQLITE_FALSE)
+                + " WHERE " + DbSchemaM.KarmaTable.Cols.id
+                + "=" + str(karma_id_ref)
+                + " AND " + DbSchemaM.KarmaTable.Cols.archived
+                + "=" + str(SQLITE_FALSE)
             )
             t_karma_tuple = db_cursor_result.fetchone()
             ret_karma_list.append(KarmaM(
@@ -462,15 +521,23 @@ class KarmaM:
         )
         db_connection.commit()
 
+
 class DiaryM:
-    def __init__(self, i_id, i_date_added_it, i_diary_text="", i_ref_karma_id=-1):
+    def __init__(self,
+                 i_id,
+                 i_date_added_it,
+                 i_diary_text="",
+                 i_ref_karma_id=-1):
         self.id = i_id
         self.date_added_it = i_date_added_it
         self.diary_text = i_diary_text
         self.ref_karma_id = i_ref_karma_id
 
     @staticmethod
-    def add(i_date_added_it, i_diary_text, i_karma_ref, i_observance_ref_id_it_list):
+    def add(i_date_added_it,
+            i_diary_text,
+            i_karma_ref,
+            i_observance_ref_id_it_list):
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
         db_cursor.execute(
@@ -532,7 +599,8 @@ class DiaryM:
 
         db_cursor.execute(
             "DELETE FROM " + DbSchemaM.DiaryObsRefTable.name
-            + " WHERE " + DbSchemaM.DiaryObsRefTable.Cols.diary_ref + "=" + str(i_id_it)
+            + " WHERE " + DbSchemaM.DiaryObsRefTable.Cols.diary_ref
+            + "=" + str(i_id_it)
         )
         db_connection.commit()
 
@@ -555,7 +623,7 @@ class DiaryM:
         )
 
     @staticmethod
-    def get_all(i_reverse_bl = False):
+    def get_all(i_reverse_bl=False):
         t_direction_sg = "ASC"
         if i_reverse_bl:
             t_direction_sg = "DESC"
@@ -563,8 +631,12 @@ class DiaryM:
         db_connection = DbHelperM.get_db_connection()
         db_cursor = db_connection.cursor()
         db_cursor_result = db_cursor.execute(
-            "SELECT * FROM " + DbSchemaM.DiaryTable.name
-            + " ORDER BY " + DbSchemaM.DiaryTable.Cols.date_added + " " + t_direction_sg
+            "SELECT * FROM "
+            + DbSchemaM.DiaryTable.name
+            + " ORDER BY "
+            + DbSchemaM.DiaryTable.Cols.date_added
+            + " "
+            + t_direction_sg
         )
         t_diary_from_db = db_cursor_result.fetchall()
         for t_tuple in t_diary_from_db:
@@ -578,10 +650,13 @@ class DiaryM:
         return ret_diary_lt
 
     @staticmethod
-    def get_all_for_obs_and_day(i_obs_id, i_start_of_day_as_unix_time_it, i_reverse_bl=True):
+    def get_all_for_obs_and_day(i_obs_id,
+                                i_start_of_day_as_unix_time_it,
+                                i_reverse_bl=True):
         """
         :param i_obs_id:
-        :param i_start_of_day_as_unix_time_it: It's very important that this is given as the start of the day
+        :param i_start_of_day_as_unix_time_it:
+             It's very important that this is given as the start of the day
         :param i_reverse_bl:
         :return:
         """
@@ -591,7 +666,8 @@ class DiaryM:
         db_cursor = db_connection.cursor()
         db_cursor_result = db_cursor.execute(
             "SELECT * FROM " + DbSchemaM.DiaryObsRefTable.name
-            + " WHERE " + DbSchemaM.DiaryObsRefTable.Cols.observance_ref + "=" + str(i_obs_id)
+            + " WHERE " + DbSchemaM.DiaryObsRefTable.Cols.observance_ref
+            + "=" + str(i_obs_id)
         )
         t_diary_tuple_list = db_cursor_result.fetchall()
         t_diary_id_list = [x[1] for x in t_diary_tuple_list]
@@ -601,9 +677,12 @@ class DiaryM:
             db_cursor = db_connection.cursor()
             db_cursor_result = db_cursor.execute(
                 "SELECT * FROM " + DbSchemaM.DiaryTable.name
-                + " WHERE " + DbSchemaM.DiaryTable.Cols.id + "=" + str(t_diary_id)
-                + " AND " + DbSchemaM.DiaryTable.Cols.date_added + ">=" + str(i_start_of_day_as_unix_time_it)
-                + " AND " + DbSchemaM.DiaryTable.Cols.date_added + "<" + str(i_start_of_day_as_unix_time_it + 24 * 3600)
+                + " WHERE " + DbSchemaM.DiaryTable.Cols.id
+                + "=" + str(t_diary_id)
+                + " AND " + DbSchemaM.DiaryTable.Cols.date_added
+                + ">=" + str(i_start_of_day_as_unix_time_it)
+                + " AND " + DbSchemaM.DiaryTable.Cols.date_added
+                + "<" + str(i_start_of_day_as_unix_time_it + 24 * 3600)
             )
             t_diary_from_db = db_cursor_result.fetchall()
             for t_tuple in t_diary_from_db:
@@ -626,7 +705,8 @@ class DiaryM:
         db_cursor = db_connection.cursor()
         db_cursor_result = db_cursor.execute(
             "SELECT * FROM " + DbSchemaM.DiaryTable.name
-            + " WHERE " + DbSchemaM.DiaryTable.Cols.karma_ref + "=" + str(i_karma_id_it)
+            + " WHERE " + DbSchemaM.DiaryTable.Cols.karma_ref
+            + "=" + str(i_karma_id_it)
         )
         diary_entry_list_for_karma_list = db_cursor_result.fetchall()
         if diary_entry_list_for_karma_list == []:
@@ -647,7 +727,8 @@ def export_all():
     for obs_item in ObservanceM.get_all():
         csv_writer.writerow((obs_item.title, obs_item.description))
     csv_writer.writerow(("\n\n\n",))
-    for obs in ObservanceM.get_all():  # -TODO: This doesn't work since we may skip indexes
+    # -TODO: This doesn't work since we may skip indexes
+    for obs in ObservanceM.get_all():
         csv_writer.writerow((obs.title,))
         for karma_item in KarmaM.get_for_observance_list([obs.id]):
             csv_writer.writerow((t_space_tab_sg + karma_item.title_sg,))
@@ -662,7 +743,9 @@ def export_all():
             t_diary_entry_karma_sg = ""
         else:
             t_diary_entry_karma_sg = t_karma.title_sg
-        csv_writer.writerow((t_diary_entry_obs_sg, t_diary_entry_karma_sg, diary_item.diary_text))
+        csv_writer.writerow((t_diary_entry_obs_sg,
+                             t_diary_entry_karma_sg,
+                             diary_item.diary_text))
     """
 
     for diary_item in DiaryM.get_all():
@@ -672,6 +755,7 @@ def export_all():
         else:
             t_diary_entry_karma_sg = t_karma.title_sg
         csv_writer.writerow((t_diary_entry_karma_sg, diary_item.diary_text))
+
 
 def backup_db_file():
     date_sg = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
