@@ -145,7 +145,10 @@ self.row_last_clicked = None
                 fromtimestamp(diary_entry.date_added_it)\
                 .strftime(t_time_of_day_format_string)
             t_time_of_day_label = QLabel(time_of_day_sg)
-            ##t_time_of_day_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.MinimumExpanding)  # horizontal, vertical
+            ##t_time_of_day_label.setSizePolicy(
+                QSizePolicy.Minimum,
+                QSizePolicy.MinimumExpanding)  # horizontal, vertical
 
-            ###row_layout_l7.addWidget(t_time_of_day_label)  # , QtCore.Qt.AlignRight
+            ###row_layout_l7.addWidget(t_time_of_day_label)
+            # , QtCore.Qt.AlignRight
 """

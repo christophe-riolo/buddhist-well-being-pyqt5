@@ -19,7 +19,7 @@ import datetime
 # * Various functions (for backing up the db etc)
 #
 # Notes:
-# * When inserting vales, it's best to use "VALUES (?, ?)"
+# * When inserting values, it's best to use "VALUES (?, ?)"
 #   because then the sqlite3 module will take care of
 #   escaping values for us
 #
