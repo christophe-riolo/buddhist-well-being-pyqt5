@@ -1,14 +1,10 @@
+import enum
+import sys
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
-
-import bwb_model
-import bwb_diary_widget
-import bwb_karma
-import bwb_observances
-
-import enum
-import sys
+from bwb import model
+from bwb.window import diary, karma, observances
 
 
 class EventSource(enum.Enum):
@@ -38,7 +34,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
         # Setup of widgets..
         # ..observances
         obs_dock_w2 = QtWidgets.QDockWidget("Blessings", self)
-        self.obs_composite_w3 = bwb_observances.ObsCompositeWidget()
+        self.obs_composite_w3 = observances.ObsCompositeWidget()
         self.obs_composite_w3.item_selection_changed_signal.connect(
             self.on_obs_item_selection_changed)
         self.obs_composite_w3.current_row_changed_signal.connect(
@@ -48,7 +44,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
         obs_dock_w2.setFixedHeight(440)  # -TODO: Find a better way to do this
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, obs_dock_w2)
         # ..diary
-        self.diary_composite_w2 = bwb_diary_widget.DiaryListWidget()
+        self.diary_composite_w2 = diary.DiaryListWidget()
         self.diary_composite_w2.add_text_to_diary_button_pressed_signal.\
             connect(self.on_diary_add_entry_button_pressed)
         self.diary_composite_w2.context_menu_change_date_signal.\
@@ -58,7 +54,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(self.diary_composite_w2)
         # ..karma
         karma_dock_w2 = QtWidgets.QDockWidget("Activities", self)
-        self.karma_composite_widget_w3 = bwb_karma.KarmaCompositeWidget()
+        self.karma_composite_widget_w3 = karma.KarmaCompositeWidget()
         self.karma_composite_widget_w3.current_row_changed_signal.connect(
             self.on_karma_current_row_changed)
         self.karma_composite_widget_w3.new_karma_button_pressed_signal.connect(
@@ -74,7 +70,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
         # Creating the menu bar..
         # ..setup of actions
         export_action = QtWidgets.QAction("Export", self)
-        export_action.triggered.connect(bwb_model.export_all)
+        export_action.triggered.connect(model.export_all)
         exit_action = QtWidgets.QAction("Exit", self)
         exit_action.triggered.connect(lambda x: sys.exit())
         redraw_action = QtWidgets.QAction("Redraw", self)
@@ -82,7 +78,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
         about_action = QtWidgets.QAction("About", self)
         about_action.triggered.connect(self.show_about_box)
         backup_action = QtWidgets.QAction("Backup db", self)
-        backup_action.triggered.connect(bwb_model.backup_db_file)
+        backup_action.triggered.connect(model.backup_db_file)
         # ..adding menu items
         self.menu_bar = self.menuBar()
         file_menu = self.menu_bar.addMenu("&File")
@@ -105,7 +101,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
 
     def on_karma_current_row_changed(self, i_karma_id_it):
         self.obs_composite_w3.list_widget.clearSelection()
-        observance_list = bwb_model.ObservanceM.get_all_for_karma_id(
+        observance_list = model.ObservanceM.get_all_for_karma_id(
                             i_karma_id_it)
         list_length_it = self.obs_composite_w3.list_widget.count()
         for i in range(0, list_length_it):
@@ -122,7 +118,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
             obs_selected_item_id_list = [
                 x.data(QtCore.Qt.UserRole)
                 for x in obs_selected_item_list]
-            bwb_model.KarmaM.add(obs_selected_item_id_list, i_karma_text_sg)
+            model.KarmaM.add(obs_selected_item_id_list, i_karma_text_sg)
             self.update_gui()
         else:
             # message_box = QtWidgets.QMessageBox.information(
@@ -155,7 +151,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
                 x.data(QtCore.Qt.UserRole)
                 for x in obs_selected_item_list]
             print("t_unix_time_it = " + str(i_unix_time_it))
-            bwb_model.DiaryM.add(
+            model.DiaryM.add(
                 i_unix_time_it,
                 i_text_sg,
                 t_karma_id,
@@ -173,12 +169,13 @@ class WellBeingWindow(QtWidgets.QMainWindow):
     def show_about_box(self):
         # message_box = QtWidgets.QMessageBox.about(
         QtWidgets.QMessageBox.about(
-            self, "About Buddhist Well-Being",
-            ("Concept and programming by Tord Dellsén\n"
-                'Photography (for icons) by Torgny Dellsén - ' +
-                '<a href="torgnydellsen.zenfolio.com">asdf</a><br>'
-                "Software License: GPLv3\n"
-                "Art license: CC BY-SA 4.0")
+            self,
+            "About Buddhist Well-Being",
+            "<html>Concept and programming by Tord Dellsén<br/>"
+            'Photography (for icons) by '
+            '<a href="torgnydellsen.zenfolio.com">Torgny Dellsén</a><br/>'
+            "Software License: GPLv3<br/>"
+            "Art license: CC BY-SA 4.0</html>"
         )
 
     def update_gui(self, i_event_source=EventSource.undefined):
