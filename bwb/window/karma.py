@@ -3,7 +3,7 @@ from PyQt5 import QtGui
 from PyQt5 import QtCore
 import datetime
 import logging
-import bwb_model
+from bwb import model
 
 
 class KarmaCompositeWidget(QtWidgets.QWidget):
@@ -54,7 +54,7 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
         else:
             current_karma_list_item = self.list_widget.item(
                     current_karma_row_it)
-            karma_entry = bwb_model.KarmaM.get(
+            karma_entry = model.KarmaM.get(
                     current_karma_list_item.data(QtCore.Qt.UserRole))
             self.current_row_changed_signal.emit(karma_entry.id)
 
@@ -71,13 +71,13 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
         self.list_widget.clear()
         if i_obs_sel_list is not None:
             logging.debug("i_obs_sel_list = " + str(i_obs_sel_list))
-            karma_entry_list = bwb_model.KarmaM.\
+            karma_entry_list = model.KarmaM.\
                 get_for_observance_list(i_obs_sel_list)
         else:
-            karma_entry_list = bwb_model.KarmaM.get_all()
+            karma_entry_list = model.KarmaM.get_all()
         for karma_item in karma_entry_list:
             duration_sg = "x"
-            latest_diary_entry = bwb_model.DiaryM.\
+            latest_diary_entry = model.DiaryM.\
                 get_latest_for_karma(karma_item.id)
             if latest_diary_entry is not None:
                 diary_entry_date_added = datetime.datetime.\
@@ -113,7 +113,7 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
             "Are you sure that you want to remove this activity?"
         )
         if message_box_reply == QtWidgets.QMessageBox.Yes:
-            bwb_model.KarmaM.archive(
+            model.KarmaM.archive(
                 int(self.last_clicked_list_item.data(QtCore.Qt.UserRole)))
             self.delete_signal.emit()
         else:

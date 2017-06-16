@@ -1,5 +1,5 @@
-import bwb_model
-import bwb_date_time_dialog
+from bwb import model
+from bwb.window import date
 import datetime
 import time
 from PyQt5 import QtWidgets
@@ -95,7 +95,7 @@ class DiaryListWidget(QtWidgets.QWidget):
                 "Are you sure that you want to remove this diary entry?"
                 )
         if message_box_reply == QtWidgets.QMessageBox.Yes:
-            bwb_model.DiaryM.remove(
+            model.DiaryM.remove(
                     int(self.row_last_clicked.data(QtCore.Qt.UserRole)))
             self.update_gui()
             self.context_menu_delete_signal.emit()
@@ -108,7 +108,7 @@ class DiaryListWidget(QtWidgets.QWidget):
         """
         last_clicked_row_dbkey_it = int(
                 self.row_last_clicked.data(QtCore.Qt.UserRole))
-        diary_entry = bwb_model.DiaryM.get(last_clicked_row_dbkey_it)
+        diary_entry = model.DiaryM.get(last_clicked_row_dbkey_it)
         text_input_dialog = QtWidgets.QInputDialog()
         new_text_qstring = text_input_dialog.getText(
                 self,
@@ -117,7 +117,7 @@ class DiaryListWidget(QtWidgets.QWidget):
                 text=diary_entry.diary_text)
         if new_text_qstring[0]:
             print("new_text_qstring = " + str(new_text_qstring))
-            bwb_model.DiaryM.update_note(
+            model.DiaryM.update_note(
                     last_clicked_row_dbkey_it, new_text_qstring[0])
             self.update_gui()
         else:
@@ -126,11 +126,11 @@ class DiaryListWidget(QtWidgets.QWidget):
     def on_context_menu_change_date(self):
         last_clicked_row_dbkey_it = int(
                 self.row_last_clicked.data(QtCore.Qt.UserRole))
-        diary_item = bwb_model.DiaryM.get(last_clicked_row_dbkey_it)
-        updated_time_unix_time_it = bwb_date_time_dialog.DateTimeDialog.\
+        diary_item = model.DiaryM.get(last_clicked_row_dbkey_it)
+        updated_time_unix_time_it = date.DateTimeDialog.\
             get_date_time_dialog(diary_item.date_added_it)
         if updated_time_unix_time_it != -1:
-            bwb_model.DiaryM.update_date(
+            model.DiaryM.update_date(
                     diary_item.id, updated_time_unix_time_it)
             self.update_gui()
             self.context_menu_change_date_signal.emit()
@@ -147,9 +147,9 @@ class DiaryListWidget(QtWidgets.QWidget):
         self.list_widget.clear()
         prev_diary_entry = None
 
-        for diary_entry in bwb_model.DiaryM.get_all():
+        for diary_entry in model.DiaryM.get_all():
             # Setting up the underlying data
-            observance_list = bwb_model.ObservanceM.get_all_for_diary_id(
+            observance_list = model.ObservanceM.get_all_for_diary_id(
                     diary_entry.id)
             diary_entry_obs_sg = ""
             delimiter_sg = ", "
@@ -158,7 +158,7 @@ class DiaryListWidget(QtWidgets.QWidget):
                     diary_entry_obs_sg = diary_entry_obs_sg +\
                         obs_entry.title +\
                         delimiter_sg
-            karma_entry = bwb_model.KarmaM.get(diary_entry.ref_karma_id)
+            karma_entry = model.KarmaM.get(diary_entry.ref_karma_id)
             if (prev_diary_entry is None) or (
                     not is_same_day(
                         prev_diary_entry.date_added_it,

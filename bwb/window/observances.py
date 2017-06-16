@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 import datetime
-import bwb_model
+from bwb import model
 
 
 class ObsCompositeWidget(QtWidgets.QWidget):
@@ -50,7 +50,7 @@ class ObsCompositeWidget(QtWidgets.QWidget):
             # We might get here when a karma item has been clicked
             return
         t_current_list_item = self.list_widget.item(current_row_it)
-        t_observance = bwb_model.\
+        t_observance = model.\
             ObservanceM.get(t_current_list_item.data(QtCore.Qt.UserRole))
         self.ten_obs_details_ll.setText(t_observance.description)
 
@@ -70,7 +70,7 @@ class ObsCompositeWidget(QtWidgets.QWidget):
         """
         self.list_widget.clear()
         counter = 0
-        for observance_item in bwb_model.ObservanceM.get_all():
+        for observance_item in model.ObservanceM.get_all():
             # Important: "Alternatively, if you want the widget to have
             # a fixed size based on its contents,
             # you can call QLayout::setSizeConstraint(QLayout::SetFixedSize);"
@@ -97,7 +97,7 @@ class ObsCompositeWidget(QtWidgets.QWidget):
                     + datetime.timedelta(days=day_weekday_nr_it)
                 start_of_day_unixtime_it =\
                     int(start_of_day_datetime.timestamp())
-                t_diary_filtered_list = bwb_model.DiaryM.\
+                t_diary_filtered_list = model.DiaryM.\
                     get_all_for_obs_and_day(observance_item.id,
                                             start_of_day_unixtime_it)
                 total_number_for_day_it = len(t_diary_filtered_list)
