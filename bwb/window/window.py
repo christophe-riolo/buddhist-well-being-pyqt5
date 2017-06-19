@@ -43,6 +43,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
         obs_dock_w2.setFeatures(QtWidgets.QDockWidget.NoDockWidgetFeatures)
         obs_dock_w2.setFixedHeight(440)  # -TODO: Find a better way to do this
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, obs_dock_w2)
+
         # ..diary
         self.diary_composite_w2 = diary.DiaryListWidget()
         self.diary_composite_w2.add_text_to_diary_button_pressed_signal.\
@@ -52,6 +53,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
         self.diary_composite_w2.context_menu_delete_signal.connect(
             self.on_diary_context_menu_delete)
         self.setCentralWidget(self.diary_composite_w2)
+
         # ..karma
         karma_dock_w2 = QtWidgets.QDockWidget("Activities", self)
         self.karma_composite_widget_w3 = karma.KarmaCompositeWidget()
@@ -79,6 +81,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
         about_action.triggered.connect(self.show_about_box)
         backup_action = QtWidgets.QAction("Backup db", self)
         backup_action.triggered.connect(model.backup_db_file)
+
         # ..adding menu items
         self.menu_bar = self.menuBar()
         file_menu = self.menu_bar.addMenu("&File")
@@ -92,12 +95,6 @@ class WellBeingWindow(QtWidgets.QMainWindow):
 
         self.update_gui()
         self.show()
-
-    def on_diary_context_menu_change_date(self):
-        self.update_gui()
-
-    def on_diary_context_menu_delete(self):
-        self.update_gui()
 
     def on_karma_current_row_changed(self, i_karma_id_it):
         self.obs_composite_w3.list_widget.clearSelection()
@@ -202,5 +199,11 @@ class WellBeingWindow(QtWidgets.QMainWindow):
         # self.update_gui_user_text(t_current_obs_item)
         # self.update_gui_notifications()
 
+    def on_diary_context_menu_change_date(self):
+        self.update_gui()
+
+    def on_diary_context_menu_delete(self):
+        self.update_gui()
+
     def on_karma_deleted(self):
-        self.update_gui()  # - EventSource.karma_current_row_changed
+        self.update_gui()
