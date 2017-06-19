@@ -1,60 +1,55 @@
-from PyQt5 import QtWidgets
-from PyQt5 import QtCore
 import datetime
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtWidgets import QAbstractItemView
 from bwb import model
 
 
 class ObsCompositeWidget(QtWidgets.QWidget):
+    """Widget for displaying and selecting the blessings.
+    This widget also displays information on the selected blessing."""
+
     item_selection_changed_signal = QtCore.pyqtSignal()
     current_row_changed_signal = QtCore.pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
 
+        # The blessings are placed in a vbox layout.
         vbox = QtWidgets.QVBoxLayout()
         self.setLayout(vbox)
 
-        # ..for ten practices (left column)
-        ten_obs_label = QtWidgets.QLabel("<h3>Ten Blessings</h3>")  # <b></b>
-        vbox.addWidget(ten_obs_label)
+        # Setting the title of widget.
+        vbox.addWidget(QtWidgets.QLabel("<h3>Ten Blessings</h3>"))
+
+        # The different blessings are items of a QListWidget.
         self.list_widget = QtWidgets.QListWidget()
-        # obs_dock_w2.setWidget(self.ten_obs_lb)
-        self.list_widget.\
-            setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.list_widget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         vbox.addWidget(self.list_widget)
-        # self.list_widget.itemSelectionChanged.connect(self.on_item_selection_changed)
-        self.list_widget.itemPressed.connect(self.on_item_selection_changed)
-        # -itemClicked didn't work, unknown why
-        #   (it worked on the first click but never when running in debug mode)
-        # -currentItemChanged cannot be used since it is activated
-        #   before the list of selected items is updated
-        # self.ten_observances_lb.setSizeAdjustPolicy(QListWidget.AdjustToContents)
-        # self.list_widget.currentRowChanged.connect(self.on_current_row_changed)
-        # ..for details (left column)
+
+        # We need to update the label when we select a blessing.
+        self.list_widget.currentRowChanged.connect(
+            self.on_item_selection_changed)
+
+        # Explanation of current blessing are put in a
+        # QLabel at the bottom.
         self.ten_obs_details_ll = QtWidgets.QLabel("-----")
         self.ten_obs_details_ll.setWordWrap(True)
         vbox.addWidget(self.ten_obs_details_ll)
 
-    def on_current_row_changed(self):
-        pass
-        # self.current_row_changed_signal.emit(current_row_it)
-
-    def on_item_selection_changed(self, i_q_listwidget_item):
+    def on_item_selection_changed(self, current_row_it):
         print("self.ten_obs_lb.currentRow() = "
               + str(self.list_widget.currentRow()))
         print("len(self.ten_obs_lb.selectedItems()) = "
               + str(len(self.list_widget.selectedItems())))
 
-        current_row_it = self.list_widget.currentRow()
-        if current_row_it == -1:
-            # We might get here when a karma item has been clicked
-            return
-        t_current_list_item = self.list_widget.item(current_row_it)
-        t_observance = model.\
-            ObservanceM.get(t_current_list_item.data(QtCore.Qt.UserRole))
-        self.ten_obs_details_ll.setText(t_observance.description)
+        # We test whether a blessing has been selected.
+        if current_row_it != -1:
+            t_current_list_item = self.list_widget.item(current_row_it)
+            t_observance = model.\
+                ObservanceM.get(t_current_list_item.data(QtCore.Qt.UserRole))
+            self.ten_obs_details_ll.setText(t_observance.description)
 
-        self.item_selection_changed_signal.emit()
+            self.item_selection_changed_signal.emit()
 
     def update_gui(self):
         """
@@ -69,46 +64,49 @@ class ObsCompositeWidget(QtWidgets.QWidget):
         https://unicode-table.com/en/blocks/miscellaneous-symbols/
         """
         self.list_widget.clear()
-        counter = 0
         for observance_item in model.ObservanceM.get_all():
             # Important: "Alternatively, if you want the widget to have
             # a fixed size based on its contents,
             # you can call QLayout::setSizeConstraint(QLayout::SetFixedSize);"
             # https://doc.qt.io/qt-5/qwidget.html#setSizePolicy-1
 
-            row_i6 = QtWidgets.QListWidgetItem()
-            row_layout_l7 = QtWidgets.QVBoxLayout()
-
             # Updating frequency
-            total_number_week_list = []
-            today_date = datetime.date.today()
-            start_of_today_datetime = datetime.datetime(
-                year=today_date.year,
-                month=today_date.month,
-                day=today_date.day)
-            # today_weekday_nr_it = datetime.datetime.now().weekday()
-            # start_weekday_it = today_weekday_nr_it
-            # (Ex: Monday in Sweden, Sunday in the US)
-            total_number_for_week_it = 0
-            for day_weekday_nr_it in range(0, 7):
-                check_box_sign_sg = "○"
-                start_of_day_datetime = start_of_today_datetime\
-                    - datetime.timedelta(days=today_date.weekday())\
-                    + datetime.timedelta(days=day_weekday_nr_it)
-                start_of_day_unixtime_it =\
-                    int(start_of_day_datetime.timestamp())
-                t_diary_filtered_list = model.DiaryM.\
-                    get_all_for_obs_and_day(observance_item.id,
-                                            start_of_day_unixtime_it)
-                total_number_for_day_it = len(t_diary_filtered_list)
-                if total_number_for_day_it > 0:
-                    check_box_sign_sg = "●"
-                    total_number_for_week_it = total_number_for_week_it + 1
-                # t_weekday_one_char_sg = datetime.datetime.\
-                #     fromtimestamp(start_of_day_unixtime_it).strftime("%A")[0:1]
-                total_number_week_list.append(check_box_sign_sg)
-                # t_weekday_one_char_sg.capitalize() +
+            year, month, day, *__ = datetime.date.today().timetuple()
+            today = datetime.datetime(year, month, day)
 
+            # Storing the start time of each day of the week.
+            week = [
+                int((
+                    today
+                    - datetime.timedelta(days=today.weekday())
+                    + datetime.timedelta(days=weekday)
+                    ).timestamp()
+                    )
+                for weekday in range(0, 7)
+            ]
+
+            # # List of the actions in the diary for the current observance,
+            # # for each day of the week.
+            t_diary_filtered_list = map(
+                lambda day: model.DiaryM.get_all_for_obs_and_day(
+                    observance_item.id,
+                    day),
+                week
+                )
+
+            # Creating the bullets to show the following of the observances
+            # during the current week.
+            total_number_week_list = ["●" if diary_entry
+                                      else "○"
+                                      for diary_entry in t_diary_filtered_list
+                                      ]
+
+            # We count the number of days with diary entries for current
+            # observance during the current week.
+            total_number_for_week_it = sum(
+                (int(bool(diary_entry))
+                 for diary_entry in t_diary_filtered_list)
+                )
             # Experimental:
             weekly_goal_reached_sg = ""
             if total_number_for_week_it > 1:
@@ -117,9 +115,12 @@ class ObsCompositeWidget(QtWidgets.QWidget):
             observance_short_formatted_sg = "" + observance_item.title + ""
             row_label_w8 = QtWidgets.QLabel(
                 observance_short_formatted_sg
-                + "<br>" + ' '.join(x for x in total_number_week_list)
+                + "<br>" + ' '.join(total_number_week_list)
                 + weekly_goal_reached_sg
             )
+
+            row_i6 = QtWidgets.QListWidgetItem()
+            row_layout_l7 = QtWidgets.QVBoxLayout()
 
             row_label_w8.adjustSize()
             row_layout_l7.addWidget(row_label_w8)
@@ -134,23 +135,8 @@ class ObsCompositeWidget(QtWidgets.QWidget):
 
             row_i6.setData(QtCore.Qt.UserRole, observance_item.id)
 
-            # my_size = QtCore.QSize(-1, row_w6.height())
-
             row_i6.setSizeHint(row_w6.sizeHint())
             # - Please note: If we set the size hint to (-1, height)
             #   we will get overflow towards the bottom
             self.list_widget.addItem(row_i6)
             self.list_widget.setItemWidget(row_i6, row_w6)
-
-            counter += 1
-
-    def get_selected_id_list(self, i_curr_item=None):
-        obs_selected_item_list = self.list_widget.selectedItems()
-        ret_obs_selected_id_list = []
-        if i_curr_item is not None and i_curr_item.isSelected():
-            obs_selected_item_list.append(i_curr_item)
-        if obs_selected_item_list is not None:
-            ret_obs_selected_id_list = [
-                x.data(QtCore.Qt.UserRole)
-                for x in obs_selected_item_list]
-        return ret_obs_selected_id_list
