@@ -23,10 +23,12 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
         karma_label = QtWidgets.QLabel("<h3>Activities</h3>")
         vbox.addWidget(karma_label)
         self.list_widget = QtWidgets.QListWidget()
+
         # self.list_widget.currentRowChanged.connect(self.on_karma_current_row_changed)
         self.list_widget.itemSelectionChanged.connect(
                 self.on_karma_current_row_changed)
         vbox.addWidget(self.list_widget)
+
         # ..for adding new karma (left column)
         self.adding_new_karma_ey = QtWidgets.QLineEdit()
         vbox.addWidget(self.adding_new_karma_ey)
@@ -34,13 +36,12 @@ class KarmaCompositeWidget(QtWidgets.QWidget):
         vbox.addWidget(self.adding_new_karma_bn)
         self.adding_new_karma_bn.clicked.connect(
                 self.on_add_new_karma_button_pressed)
-        """
-        #..for notifications
-        notifications_label = QLabel("<h4>Notifications</h4>")
-        vbox.addWidget(notifications_label)
-        self.notifications_lb = QListWidget()
-        vbox.addWidget(self.notifications_lb)
-        """
+
+        # #..for notifications
+        # notifications_label = QLabel("<h4>Notifications</h4>")
+        # vbox.addWidget(notifications_label)
+        # self.notifications_lb = QListWidget()
+        # vbox.addWidget(self.notifications_lb)
 
     def on_karma_current_row_changed(self):
         current_karma_row_it = self.list_widget.currentRow()
