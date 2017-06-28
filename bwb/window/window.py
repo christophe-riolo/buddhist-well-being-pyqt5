@@ -3,7 +3,7 @@ import sys
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
-from bwb import model
+from bwb import model, database
 from bwb.window import diary, karma, observances
 
 
@@ -80,7 +80,7 @@ class WellBeingWindow(QtWidgets.QMainWindow):
         about_action = QtWidgets.QAction("About", self)
         about_action.triggered.connect(self.show_about_box)
         backup_action = QtWidgets.QAction("Backup db", self)
-        backup_action.triggered.connect(model.backup_db_file)
+        backup_action.triggered.connect(database.backup_db_file)
 
         # ..adding menu items
         self.menu_bar = self.menuBar()
