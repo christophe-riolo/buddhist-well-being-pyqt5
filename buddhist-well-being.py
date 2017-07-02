@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 import sys
 import sqlite3
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QAction, QSystemTrayIcon, QMenu
-from PyQt5 import QtCore
-from PyQt5 import Qt
-from bwb import model, window
+from PyQt5.QtWidgets import QApplication
+from PyQt5 import Qt, QtCore, uic
+from bwb import model
+from bwb.window.observances import ObsModel
 
 ######################
 #
@@ -18,19 +17,10 @@ BWB_APPLICATION_VERSION_SG = "private prototype"
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    main_window = window.WellBeingWindow()
+    ui = uic.loadUi("bwb.ui")
+    main_window = ui.window()
 
-    # System tray
-    tray_icon = QSystemTrayIcon(QIcon("icon.png"), app)
-    tray_menu = QMenu()
-    tray_restore_action = QAction("Restore")
-    tray_restore_action.triggered.connect(lambda x: main_window.show())
-    tray_menu.addAction(tray_restore_action)
-    tray_quit_action = QAction("Quit")
-    tray_quit_action.triggered.connect(lambda x: sys.exit())
-    tray_menu.addAction(tray_quit_action)
-    tray_icon.setContextMenu(tray_menu)
-    tray_icon.show()
+    main_window.observances.setModel(ObsModel())
 
     print("===== Starting Buddhist Well-Being =====")
     print("Python version: " + str(sys.version))
@@ -45,4 +35,5 @@ if __name__ == "__main__":
           + str(model.DbHelperM.get_schema_version(t_db_conn)))
     print("=====")
 
+    main_window.show()
     sys.exit(app.exec_())
