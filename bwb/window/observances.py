@@ -1,5 +1,5 @@
 import datetime
-from PyQt5.QtCore import QStringListModel
+from PyQt5.QtCore import QStringListModel, Qt
 from bwb import model
 
 
@@ -23,6 +23,8 @@ class ObsModel(QStringListModel):
 
         # Creating the initial data
         data = []
+        self.details = []
+
         for observance_item in model.ObservanceM.get_all():
             # List of the actions in the diary for the current observance,
             # for each day of the week.
@@ -57,5 +59,22 @@ class ObsModel(QStringListModel):
                 + weekly_goal_reached_sg
             )
 
+            self.details.append(observance_item.description)
+
         # We initialize the QStringListModel
         super().__init__(data)
+
+
+# Decorating the data() method to give tooltips.
+def tooltip_detail(data):
+    def decorated(self, index, role=Qt.DisplayRole):
+        if role == Qt.DisplayRole:
+            return data(self, index, role)
+        elif role == Qt.ToolTipRole:
+            return self.details[index.row()]
+        else:
+            pass
+    return decorated
+
+
+ObsModel.data = tooltip_detail(ObsModel.data)
