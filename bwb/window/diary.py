@@ -1,94 +1,50 @@
 from bwb import model
 from bwb.window import date
-import datetime
+from datetime import datetime
 import time
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5 import QtGui
+from PyQt5.QtCore import QStringListModel
 
 
-class DiaryListWidget(QtWidgets.QWidget):
-    """
-    Inspiration for this class:
-    http://stackoverflow.com/questions/20041385/python-pyqt-setting-scroll-area
-    """
-
-    add_text_to_diary_button_pressed_signal = QtCore.pyqtSignal(str, int)
-    context_menu_change_date_signal = QtCore.pyqtSignal()
-    context_menu_delete_signal = QtCore.pyqtSignal()
-
-    row_last_clicked = None
-
-    def __init__(self):
+class DiaryModel(QStringListModel):
+    def __init__(self, ui):
         super().__init__()
 
-        self.v_box = QtWidgets.QVBoxLayout(self)
-        self.list_widget = QtWidgets.QListWidget()
-        self.setLayout(self.v_box)
-        diary_label = QtWidgets.QLabel("<h3>Diary</h3>")
-        self.v_box.addWidget(diary_label)
-        # self.list_widget.setMinimumWidth(530)
-        # -strange but we have to set a min width to avoid seeing
-        # the horizontal scrollbar
-        self.v_box.addWidget(self.list_widget)
-
-        # Clicked doesn't work
-        self.list_widget.itemPressed.connect(self.on_item_pressed)
-        self.list_widget.setSelectionMode(
-                QtWidgets.QAbstractItemView.NoSelection)
-        self.list_widget.setVerticalScrollMode(
-                QtWidgets.QAbstractItemView.ScrollPerPixel)
-
-        # Adding new diary entry..
-        # ..label
-        diary_entry_label = QtWidgets.QLabel("<h4>New diary entry</h4>")
-        self.v_box.addWidget(diary_entry_label)
-        # ..
-        edit_diary_entry_hbox_l5 = QtWidgets.QHBoxLayout()
-        self.v_box.addLayout(edit_diary_entry_hbox_l5)
-        # ..text area
-        self.adding_text_to_diary_textedit_w6 = QtWidgets.QTextEdit()
-        edit_diary_entry_hbox_l5.addWidget(
-                self.adding_text_to_diary_textedit_w6)
-        self.adding_text_to_diary_textedit_w6.setFixedHeight(50)
-        self.adding_to_diary_date_datetimeedit_w6 = QtWidgets.QDateTimeEdit()
-        self.adding_to_diary_date_datetimeedit_w6.setDisplayFormat("dddd")
-        self.adding_to_diary_date_datetimeedit_w6.setCalendarPopup(True)
-        self.update_gui_date()
-        edit_diary_entry_hbox_l5.addWidget(
-                self.adding_to_diary_date_datetimeedit_w6)
-        self.adding_to_diary_now_button = QtWidgets.QPushButton("Now/Today")
-        self.adding_to_diary_now_button.pressed.connect(
-                self.on_today_button_pressed)
-        edit_diary_entry_hbox_l5.addWidget(self.adding_to_diary_now_button)
-        self.adding_diary_entry_bn_w5 = QtWidgets.QPushButton("Add new")
-        self.v_box.addWidget(self.adding_diary_entry_bn_w5)
-        self.adding_diary_entry_bn_w5.clicked.connect(
-                self.on_add_text_to_diary_button_clicked)
+        # We need the ui to access the actions.
+        self.ui = ui
+        self.update_gui()
 
     def on_item_pressed(self, i_listwidgetitem):
         row_index_it = i_listwidgetitem.listWidget().row(i_listwidgetitem)
         print("cell clicked -- row = " + str(row_index_it))
         self.row_last_clicked = i_listwidgetitem
 
+    # TODO should be in view b
+    # not model
     def contextMenuEvent(self, i_QContextMenuEvent):
         """
         Overridden
         Docs: http://doc.qt.io/qt-5/qwidget.html#contextMenuEvent
         """
-        self.right_click_menu = QtWidgets.QMenu()
-        rename_action = QtWidgets.QAction("Rename")
-        rename_action.triggered.connect(self.on_context_menu_rename)
-        self.right_click_menu.addAction(rename_action)
-        delete_action = QtWidgets.QAction("Delete")
-        delete_action.triggered.connect(self.on_context_menu_delete)
-        self.right_click_menu.addAction(delete_action)
-        change_date_action = QtWidgets.QAction("Change date")
-        change_date_action.triggered.connect(self.on_context_menu_change_date)
-        self.right_click_menu.addAction(change_date_action)
-        self.right_click_menu.exec_(QtGui.QCursor.pos())
+        print("Making context menu")
+        self.menu = QtWidgets.QMenu()
 
-    def on_context_menu_delete(self):
+        # Adding the actions to the menu.
+        self.menu.addAction(self.ui.actionRename)
+        self.menu.addAction(self.ui.actionDelete)
+        self.menu.addAction(self.ui.actionChange_date)
+
+        # Connecting the actions to the slots.
+        self.ui.actionRename.triggered.connect(self.rename)
+        self.ui.actionDelete.triggered.connect(self.delete)
+        self.ui.actionChangeDate.triggered.connect(self.change_date)
+
+        # Showing the menu.
+        self.menu.exec_(QtGui.QCursor.pos())
+
+    def delete(self):
         message_box_reply = QtWidgets.QMessageBox.question(
                 self,
                 "Remove diary entry?",
@@ -102,7 +58,7 @@ class DiaryListWidget(QtWidgets.QWidget):
         else:
             pass  # -do nothing
 
-    def on_context_menu_rename(self):
+    def rename(self):
         """
         Docs: http://doc.qt.io/qt-5/qinputdialog.html#getText
         """
@@ -123,7 +79,7 @@ class DiaryListWidget(QtWidgets.QWidget):
         else:
             pass  # -do nothing
 
-    def on_context_menu_change_date(self):
+    def change_date(self):
         last_clicked_row_dbkey_it = int(
                 self.row_last_clicked.data(QtCore.Qt.UserRole))
         diary_item = model.DiaryM.get(last_clicked_row_dbkey_it)
@@ -138,84 +94,58 @@ class DiaryListWidget(QtWidgets.QWidget):
             pass  # -do nothing
 
     def update_gui(self):
-        def is_same_day(i_first_date_it, i_second_date_it):
-            first_date = datetime.datetime.fromtimestamp(i_first_date_it)
-            second_date = datetime.datetime.fromtimestamp(i_second_date_it)
-            # - == operator works for "datetime" type
+        def is_same_day(first_date, second_date):
+            first_date = datetime.fromtimestamp(first_date.date_added_it)
+            second_date = datetime.fromtimestamp(second_date.date_added_it)
+
             return first_date.date() == second_date.date()
 
-        self.list_widget.clear()
         prev_diary_entry = None
 
+        # TODO: this could probably be made into a list comprehension
+        # using functions.
+        data = []
         for diary_entry in model.DiaryM.get_all():
-            # Setting up the underlying data
+            # Setting up the underlying data.
             observance_list = model.ObservanceM.get_all_for_diary_id(
                     diary_entry.id)
             diary_entry_obs_sg = ""
-            delimiter_sg = ", "
-            if observance_list is not None and observance_list != []:
-                for obs_entry in observance_list:
-                    diary_entry_obs_sg = diary_entry_obs_sg +\
-                        obs_entry.title +\
-                        delimiter_sg
+
+            # There *should* be observances, else this entry is corrupt.
+            if observance_list:
+                diary_entry_obs_sg = ", ".join(
+                    map(lambda x: x.title, observance_list))
+            else:
+                continue
+
+            # Getting the activity.
             karma_entry = model.KarmaM.get(diary_entry.ref_karma_id)
-            if (prev_diary_entry is None) or (
-                    not is_same_day(
-                        prev_diary_entry.date_added_it,
-                        diary_entry.date_added_it)):
-                t_date_as_weekday_sg = datetime.datetime.fromtimestamp(
-                                diary_entry.date_added_it).strftime("%A")
-                list_item = QtWidgets.QListWidgetItem(
-                        "     " + t_date_as_weekday_sg.title())
-                list_item.setFlags(list_item.flags()
-                                   & ~ QtCore.Qt.ItemIsSelectable
-                                   & QtCore.Qt.ItemIsUserCheckable)
-                self.list_widget.addItem(list_item)
             karma_title_sg = ""
             if karma_entry is not None:
                 karma_title_sg = karma_entry.title_sg.strip() + " "
+
+            # Putting all the text pieces together.
             label_text_sg = karma_title_sg\
-                + "[" + diary_entry_obs_sg.strip(delimiter_sg) + "] "\
+                + "[" + diary_entry_obs_sg + "] "\
                 + diary_entry.diary_text.strip()
 
-            # Setting up the display
-            list_item = QtWidgets.QListWidgetItem()
+            # Adding weekday if we have reached a new day.
+            # TODO: make it a list separator, not part of an entry.
+            if (prev_diary_entry is None
+                    or not is_same_day(prev_diary_entry, diary_entry)):
+                weekday = datetime.fromtimestamp(
+                          diary_entry.date_added_it)\
+                          .strftime("%A")
+                label_text_sg = ("     "
+                                 + weekday.title()
+                                 + "\n"
+                                 + label_text_sg)
 
-            # to read: .data
-            list_item.setData(QtCore.Qt.UserRole, diary_entry.id)
-            row_layout_l7 = QtWidgets.QHBoxLayout()
-            row_label_w8 = QtWidgets.QLabel(label_text_sg)
-            # row_label_w8.setSizePolicy(
-            #     QSizePolicy.Minimum, QSizePolicy.Maximum)
-            row_label_w8.setWordWrap(True)
-            row_layout_l7.addWidget(row_label_w8)
-            row_layout_l7.setContentsMargins(5, 5, 5, 5)
-            # -if this is not set we will get a default that is big
-            # and looks strange for a list
-            row_layout_l7.setSpacing(2)
-            row_w6 = QtWidgets.QWidget()
-            row_w6.setLayout(row_layout_l7)
-            row_w6.setSizePolicy(QtWidgets.QSizePolicy.Minimum,
-                                 QtWidgets.QSizePolicy.MinimumExpanding)
-            row_w6.adjustSize()
-            list_item.setSizeHint(row_w6.sizeHint())
-            self.list_widget.addItem(list_item)
-
-            # -http://doc.qt.io/qt-5/qlistwidget.html#setItemWidget
-            self.list_widget.setItemWidget(list_item, row_w6)
-
-            """
-            if i_cur_sel_it == diary_entry.observance_ref:
-                #label.setFrameStyle(QFrame.StyledPanel)
-                # -http://doc.qt.io/qt-4.8/qframe.html#setFrameStyle
-                # -http://nullege.com/codes/search/PyQt4.QtGui.QFrame.setFrameStyle
-
-                #list_item.setFlags(list_item.flags() & ~ Qt.ItemIsSelectable)
-                ######list_item.setBackground(QtCore.Qt.red) <-----------------
-            """
+            data.append(label_text_sg)
 
             prev_diary_entry = diary_entry  # -used for the weekday labels
-        self.list_widget.scrollToBottom()
+
+        self.setStringList(data)
 
     def update_gui_date(self, i_unix_time_it=time.time()):
         """

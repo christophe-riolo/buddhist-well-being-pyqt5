@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5 import Qt, QtCore, uic
 from bwb import model
 from bwb.window.observances import ObsModel
+from bwb.window.diary import DiaryModel
 
 ######################
 #
@@ -21,6 +22,7 @@ if __name__ == "__main__":
     main_window = ui.window()
 
     main_window.observances.setModel(ObsModel())
+    main_window.diary_list.setModel(DiaryModel(ui))
 
     print("===== Starting Buddhist Well-Being =====")
     print("Python version: " + str(sys.version))
